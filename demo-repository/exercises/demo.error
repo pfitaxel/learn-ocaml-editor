@@ -1,0 +1,28 @@
+File "_none_", line 1:
+Error: Internal error while testing your solution:
+
+File "test.ml", line 9, characters 7-89:
+This expression has type int list list -> Learnocaml_report.report
+       but an expression was expected of type
+         Report.report = Report.item list
+
+
+grader outcomes:
+val print_html : 'a -> 'b = <fun>
+val greetings : string = "Hello world!"
+module Code :
+  sig
+    val get : int -> 'a list -> 'a
+    val getd : int -> 'a list -> 'a * 'a
+    val med : int list -> float
+  end
+module Solution :
+  sig
+    val get : int -> 'a list -> 'a
+    val getd : int -> 'a list -> 'a * 'a
+    val med : int list -> float
+  end
+module Test_lib : Test_lib.S
+module Report = Learnocaml_report
+
+

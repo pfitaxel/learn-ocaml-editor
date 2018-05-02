@@ -662,11 +662,16 @@ let () =
       Manip.removeClass menu "hidden" ;
     Lwt.return ()
   end ;
+  (* let editor_tab _ _ ()  =Lwt.Return () in *)
+  
+ 
+  
   let tabs =
     [ "tryocaml", ("Try OCaml", tryocaml_tab) ;
       "lessons", ("Lessons", lessons_tab) ;
       "exercises", ("Exercises", exercises_tab) ;
-      "toplevel", ("Toplevel", toplevel_tab) ] in
+      "toplevel", ("Toplevel", toplevel_tab);
+   "editor",("Editor",exercises_tab) ] in
   let tabs =
     let container = find_component "learnocaml-tab-buttons-container" in
     let content_div = find_component "learnocaml-main-content" in

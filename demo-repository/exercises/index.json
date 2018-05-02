@@ -2,4 +2,8 @@
   "groups":
   { "demo":
     { "title": "Demo exercise pack",
+<<<<<<< HEAD
       "exercises": [ "demo","manu" ] } } }
+=======
+      "exercises": [ "demo","test" ] } } }
+>>>>>>> 482143b... bandeau nouvau exo

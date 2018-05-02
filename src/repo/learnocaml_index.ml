@@ -203,7 +203,11 @@ let tutorial_index_enc =
   check_version_1 @@
   obj1 (req "series" (map_enc series_enc))
 
+<<<<<<< HEAD
 let exercise_index_path = "exercises.json"
+=======
+let exercise_index_path= "exercises.json"
+>>>>>>> 482143b... bandeau nouvau exo
 
 let exercise_path id = "exercise_" ^ id ^ ".json"
 

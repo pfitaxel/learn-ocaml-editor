@@ -106,6 +106,14 @@ let exercises_tab _ _ () =
   Lwt.return list_div
 ;;
 
+ let editor_tab _ _ ()  =
+    show_loading ~id:"learnocaml-main-loading"
+      Tyxml_js.Html5.[ ul [ li [ pcdata "Loading editor" ] ] ];
+     Lwt_js.sleep 0.5 >>= fun () ->
+    let div = Tyxml_js.Html5.(div ~a: [ a_id "learnocaml-main-editor" ]) [] in
+    hide_loading ~id:"learnocaml-main-loading" ();
+    Lwt.return div;; 
+
 let lessons_tab select (arg, set_arg, delete_arg) () =
   let open Learnocaml_lesson in
   show_loading ~id:"learnocaml-main-loading"
@@ -662,7 +670,8 @@ let () =
       Manip.removeClass menu "hidden" ;
     Lwt.return ()
   end ;
-  (* let editor_tab _ _ ()  =Lwt.Return () in *)
+  
+ 
   
  
   
@@ -671,7 +680,7 @@ let () =
       "lessons", ("Lessons", lessons_tab) ;
       "exercises", ("Exercises", exercises_tab) ;
       "toplevel", ("Toplevel", toplevel_tab);
-   "editor",("Editor",exercises_tab) ] in
+      "editor", ("Editor",editor_tab) ] in
   let tabs =
     let container = find_component "learnocaml-tab-buttons-container" in
     let content_div = find_component "learnocaml-main-content" in

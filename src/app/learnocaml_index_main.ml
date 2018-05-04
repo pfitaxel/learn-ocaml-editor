@@ -62,11 +62,7 @@ let exercises_tab _ _ () =
                     | Some pct when  pct >= 100 -> [ "stats" ; "success" ]
                     | Some _ -> [ "stats" ; "partial" ])
                   pct_signal in
-<<<<<<< HEAD
               a ~a:[ a_href ("exercise.html#id=" ^ exercise_id ^ "&action=open") ;
-=======
-              a ~a:[ a_href ("exercise.html#id=" ^ exercise_id ^ "&action=open") ; 
->>>>>>> 482143b... bandeau nouvau exo
                      a_class [ "exercise" ] ] [
                 div ~a:[ a_class [ "descr" ] ] [
                   h1 [ pcdata exercise_title ] ;
@@ -107,23 +103,9 @@ let exercises_tab _ _ () =
       (format_exercise_list Learnocaml_local_storage.(retrieve all_exercise_states)) in
   Manip.appendChild content_div list_div ;
   hide_loading ~id:"learnocaml-main-loading" () ;
-<<<<<<< HEAD
-  Lwt.return list_div
-;;
-
- let editor_tab _ _ ()  =
-    show_loading ~id:"learnocaml-main-loading"
-      Tyxml_js.Html5.[ ul [ li [ pcdata "Loading editor" ] ] ];
-     Lwt_js.sleep 0.5 >>= fun () ->
-    let div = Tyxml_js.Html5.(div ~a: [ a_id "learnocaml-main-editor" ]) [] in
-    hide_loading ~id:"learnocaml-main-loading" ();
-    Lwt.return div;; 
-=======
  Lwt.return list_div
 ;;
 
-
-(*test*)
 let editor_tab _ _ () =
   show_loading ~id:"learnocaml-main-loading"
     Tyxml_js.Html5.[ ul [ li [ pcdata "Loading editor" ] ] ] ;
@@ -193,8 +175,8 @@ let editor_tab _ _ () =
     List.rev (format_contents 1 [a ~a:[ a_href ("new_exercise.html#&action=open") ; 
         a_class [ "exercise" ] ] [
       div ~a:[ a_class [ "descr" ] ] [
-        h1 [ pcdata "Create new exo" ];
-        p [pcdata "Create a new exercise with our great builder"];];
+        h1 [ pcdata "New exercise" ];
+        p [pcdata "Create a new exercise"];];
       ]] index) in
   let list_div =
     Tyxml_js.Html5.(div ~a: [ Tyxml_js.Html5.a_id "learnocaml-main-exercise-list" ])
@@ -203,12 +185,6 @@ let editor_tab _ _ () =
   hide_loading ~id:"learnocaml-main-loading" () ;
   Lwt.return list_div
 ;;
-
-
-
-
-
->>>>>>> 482143b... bandeau nouvau exo
 
 let lessons_tab select (arg, set_arg, delete_arg) () =
   let open Learnocaml_lesson in
@@ -766,25 +742,13 @@ let () =
       Manip.removeClass menu "hidden" ;
     Lwt.return ()
   end ;
-<<<<<<< HEAD
-  
- 
-  
- 
-  
-=======
->>>>>>> 482143b... bandeau nouvau exo
+
   let tabs =
     [ "tryocaml", ("Try OCaml", tryocaml_tab) ;
       "lessons", ("Lessons", lessons_tab) ;
       "exercises", ("Exercises", exercises_tab) ;
-<<<<<<< HEAD
-      "toplevel", ("Toplevel", toplevel_tab);
-      "editor", ("Editor",editor_tab) ] in
-=======
       "toplevel", ("Toplevel", toplevel_tab) ;
-      "editor", ("Editor",editor_tab)] in
->>>>>>> 482143b... bandeau nouvau exo
+      "editor", ("Editor", editor_tab)] in
   let tabs =
     let container = find_component "learnocaml-tab-buttons-container" in
     let content_div = find_component "learnocaml-main-content" in

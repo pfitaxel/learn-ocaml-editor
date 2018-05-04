@@ -27,39 +27,38 @@
     </div>
     <h1>New Exercise</h1>
     <div>
-      <label for="title">Identity :<br></label>
-      <input type="text" id="identity" name="id_exo">
-    </div>
-    <div>
-      <label for="title">Title :<br></label>
-      <input type="text" id="title" name="title_exo">
-      <br>
-      <br>
-      <br>
-      <label for="description">Description :<br></label>
-      <textarea id="description" name="description_exo" cols="100" rows="25"></textarea>
-    </div>
-    <br>
-    <br>
-    <p>Difficulty :</p>
-    <FORM>
-      <SELECT name="difficulté" size="1">
-	<OPTION>0        
-	<OPTION>1
-        <OPTION>2
-        <OPTION>3
-        <OPTION>4
-        <OPTION>5
-        <OPTION>6
-        <OPTION>7
-        <OPTION>8
-      </SELECT>
-    </FORM>
-    <br>
-    <br>
+    	<form method="post" action="">
+    		<p>
+    			<label for="identifier">Unique identifier:<br></label>
+    			<input type="text" id="identifier" name="identifier">
+    		</p>
+    		<p>
+    			<label for="title">Title (unique too):<br></label>
+    			<input type="text" id="title" name="title">
+    		</p>
+    		<p>
+    			<label for="description">Description of the exercise:<br></label>
+    			<textarea id="description" name="description" cols="80" rows="10"></textarea>
+    		</p>
+    		<p>
+				<label for="difficulty">Difficulty level:<br></label>
+				<select name="difficulty" id="difficulty" size="1">
+					<option value = zero>0</option>
+					<option value = zerohalf>0.5</option>
+					<option value = one>1</option>
+					<option value = onehalf>1.5</option>
+					<option value = two>2</option>
+					<option value = twohalf>2.5</option>
+					<option value = three>3</option>
+					<option value = threehalf>3.5</option>
+					<option value = four>4</option>
+				</select>
+			</p>
+		</form>
+	</div>
     <div id="learnocaml-tab-buttons-container" class="tabs">
       <!-- Keep in sync with learnocaml_main.ml -->
-      <button>Sauvegarde</button>
+      <button>Save</button>
     </div>
   </body>
 </html>

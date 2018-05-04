@@ -48,6 +48,7 @@ let fetch_json filename =
         filename (Js.to_string err ## message) in
     Lwt.fail (Cannot_fetch msg)
 
+
 let fetch_and_decode_json enc filename =
   fetch_json filename >>= fun json ->
   try Lwt.return (Json_repr_browser.Json_encoding.destruct enc json) with exn ->
@@ -56,6 +57,9 @@ let fetch_and_decode_json enc filename =
         filename
         (fun ppf -> Json_encoding.print_error ppf) exn in
     Lwt.fail (Cannot_fetch msg)
+
+let fetch_editor_index ()  =
+ fetch_and_decode_json Learnocaml_index.exercise_index_enc "editor.json" ;;
 
 let fetch_exercise_index () =
   fetch_and_decode_json

@@ -36,3 +36,5 @@ val gimme_sync_token : unit -> string Lwt.t
 val fetch_save_file : token: string -> Learnocaml_sync.save_file Lwt.t
 
 val upload_save_file : token: string -> Learnocaml_sync.save_file -> unit Lwt.t
+
+val fetch_editor_index : unit -> Learnocaml_index.group_contents Lwt.t

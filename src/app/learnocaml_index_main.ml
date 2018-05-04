@@ -114,13 +114,13 @@ let exercises_tab _ _ () =
     hide_loading ~id:"learnocaml-main-loading" ();
     Lwt.return div;; *)
 
-
 (*test*)
+    
 let editor_tab _ _ () =
   show_loading ~id:"learnocaml-main-loading"
     Tyxml_js.Html5.[ ul [ li [ pcdata "Loading editor" ] ] ] ;
   Lwt_js.sleep 0.5 >>= fun () ->
-  Server_caller.fetch_exercise_index () >>= fun index ->
+  Server_caller.fetch_editor_index () >>= fun index ->
   let content_div = find_component "learnocaml-main-content" in
   let format_exercise_list all_exercise_states =
     let rec format_contents lvl acc contents =
@@ -740,6 +740,14 @@ let () =
       ~theme:"white" ~icon: "sync" "Sync" @@ fun () ->
     sync ()
   end ;
+  begin button
+      ~container: sync_buttons
+      
+      ~theme:"white" ~icon: "save" "exos" @@ fun () ->
+  Lwt.return_unit
+  end ;
+
+  
   let menu_hidden = ref true in
   let menu = find_component "learnocaml-main-panel" in
   begin button

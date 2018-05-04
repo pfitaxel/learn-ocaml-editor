@@ -105,6 +105,8 @@ let group_enc =
           | _ -> None)
         (fun (title, map) -> (title, Groups map)) ]
 
+(* f @@ g @@ x = f (g (x)) *)
+
 let exercise_index_enc =
   check_version_1 @@
   union

@@ -1,0 +1,64 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1">
+    <title>Learn OCaml by OCamlPro - Exercise</title>
+    <link rel="stylesheet" href="learnocaml_common.css">
+    <link rel="stylesheet" href="learnocaml_exercise.css">
+    <link rel="stylesheet" href="learnocaml_report.css">
+    <link rel="stylesheet" href="learnocaml_tryocaml.css">
+    <script src="ace.js" type="text/javascript" charset="utf-8" defer></script>
+  </head>
+  <body>
+    <div style="display:none">
+      <!-- preload -->
+      <img src="tryocaml_loading_1.gif"><img src="tryocaml_loading_2.gif">
+      <img src="tryocaml_loading_3.gif"><img src="tryocaml_loading_4.gif">
+      <img src="tryocaml_loading_5.gif"><img src="tryocaml_loading_6.gif">
+      <img src="tryocaml_loading_7.gif"><img src="tryocaml_loading_8.gif">
+    </div>
+    <div id="learnocaml-main-toolbar">
+      <div class="logo">
+        <img src="logo_ocaml.svg">
+        <span>Learn OCaml</span>
+        <img src="logo_ocp.svg">
+      </div>
+    </div>
+    <h1>New Exercise</h1>
+    <div>
+    	<form method="post" action="">
+    		<p>
+    			<label for="identifier">Unique identifier:<br></label>
+    			<input type="text" id="identifier" name="identifier">
+    		</p>
+    		<p>
+    			<label for="title">Title (unique too):<br></label>
+    			<input type="text" id="title" name="title">
+    		</p>
+    		<p>
+    			<label for="description">Description of the exercise:<br></label>
+    			<textarea id="description" name="description" cols="80" rows="10"></textarea>
+    		</p>
+    		<p>
+				<label for="difficulty">Difficulty level:<br></label>
+				<select name="difficulty" id="difficulty" size="1">
+					<option value = zero>0</option>
+					<option value = zerohalf>0.5</option>
+					<option value = one>1</option>
+					<option value = onehalf>1.5</option>
+					<option value = two>2</option>
+					<option value = twohalf>2.5</option>
+					<option value = three>3</option>
+					<option value = threehalf>3.5</option>
+					<option value = four>4</option>
+				</select>
+			</p>
+		</form>
+	</div>
+    <div id="learnocaml-tab-buttons-container" class="tabs">
+      <!-- Keep in sync with learnocaml_main.ml -->
+      <button>Save</button>
+    </div>
+  </body>
+</html>

@@ -182,7 +182,7 @@ let editor_tab _ _ () =
                  group_contents)
             groups acc in
      let open Tyxml_js.Html5 in
-    List.rev (format_contents 1 [a ~a:[ a_href ("try.html#&action=open") ; 
+    List.rev (format_contents 1 [a ~a:[ a_href ("new_exercise.html#&action=open") ; 
         a_class [ "exercise" ] ] [
       div ~a:[ a_class [ "descr" ] ] [
         h1 [ pcdata "Create new exo" ];

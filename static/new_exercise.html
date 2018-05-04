@@ -30,11 +30,11 @@
     	<form method="post" action="">
     		<p>
     			<label for="identifier">Unique identifier:<br></label>
-    			<input type="text" id="identifier" name="identifier">
+    			<input type="text" id="identifier" name="identifier" required autofocus />
     		</p>
     		<p>
     			<label for="title">Title (unique too):<br></label>
-    			<input type="text" id="title" name="title">
+    			<input type="text" id="title" name="title" required />
     		</p>
     		<p>
     			<label for="description">Description of the exercise:<br></label>
@@ -42,7 +42,7 @@
     		</p>
     		<p>
 				<label for="difficulty">Difficulty level:<br></label>
-				<select name="difficulty" id="difficulty" size="1">
+				<select name="difficulty" id="difficulty" size="1" required />
 					<option value = zero>0</option>
 					<option value = zerohalf>0.5</option>
 					<option value = one>1</option>
@@ -56,9 +56,8 @@
 			</p>
 		</form>
 	</div>
-    <div id="learnocaml-tab-buttons-container" class="tabs">
-      <!-- Keep in sync with learnocaml_main.ml -->
-      <button>Save</button>
+	<input type="reset" id="cancel" name="cancel" value="Cancel" class="tabs" />
+    <input type="submit" id="save" name="save" value="Save" class="tabs" />
     </div>
   </body>
 </html>

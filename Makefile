@@ -28,6 +28,7 @@ build:
 	@cp _obuild/*/learnocaml-exercise.js ${DEST_DIR}/
 	@cp _obuild/*/learnocaml-toplevel-worker.js ${DEST_DIR}/
 	@cp _obuild/*/learnocaml-grader-worker.js ${DEST_DIR}/
+	@cp _obuild/*/new_exercise.js ${DEST_DIR}/
 	@mkdir -p $(DEST_DIR)
 	_obuild/*/learnocaml-process-repository.byte -j ${PROCESSING_JOBS} \
           -exercises-dir ${EXERCISES_DIR} \

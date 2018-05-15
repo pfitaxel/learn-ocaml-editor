@@ -149,7 +149,7 @@ let editor_tab _ _ () =
                     | Some pct when  pct >= 100 -> [ "stats" ; "success" ]
                     | Some _ -> [ "stats" ; "partial" ])
                   pct_signal in
-              a ~a:[ a_href ("try.html#&action=open") ; 
+              a ~a:[ a_href ("editor.html#id=" ^ exercise_id ^ "&action=open") ; 
                      a_class [ "exercise" ] ] [
                   div ~a:[ a_class [ "descr" ] ] [
                   h1 [ pcdata exercise_title ] ;
@@ -346,6 +346,10 @@ let lessons_tab select (arg, set_arg, delete_arg) () =
   hide_loading ~id:"learnocaml-main-loading" () ;
   Lwt.return lesson_div
 ;;
+
+
+
+
 
 let tryocaml_tab select (arg, set_arg, delete_arg) () =
   let open Learnocaml_tutorial in

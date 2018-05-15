@@ -1,3 +1,4 @@
+(*
 open Js_utils
 open Lwt
 open Learnocaml_index
@@ -34,7 +35,7 @@ let f =function
 ;;
 
 
-
+*)
 
 
 
@@ -75,7 +76,7 @@ let saveb=getElementById "save";;
 (*let title =getElementById "title" in
 let identity=getElementById "identity" in
 let description=getElementById "description" in*)
-let para =getElementById ("para") in
+let para =getElementById "para" in
 (*let dificulty=getElementById_coerce "dificulty" CoerceTo.input in
 match dificulty with
 | None ->
@@ -83,5 +84,5 @@ match dificulty with
 |Some input -> 
  saveb##.onclick:=handler (fun _ ->  setInnerHtml para (Js.to_string ( input##.value) )  ;Js._true);; 
 *)
-saveb##onclick<-handler ( fun _ ->  setInnerHtml para (f (!a)) ) ;Js._true);; 
+saveb##onclick<-handler (fun _ ->  setInnerHtml para "hello"  ;Js._true);; 
 

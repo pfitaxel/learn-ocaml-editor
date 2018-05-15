@@ -19,7 +19,7 @@ TUTORIALS_DIR ?= ${REPO_DIR}/tutorials
 
 build:
 	@ocp-build init
-	@ocp-build --scan
+	@ocp-build
 	@mkdir -p ${DEST_DIR}
 	@${MAKE} -C  static
 	cp static/* ${DEST_DIR}
@@ -28,7 +28,7 @@ build:
 	@cp _obuild/*/learnocaml-exercise.js ${DEST_DIR}/
 	@cp _obuild/*/learnocaml-toplevel-worker.js ${DEST_DIR}/
 	@cp _obuild/*/learnocaml-grader-worker.js ${DEST_DIR}/
-	@cp _obuild/*/learnocaml-exercise.js ${DEST_DIR}/
+	
 	@mkdir -p $(DEST_DIR)
 	_obuild/*/learnocaml-process-repository.byte -j ${PROCESSING_JOBS} \
           -exercises-dir ${EXERCISES_DIR} \

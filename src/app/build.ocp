@@ -80,32 +80,3 @@ begin program "learnocaml-exercise"
   ]
 end
 
-
-begin program "new_exercise"
-  requires = [
-    "ezjsonm"
-    "grading-jsoo"
-    "ace"
-    "learnocaml-repository"
-    "learnocaml-app-common"
-    "learnocaml-toplevel"
-    "jsutils"
-    "js"
-  ]
-  files = [
-    "new_exercise.ml"  ( pp = camlp4_js ) 
-  ]
-  build_rules = [
-    "%{learnocaml-exercise_FULL_DST_DIR}%/new_exercise.js" (
-      build_target = true
-      sources = %byte_exe( p = "new_exercise" )
-      commands = [ {
-        "js_of_ocaml"
-          "+weak.js"
-           "+cstruct/cstruct.js"
-           "%{ace_FULL_SRC_DIR}%/ace_bindings.js"
-           %byte_exe( p = "new_exercise" )
-      } ]
-    )
-  ]
-end

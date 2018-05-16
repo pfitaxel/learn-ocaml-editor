@@ -55,7 +55,7 @@ open Js_of_ocaml;;
 open Dom_html;;
 
 let setInnerHtml elt s =    
-  elt##innerHTML<-Js.string s ;;
+  elt##.innerHTML:=Js.string s ;;
 
 (*
 let checkbox txt checked action =
@@ -77,12 +77,12 @@ let saveb=getElementById "save";;
 let identity=getElementById "identity" in
 let description=getElementById "description" in*)
 let para =getElementById "para" in
-(*let dificulty=getElementById_coerce "dificulty" CoerceTo.input in
+let dificulty=getElementById_coerce "description" CoerceTo.input in
 match dificulty with
 | None ->
     failwith "fail"
 |Some input -> 
  saveb##.onclick:=handler (fun _ ->  setInnerHtml para (Js.to_string ( input##.value) )  ;Js._true);; 
-*)
-saveb##onclick<-handler (fun _ ->  setInnerHtml para "hello"  ;Js._true);; 
+
+ 
 

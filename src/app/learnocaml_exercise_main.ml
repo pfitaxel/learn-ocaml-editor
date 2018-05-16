@@ -244,10 +244,16 @@ let () =
   let editor = Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div editor_test) in
   let ace = Ocaml_mode.get_editor editor in
   Ace.set_contents ace
-    (match solution with
-     | Some solution -> solution
-     | None -> Learnocaml_exercise.(get test) exo) ;
+    (Learnocaml_exercise.(get test) exo) ;
   Ace.set_font_size ace 18;
+
+  (* ---- template pane --------------------------------------------------- *)
+  let editor_template = find_component "learnocaml-exo-tab-template" in
+  let editor = Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div editor_template) in
+  let ace = Ocaml_mode.get_editor editor in
+  Ace.set_contents ace (Learnocaml_exercise.(get template) exo) ;
+  Ace.set_font_size ace 18;
+
 
   (* ---- editor pane --------------------------------------------------- *)
   let editor_pane = find_component "learnocaml-exo-editor-pane" in
@@ -325,9 +331,13 @@ let () =
     Lwt.return ()
   end;                          
   begin toolbar_button
-      ~icon: "list" "Exercises" @@ fun () ->
-    Dom_html.window##location##assign
-      (Js.string "index.html#activity=exercises") ;
+      ~icon: "list" "Exercises" @@ fun () ->(
+  let b =
+    Dom_html.window##confirm (Js.string "Save ?") in
+    if (Js.to_bool b) then
+      Dom_html.window##location##assign
+      (Js.string "index.html#activity=exercises") 
+      else () );
     Lwt.return ()
   end ;                          (*    marque fin de la barre au dessus de celle a creer   ééé   *)
   let messages = Tyxml_js.Html5.ul [] in

@@ -11,6 +11,12 @@
     <script src="ace.js" type="text/javascript" charset="utf-8" defer></script>
   </head>
   <body>
+    <style type="text/css"> 
+      a:link 
+      { 
+      text-decoration:none; 
+      } 
+    </style>
     <div style="display:none">
       <!-- preload -->
       <img src="tryocaml_loading_1.gif"><img src="tryocaml_loading_2.gif">
@@ -57,10 +63,12 @@
       </form>
     </div>
     <div>      
-      <input type="reset" id="cancel" name="cancel" value="Cancel" class="tabs" />
-        <a href="editor.html#id=manu&action=open">
-          <input type="submit" id="save" name="save" value="Save" class="tabs" />
-        </a>
+      <a href="index.html#activity=editor">
+        <input type="reset" id="cancel" name="cancel" value="Cancel" class="tabs" />
+      </a>
+      <a href="editor.html#id=manu&action=open">
+        <input type="submit" id="save" name="save" value="Save" class="tabs" />
+      </a>
     </div>
   </body>
 </html>

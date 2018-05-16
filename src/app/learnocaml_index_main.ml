@@ -139,7 +139,7 @@ let editor_tab _ _ () =
                     | Some pct when  pct >= 100 -> [ "stats" ; "success" ]
                     | Some _ -> [ "stats" ; "partial" ])
                   pct_signal in
-              a ~a:[ a_href ("try.html#&action=open") ; 
+              a ~a:[ a_href ("editor.html#id=" ^ exercise_id ^ "&action=open") ; 
                      a_class [ "exercise" ] ] [
                   div ~a:[ a_class [ "descr" ] ] [
                   h1 [ pcdata exercise_title ] ;
@@ -172,7 +172,7 @@ let editor_tab _ _ () =
                  group_contents)
             groups acc in
      let open Tyxml_js.Html5 in
-    List.rev (format_contents 1 [a ~a:[ a_href ("new_exercise.html#&action=open") ; 
+    List.rev (format_contents 1 [a ~a:[ a_href ("new_exercise.html#id=edit&action=open") ; 
         a_class [ "exercise" ] ] [
       div ~a:[ a_class [ "descr" ] ] [
         h1 [ pcdata "New exercise" ];

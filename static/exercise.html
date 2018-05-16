@@ -48,15 +48,18 @@
       -->
     </div>
     <div id="learnocaml-exo-tab-buttons">
-      <button id="learnocaml-exo-button-editor">Editor</button>
+      <button id="learnocaml-exo-button-editor">Solution</button>
       <!-- To select a tab, make it the only one whose
            button and tab have the class .front-tab.
            Don't set the editor to .front-tab initially. -->
+      <button id="learnocaml-exo-button-template">Template</button>
       <button id="learnocaml-exo-button-toplevel" class="front-tab">Toplevel</button>
       <!-- When graded, apply one of .partial, .success or .failure.
            The score must be put in a span.score. -->
+      <button id="learnocaml-exo-button-test.ml">Test.ml</button>
+      <button id="learnocaml-exo-button-text">Question</button>
       <button id="learnocaml-exo-button-report">Report</button>
-      <button id="learnocaml-exo-button-text">Exercise</button>
+      
       <!-- Any other button can be added. -->
     </div>
     <div id="learnocaml-exo-tabs">
@@ -125,6 +128,10 @@
                      width: 100%; text-align: center;">
           Click the Grade button to get your report
         </span>
+      </div>
+      <div id="learnocaml-exo-tab-template">
+      </div>
+      <div id="learnocaml-exo-tab-test.ml">
       </div>
       <!-- Any tab can be added. -->
     </div>

@@ -20,7 +20,7 @@ open Lwt.Infix
 open Learnocaml_common
 
 let init_tabs, select_tab =
-  let names = [ "text" ; "toplevel" ; "report" ; "editor" ] in
+  let names = [ "text" ; "toplevel" ; "report" ; "editor" ;"template";"test.ml"] in
   let current = ref "text" in
   let select_tab name =
     set_arg "tab" name ;
@@ -236,6 +236,15 @@ let () =
        d##open_ ();
        d##write (Js.string html);
        d##close ()) ;
+  (* ---- test.ml pane ------------------------------------------------ *)
+  let test_pane = find_component "learnocaml-exo-tab-test.ml" in
+  let editor = Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div test_pane) in
+  let ace = Ocaml_mode.get_editor editor in
+  Ace.set_contents ace
+    (match solution with
+     | Some solution -> solution
+     | None -> Learnocaml_exercise.(get test) exo) ;
+  Ace.set_font_size ace 18;
   (* ---- editor pane --------------------------------------------------- *)
   let editor_pane = find_component "learnocaml-exo-editor-pane" in
   let editor = Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div editor_pane) in
@@ -243,10 +252,10 @@ let () =
   Ace.set_contents ace
     (match solution with
      | Some solution -> solution
-     | None -> Learnocaml_exercise.(get template) exo) ;
+     | None -> Learnocaml_exercise.(get solution) exo) ;
   Ace.set_font_size ace 18;
   begin editor_button
-      ~icon: "cleanup" "Reset" @@ fun () ->
+      ~icon: "sync" "Gen.  template" @@ fun () -> (* pas de meilleur dessin de mon point de vue *)
     Ace.set_contents ace (Learnocaml_exercise.(get template) exo) ;
     Lwt.return ()
   end ;
@@ -306,11 +315,17 @@ let () =
   let exo_toolbar = find_component "learnocaml-exo-toolbar" in
   let toolbar_button = button ~container: exo_toolbar ~theme: "light" in
   begin toolbar_button
+      ~icon: "left" "Metadata" @@ fun () ->
+    Dom_html.window##location##assign
+      (Js.string "new_exercise.html");
+    Lwt.return ()
+  end;                          
+  begin toolbar_button
       ~icon: "list" "Exercises" @@ fun () ->
     Dom_html.window##location##assign
       (Js.string "index.html#activity=exercises") ;
     Lwt.return ()
-  end ;
+  end ;                          (*    marque fin de la barre au dessus de celle a creer   ééé   *)
   let messages = Tyxml_js.Html5.ul [] in
   let callback text =
     Manip.appendChild messages Tyxml_js.Html5.(li [ pcdata text ]) in

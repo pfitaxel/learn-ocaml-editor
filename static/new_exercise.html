@@ -11,6 +11,12 @@
     <script src="ace.js" type="text/javascript" charset="utf-8" defer></script>
   </head>
   <body>
+    <style type="text/css"> 
+      a:link 
+      { 
+      text-decoration:none; 
+      } 
+    </style>
     <div style="display:none">
       <!-- preload -->
       <img src="tryocaml_loading_1.gif"><img src="tryocaml_loading_2.gif">
@@ -28,37 +34,41 @@
     <h1>New Exercise</h1>
     <div>
       <form method="post" action="">
-	<p>
-    	  <label for="identifier">Unique identifier:<br></label>
-	  <input type="text" id="identifier" name="identifier" required autofocus />
-    	</p>
-	<p>
-	  <label for="title">Title (unique too):<br></label>
-	  <input type="text" id="title" name="title" required />
-	</p>
-	<p>
-	  <label for="description">Description of the exercise:<br></label>
-	  <textarea id="description" name="description" cols="80" rows="10"></textarea>
-	</p>
-	<p>
-	  <label for="difficulty">Difficulty level:<br></label>
-	  <select name="difficulty" id="difficulty" size="1" required >
-	    <option value = zero>0</option>
-	    <option value = zerohalf>0.5</option>
-	    <option value = one>1</option>
-	    <option value = onehalf>1.5</option>
-	    <option value = two>2</option>
-	    <option value = twohalf>2.5</option>
-	    <option value = three>3</option>
-	    <option value = threehalf>3.5</option>
-	    <option value = four>4</option>
-	  </select>
-	</p>
+      <p>
+        <label for="identifier">Unique identifier:<br></label>
+        <input type="text" id="identifier" name="identifier" required autofocus />
+      </p>
+      <p>
+        <label for="title">Title (unique too):<br></label>
+        <input type="text" id="title" name="title" required />
+      </p>
+      <p>
+        <label for="description">Description of the exercise:<br></label>
+        <textarea id="description" name="description" cols="80" rows="10"></textarea>
+      </p>
+      <p>
+        <label for="difficulty">Difficulty level:<br></label>
+          <select name="difficulty" id="difficulty" size="1" required />
+            <option value = zero>0</option>
+            <option value = zerohalf>0.5</option>
+            <option value = one>1</option>
+            <option value = onehalf>1.5</option>
+            <option value = two>2</option>
+            <option value = twohalf>2.5</option>
+            <option value = three>3</option>
+            <option value = threehalf>3.5</option>
+            <option value = four>4</option>
+          </select>
+        </p>
       </form>
     </div>
-    <div>
-      <input type="reset" id="cancel" name="cancel" value="Cancel" class="tabs" />
-      <input type="submit" id="save" name="save" value="Save" class="tabs" />
+    <div>      
+      <a href="index.html#activity=editor">
+        <input type="reset" id="cancel" name="cancel" value="Cancel" class="tabs" />
+      </a>
+      <a href="editor.html#id=manu&action=open">
+        <input type="submit" id="save" name="save" value="Save" class="tabs" />
+      </a>
     </div>
   </body>
 </html>

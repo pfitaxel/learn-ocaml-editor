@@ -27,40 +27,39 @@
     </div>
     <h1>New Exercise</h1>
     <div>
-      <label for="title">Identity :<br></label>
-      <input type="text" id="identity" name="id_exo">
+
+    	<form method="post" action="">
+    		<p>
+    			<label for="identifier">Unique identifier:<br></label>
+    			<input type="text" id="identifier" name="identifier" required autofocus />
+    		</p>
+    		<p>
+    			<label for="title">Title (unique too):<br></label>
+    			<input type="text" id="title" name="title" required />
+    		</p>
+    		<p>
+    			<label for="description">Description of the exercise:<br></label>
+    			<textarea id="description" name="description" cols="80" rows="10"></textarea>
+    		</p>
+    		<p id="para">
+				<label for="difficulty">Difficulty level:<br></label>
+				<select name="difficulty" id="difficulty" size="1" required />
+					<option value = zero>0</option>
+					<option value = zerohalf>0.5</option>
+					<option value = one>1</option>
+					<option value = onehalf>1.5</option>
+					<option value = two>2</option>
+					<option value = twohalf>2.5</option>
+					<option value = three>3</option>
+					<option value = threehalf>3.5</option>
+					<option value = four>4</option>
+				</select>
+			</p>
+		</form>
+	</div>
+	<input type="reset" id="cancel" name="cancel" value="Cancel" class="tabs" />
+    <input type="submit" id="save" name="save" value="Save" class="tabs" />
     </div>
-    <div>
-      <label for="title">Title :<br></label>
-      <input type="text" id="title" name="title_exo">
-      <br>
-      <br>
-      <br>
-      <label for="description">Description :<br></label>
-      <textarea id="description" name="description_exo" cols="100" rows="25"></textarea>
-    </div>
-    <br>
-    <br>
-    <p id="para">Difficulty :</p>
-    <FORM>
-      <SELECT id="dificulty"  name="difficulté" size="1">
-	<OPTION value="0">0</option>        
-	<OPTION value="1">1</option>
-	<OPTION value="2">2</option>
-	<OPTION value="3">3</option>
-	<OPTION value="4">4</option>
-	<OPTION value="5">5</option>
-	<OPTION value="6">6</option>
-	<OPTION value="7">7</option>
-	<OPTION value="8">8</option>
-      </SELECT>
-    </FORM>
-    <br>
-    <br>
-    <div id="learnocaml-tab-buttons-container" class="tabs">
-      <!-- Keep in sync with learnocaml_main.ml -->
-      <button id="save">Sauvegarde</button>
-    </div>
-    <script src="new_exercise.js" > </script>
+
   </body>
 </html>

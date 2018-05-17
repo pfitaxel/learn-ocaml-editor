@@ -336,7 +336,7 @@ let () =
     Dom_html.window##confirm (Js.string "Save ?") in
     if (Js.to_bool b) then
       Dom_html.window##location##assign
-      (Js.string "index.html#activity=exercises") 
+      (Js.string "index.html#activity=editor") 
       else () );
     Lwt.return ()
   end ;                          (*    marque fin de la barre au dessus de celle a creer   ééé   *)

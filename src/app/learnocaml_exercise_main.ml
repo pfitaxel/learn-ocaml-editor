@@ -266,7 +266,7 @@ let () =
   Ace.set_font_size ace 18;
   begin editor_button
       ~icon: "sync" "Gen.  template" @@ fun () -> (* pas de meilleur dessin de mon point de vue *)
-    Ace.set_contents ace (Learnocaml_exercise.(get template) exo) ;
+    select_tab "template" ;
     Lwt.return ()
   end ;
   begin editor_button
@@ -336,7 +336,7 @@ let () =
     Dom_html.window##confirm (Js.string "Save ?") in
     if (Js.to_bool b) then
       Dom_html.window##location##assign
-      (Js.string "index.html#activity=exercises") 
+      (Js.string "index.html#activity=editor") 
       else () );
     Lwt.return ()
   end ;                          (*    marque fin de la barre au dessus de celle a creer   ééé   *)

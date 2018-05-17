@@ -55,7 +55,7 @@ open Js_of_ocaml;;
 open Dom_html;;
 
 let setInnerHtml elt s =    
-  elt##.innerHTML:=Js.string s ;;
+  elt##innerHTML<-Js.string s ;;
 
 (*
 let checkbox txt checked action =
@@ -82,7 +82,7 @@ match dificulty with
 | None ->
     failwith "fail"
 |Some input -> 
- saveb##.onclick:=handler (fun _ ->  setInnerHtml para (Js.to_string ( input##.value) )  ;Js._true);; 
+ saveb##onclick<-handler (fun _ ->  setInnerHtml para (Js.to_string ( input##value) )  ;Js._true);; 
 
  
 

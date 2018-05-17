@@ -326,31 +326,19 @@ let () =
   let toolbar_button = button ~container: exo_toolbar ~theme: "light" in
   begin toolbar_button
       ~icon: "left" "Metadata" @@ fun () ->
-<<<<<<< HEAD
     Dom_html.window##location##assign
       (Js.string "new_exercise.html");
     Lwt.return ()
   end;                          
   begin toolbar_button
       ~icon: "list" "Exercises" @@ fun () ->
-=======
->>>>>>> 5c1b65a2c5dac76e90bee734513bc5208139825e
-    Dom_html.window##location##assign
-      (Js.string "new_exercise.html");
-    Lwt.return ()
-<<<<<<< HEAD
-=======
-  end;                          
-  begin toolbar_button
-      ~icon: "list" "Exercises" @@ fun () ->(
   let b =
     Dom_html.window##confirm (Js.string "Save ?") in
     if (Js.to_bool b) then
       Dom_html.window##location##assign
       (Js.string "index.html#activity=exercises") 
-      else () );
+      else ();
     Lwt.return ()
->>>>>>> 5c1b65a2c5dac76e90bee734513bc5208139825e
   end ;                          (*    marque fin de la barre au dessus de celle a creer   ééé   *)
   let messages = Tyxml_js.Html5.ul [] in
   let callback text =

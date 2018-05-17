@@ -11,7 +11,11 @@
     <script src="ace.js" type="text/javascript" charset="utf-8" defer></script>
     <!-- var editor = ace.edit("learnocaml-exo-editor-pane"); -->
     <!-- editor.setOptions({ fontFamily: 'Inconsolata', fontSize: "18px" }); -->
-    <script language="JavaScript" src="learnocaml-exercise.js" defer></script>
+
+    <script language="JavaScript" src="editor.js" defer></script>
+
+ 
+
   </head>
   <body>
     <!-- Shoule be kept untouched. -->
@@ -116,10 +120,6 @@
         <!-- <h1>title</h1> -->
         <!-- <iframe src="standalone-descr.html"></iframe> -->
       </div>
-      <div id="learnocaml-exo-tab-template">
-      </div>
-      <div id="learnocaml-exo-tab-test.ml">
-      </div>
       <div id="learnocaml-exo-tab-report">
         <!-- Using an iframe is the easiest way to isolate the CSSs. -->
         <!-- <iframe src="mockup_report.html"></iframe> -->
@@ -130,9 +130,15 @@
         <span style="position: absolute; top: 50%; margin: -12px 0 0 0;
                      line-height: 24px; font-size: 24px; text-shadow: 0 0 5px #888;
                      width: 100%; text-align: center;">
-          Click the Grade button to get your report
+          Click the Grade! button to test your solution
         </span>
       </div>
+      <div id="learnocaml-exo-tab-template">
+      </div>
+
+      <div id="learnocaml-exo-tab-test.ml">
+      </div>   
+
       <!-- Any tab can be added. -->
     </div>
   </body>

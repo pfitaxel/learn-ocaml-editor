@@ -250,7 +250,6 @@ let () =
   Ace.set_contents ace (Learnocaml_exercise.(get template) exo) ;
   Ace.set_font_size ace 18;
 
-
   (* ---- editor pane --------------------------------------------------- *)
   let editor_pane = find_component "learnocaml-exo-editor-pane" in
   let editor = Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div editor_pane) in
@@ -261,8 +260,9 @@ let () =
      | None -> Learnocaml_exercise.(get solution) exo) ;
   Ace.set_font_size ace 18;
   begin editor_button
-      ~icon: "sync" "Gen.  template" @@ fun () -> (* pas de meilleur dessin de mon point de vue *)
-    Ace.set_contents ace (Learnocaml_exercise.(get template) exo) ;
+      ~icon: "sync" "Gen.  template" @@ fun () ->
+    (*Ace.set_contents ace (Learnocaml_exercise.(get template) exo) ;*)
+    select_tab "template";
     Lwt.return ()
   end ;
   begin editor_button
@@ -332,10 +332,10 @@ let () =
     Dom_html.window##confirm (Js.string "Save ?") in
     if (Js.to_bool b) then
       Dom_html.window##location##assign
-      (Js.string "index.html#activity=exercises") 
+      (Js.string "index.html#activity=editor") 
       else () );
     Lwt.return ()
-  end ;                          (*    marque fin de la barre au dessus de celle a creer   ééé   *)
+  end ;
   let messages = Tyxml_js.Html5.ul [] in
   let callback text =
     Manip.appendChild messages Tyxml_js.Html5.(li [ pcdata text ]) in

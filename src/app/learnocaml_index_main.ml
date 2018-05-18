@@ -748,10 +748,12 @@ let init_sync_token button_state =
        Lwt.return ())
     (fun _ -> Lwt.return ())
 
-let set_state_from_save_file
-    { Learnocaml_sync.all_exercise_states ;
+let set_state_from_save_file { Learnocaml_sync.all_editor_states;
+      all_exercise_states ;
       all_toplevel_histories ;
       all_exercise_toplevel_histories } =
+  Learnocaml_local_storage.(store all_editor_states)
+    all_editor_states ;
   Learnocaml_local_storage.(store all_exercise_states)
     all_exercise_states ;
   Learnocaml_local_storage.(store all_toplevel_histories)
@@ -760,7 +762,10 @@ let set_state_from_save_file
     all_exercise_toplevel_histories
 
 let get_state_as_save_file () =
-  { Learnocaml_sync.all_exercise_states =
+  { Learnocaml_sync.all_editor_states =
+      Learnocaml_local_storage.(retrieve all_editor_states) ;
+
+    Learnocaml_sync.all_exercise_states =
       Learnocaml_local_storage.(retrieve all_exercise_states) ;
     all_toplevel_histories =
       Learnocaml_local_storage.(retrieve all_toplevel_histories) ;

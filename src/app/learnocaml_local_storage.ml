@@ -220,6 +220,15 @@ let exercise_list,
     [ "exercise-state" ]
     Learnocaml_exercise_state.exercise_state_enc
 
+let editor_list,
+    editor_state,
+    all_editor_states=
+  listed
+    [ "editor-state-list" ]
+    [ "editor-state" ]
+   Learnocaml_exercise_state.editor_state_enc
+
+
 let toplevel_history_list,
     toplevel_history,
     all_toplevel_histories =

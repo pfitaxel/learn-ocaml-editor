@@ -151,7 +151,7 @@ let () =
   init_tabs () ;
   toplevel_launch >>= fun top ->
   exercise_fetch >>= fun exo ->
-  let solution = match Learnocaml_local_storage.(retrieve (exercise_state id)) with
+  let solution = match Learnocaml_local_storage.(retrieve (editor_state id)) with
     | { Learnocaml_exercise_state.report = Some report ; solution } ->
         let _ : int = display_report exo report in
         Some solution
@@ -272,12 +272,18 @@ let () =
   begin editor_button
       ~icon: "save" "Save" @@ fun () ->
     let solution = Ace.get_contents ace in
-    let report, grade =
-      match Learnocaml_local_storage.(retrieve (exercise_state id)) with
-      | { Learnocaml_exercise_state.report ; grade } -> report, grade
-      | exception Not_found -> None, None in
-    Learnocaml_local_storage.(store (exercise_state id))
-      { Learnocaml_exercise_state.report ; grade ; solution ;
+    let titre=" " in
+    let question=" " in
+    let template=" " in
+    let diff=0. in
+    let test=" " in
+    let description=" " in
+    let report  =
+      match Learnocaml_local_storage.(retrieve (editor_state id)) with
+      | { Learnocaml_exercise_state.report } -> report
+      | exception Not_found -> None in
+    Learnocaml_local_storage.(store (editor_state id))
+      { Learnocaml_exercise_state.report ; id ; solution ;titre;question;template;diff;test;description;
         mtime = gettimeofday () } ;
     Lwt.return ()
   end ;

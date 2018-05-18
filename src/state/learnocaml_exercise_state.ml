@@ -48,8 +48,8 @@ let exercise_state_enc =
 type editor_state =
   { id : string ;
     titre : string;
-    description : string ;
-    diff : float ;
+    description : string option;
+    diff : float option ;
     solution : string ;
     question : string ;
     template : string ;
@@ -69,8 +69,8 @@ let editor_state_enc =
     (obj10
        (req "id" string)
        (req "titre" string)
-       (req "description" string)
-       (req "diff" float )
+       (opt "description" string)
+       (opt "diff" float )
        (req "solution" string)
        (req "question" string)
        (req "template" string)

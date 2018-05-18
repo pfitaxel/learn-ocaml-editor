@@ -26,8 +26,8 @@ val exercise_state_enc : exercise_state Json_encoding.encoding
 type editor_state =
   { id : string ;
     titre : string;
-    description : string ;
-    diff : float ;
+    description : string option ;
+    diff : float option;
     solution : string ;
     question : string ;
     template : string ;

@@ -20,7 +20,7 @@ open Lwt.Infix
 open Learnocaml_common
 
 let init_tabs, select_tab =
-  let names = [ "text" ; "toplevel" ; "report" ; "editor" ;"template";"test.ml"] in
+  let names = [ "text" ; "toplevel" ; "report" ; "editor" ; "template" ; "test.ml" ] in
   let current = ref "text" in
   let select_tab name =
     set_arg "tab" name ;

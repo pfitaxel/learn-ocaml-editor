@@ -1,4 +1,3 @@
-
 begin program "new_exercise"
   requires = [
     "ezjsonm"
@@ -13,7 +12,7 @@ begin program "new_exercise"
     "js_of_ocaml.ppx"
   ]
   files = [
-    "new_exercise.ml" (pp = camlp4_js )
+    "new_exercise.ml" ( pp = camlp4_optcomp_js )
   ]
     build_rules = [
     "%{new_exercise_FULL_DST_DIR}%/new_exercise.js" (
@@ -38,6 +37,7 @@ begin program "editor"
     "learnocaml-repository"
     "learnocaml-app-common"
     "learnocaml-toplevel"
+    
   ]
   files = [
     "editor.ml" ( pp = camlp4_js )

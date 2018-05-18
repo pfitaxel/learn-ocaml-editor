@@ -22,3 +22,17 @@ type exercise_state =
     mtime : float }
 
 val exercise_state_enc : exercise_state Json_encoding.encoding
+
+type editor_state =
+  { id : string ;
+    titre : string;
+    description : string option ;
+    diff : float option;
+    solution : string ;
+    question : string ;
+    template : string ;
+    test : string ;
+    report : Learnocaml_report.report option ;    
+    mtime : float }
+
+val editor_state_enc : editor_state Json_encoding.encoding

@@ -151,12 +151,54 @@ let () =
   init_tabs () ;
   toplevel_launch >>= fun top ->
   exercise_fetch >>= fun exo ->
-  let solution = match Learnocaml_local_storage.(retrieve (exercise_state id)) with
+  let solution = match Learnocaml_local_storage.(retrieve (editor_state id)) with
     | { Learnocaml_exercise_state.report = Some report ; solution } ->
         let _ : int = display_report exo report in
         Some solution
     | { Learnocaml_exercise_state.report = None ; solution } ->
         Some solution
+    | exception Not_found -> None in
+  let template = match Learnocaml_local_storage.(retrieve (editor_state id)) with
+    | { Learnocaml_exercise_state.report = Some report ; template } ->
+        let _ : int = display_report exo report in
+        Some template
+    | { Learnocaml_exercise_state.report = None ; template } ->
+        Some template
+    | exception Not_found -> None in
+  let test = match Learnocaml_local_storage.(retrieve (editor_state id)) with
+    | { Learnocaml_exercise_state.report = Some report ; test } ->
+        let _ : int = display_report exo report in
+        Some test
+    | { Learnocaml_exercise_state.report = None ; test } ->
+        Some test
+    | exception Not_found -> None in
+  let titre = match Learnocaml_local_storage.(retrieve (editor_state id)) with
+    | { Learnocaml_exercise_state.report = Some report ; titre } ->
+        let _ : int = display_report exo report in
+        Some titre
+    | { Learnocaml_exercise_state.report = None ; titre } ->
+        Some titre
+    | exception Not_found -> None in
+  let description = match Learnocaml_local_storage.(retrieve (editor_state id)) with
+    | { Learnocaml_exercise_state.report = Some report ; description } ->
+        let _ : int = display_report exo report in
+        Some description
+    | { Learnocaml_exercise_state.report = None ; description } ->
+        Some description
+    | exception Not_found -> None in
+  let diff = match Learnocaml_local_storage.(retrieve (editor_state id)) with
+    | { Learnocaml_exercise_state.report = Some report ; diff } ->
+        let _ : int = display_report exo report in
+        Some diff
+    | { Learnocaml_exercise_state.report = None ; diff } ->
+        Some diff
+    | exception Not_found -> None in
+  let question = match Learnocaml_local_storage.(retrieve (editor_state id)) with
+    | { Learnocaml_exercise_state.report = Some report ; question } ->
+        let _ : int = display_report exo report in
+        Some question
+    | { Learnocaml_exercise_state.report = None ; question } ->
+        Some question
     | exception Not_found -> None in
   (* ---- toplevel pane ------------------------------------------------- *)
   begin toplevel_button
@@ -241,18 +283,23 @@ let () =
        d##close ()) ;
   (* ---- test pane --------------------------------------------------- *)
   let editor_test = find_component "learnocaml-exo-tab-test.ml" in
-  let editor = Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div editor_test) in
-  let ace = Ocaml_mode.get_editor editor in
-  Ace.set_contents ace
-    (Learnocaml_exercise.(get test) exo) ;
-  Ace.set_font_size ace 18;
+  let editor_t = Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div editor_test) in
+  let ace_t = Ocaml_mode.get_editor editor_t in
+  Ace.set_contents ace_t
+     (match test with
+     | Some test -> test
+     | None -> Learnocaml_exercise.(get test) exo) ;
+  Ace.set_font_size ace_t 18;
 
   (* ---- template pane --------------------------------------------------- *)
   let editor_template = find_component "learnocaml-exo-tab-template" in
-  let editor = Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div editor_template) in
-  let ace = Ocaml_mode.get_editor editor in
-  Ace.set_contents ace (Learnocaml_exercise.(get template) exo) ;
-  Ace.set_font_size ace 18;
+  let editor_temp = Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div editor_template) in
+  let ace_temp = Ocaml_mode.get_editor editor_temp in
+  Ace.set_contents ace_temp
+    (match template with
+     | Some template -> template
+     | None -> Learnocaml_exercise.(get template) exo) ;
+  Ace.set_font_size ace_temp 18;
 
   (* ---- editor pane --------------------------------------------------- *)
   let editor_pane = find_component "learnocaml-exo-editor-pane" in
@@ -272,12 +319,16 @@ let () =
   begin editor_button
       ~icon: "save" "Save" @@ fun () ->
     let solution = Ace.get_contents ace in
-    let report, grade =
-      match Learnocaml_local_storage.(retrieve (exercise_state id)) with
-      | { Learnocaml_exercise_state.report ; grade } -> report, grade
-      | exception Not_found -> None, None in
-    Learnocaml_local_storage.(store (exercise_state id))
-      { Learnocaml_exercise_state.report ; grade ; solution ;
+    let titre = Learnocaml_exercise.(get title) exo in
+    let question=" " in
+    let template= Ace.get_contents ace_temp in
+    let test= Ace.get_contents ace_t in
+    let report, diff, description  =
+      match Learnocaml_local_storage.(retrieve (editor_state id)) with
+      | { Learnocaml_exercise_state.report ; diff ; description } -> report, diff, description
+      | exception Not_found -> None, None, None in
+    Learnocaml_local_storage.(store (editor_state id))
+      { Learnocaml_exercise_state.report ; id ; solution ; titre ; question ; template ; diff ; test ; description ;
         mtime = gettimeofday () } ;
     Lwt.return ()
   end ;
@@ -333,11 +384,24 @@ let () =
   begin toolbar_button
       ~icon: "list" "Exercises" @@ fun () ->(
   let b =
-    Dom_html.window##confirm (Js.string "Save ?") in
-    if (Js.to_bool b) then
+    Dom_html.window##confirm (Js.string "Save ? (Escape to close)") in
+    if (Js.to_bool b) then (
+    let solution = Ace.get_contents ace in
+    let titre = Learnocaml_exercise.(get title) exo in
+    let question=" " in
+    let template= Ace.get_contents ace_temp in
+    let test= Ace.get_contents ace_t in
+    let report, diff, description  =
+      match Learnocaml_local_storage.(retrieve (editor_state id)) with
+      | { Learnocaml_exercise_state.report ; diff ; description } -> report, diff, description
+      | exception Not_found -> None, None, None in
+    Learnocaml_local_storage.(store (editor_state id))
+      { Learnocaml_exercise_state.report ; id ; solution ; titre ; question ; template ; diff ; test ; description ;
+        mtime = gettimeofday () } ;
       Dom_html.window##location##assign
-      (Js.string "index.html#activity=editor") 
-      else () );
+      (Js.string "index.html#activity=editor") )
+      else Dom_html.window##location##assign
+      (Js.string "index.html#activity=editor") );
     Lwt.return ()
   end ;
   let messages = Tyxml_js.Html5.ul [] in

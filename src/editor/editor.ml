@@ -19,6 +19,59 @@ open Js_utils
 open Lwt.Infix
 open Learnocaml_common
 
+
+
+let string_of_char ch = String.make 1 ch ;;
+
+let failchar = ['f';'a';'i';'l';'w';'i';'t';'h';' ';'"';'T';'O';'D';'O';'"';'\n'] ;;
+
+let tail l = match l with
+|[]->[]
+|e::l->l ;;
+
+let rec concatenation listech = match listech with
+|[]->""
+|c::l -> (string_of_char c)^(concatenation l);;
+
+let rec decompositionSol str n = 
+if (n+1= String.length str) then [(str.[n])]
+else ( (str.[n])::(decompositionSol str (n+1)) );;
+
+let premierLet listech = match listech with 
+|[]->[]
+|'l'::'e'::'t'::' '::l -> 'l'::'e'::'t'::' '::l 
+|_->[];;
+
+let rec rechercheLet listech = match listech with
+| [] -> []
+| 'i'::'n'::' '::'l'::'e'::'t'::' '::l -> rechercheLet l
+| '='::' '::'l'::'e'::'t'::' '::l -> rechercheLet l
+| ' '::'l'::'e'::'t'::' '::l -> 'l'::'e'::'t'::' '::l
+| '\n'::'l'::'e'::'t'::' '::l -> 'l'::'e'::'t'::' '::l
+| ';'::';'::'l'::'e'::'t'::' '::l -> 'l'::'e'::'t'::' '::l
+|c::suite -> rechercheLet suite ;;
+
+let rec decomposition2 listech = match listech with
+     |[] -> []
+     |'='::l -> ['=']
+     |c::l-> c :: (decomposition2 l) ;;
+
+let decompoFirst listech = match listech with
+|[]-> []
+|_->(decomposition2 listech)@failchar ;;
+
+let rec genLet listech =
+	let liste = rechercheLet listech in
+	match liste with
+	|[]->[]
+	|_-> (decomposition2 liste)@failchar@(genLet (tail liste)) ;;
+
+let rec genTemplate chaine = 
+	concatenation ( (decompoFirst (premierLet (decompositionSol chaine 0)))@(genLet (decompositionSol chaine 0)));;
+
+
+
+
 let init_tabs, select_tab =
   let names = [ "text" ; "toplevel" ; "report" ; "editor" ;"template";"test.ml"] in
   let current = ref "text" in
@@ -314,6 +367,7 @@ let () =
       ~icon: "sync" "Gen.  template" @@ fun () ->
     (*Ace.set_contents ace (Learnocaml_exercise.(get template) exo) ;*)
     select_tab "template";
+    Ace.set_contents ace_temp (genTemplate (Ace.get_contents ace) );
     Lwt.return ()
   end ;
   begin editor_button

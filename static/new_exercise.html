@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="learnocaml_report.css">
     <link rel="stylesheet" href="learnocaml_tryocaml.css">
     <script src="ace.js" type="text/javascript" charset="utf-8" defer></script>
-    <script src="new_exercise.js" type="text/javascript" ></script>
+    <script src="new_exercise.js" type="text/javascript"></script>
   </head>
   <body>
     <style type="text/css"> 
@@ -37,17 +37,17 @@
       <form method="post" action="">
         <p>
           <label for="identifier">Unique identifier:<br></label>
-          <input type="text" id="identifier" name="identifier" required autofocus />
+          <input type="text" id="identifier" name="identifier" maxlength="250"
+          size="40" required pattern="[a-z0-9_-]+" autofocus />
         </p>
         <p>
           <label for="title">Title (unique too):<br></label>
-          <input type="text" id="title" name="title" required />
+          <input type="text" id="title" name="title" size="40" required pattern="" />
         </p>
         <p>
           <label for="description">Description of the exercise:<br></label>
-          <textarea id="description" name="description" cols="80" rows="10"></textarea>
+          <textarea id="description" name="description" cols="80" rows="12"></textarea>
         </p>
-        <p id="para">intrus </p>
         <p>
           <label for="difficulty">Difficulty level:<br></label>
           <select name="difficulty" id="difficulty" size="1" required />

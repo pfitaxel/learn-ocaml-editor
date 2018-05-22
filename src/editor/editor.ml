@@ -44,7 +44,19 @@ let premierLet listech = match listech with
 
 let rec rechercheLet listech = match listech with
 | [] -> []
-| 'i'::'n'::' '::'l'::'e'::'t'::' '::l -> rechercheLet l
+| 'e'::'l'::'s'::'e'::_::_::_::_::'l'::'e'::'t'::' '::l -> rechercheLet l
+| 'e'::'l'::'s'::'e'::_::_::_::'l'::'e'::'t'::' '::l -> rechercheLet l
+| 'e'::'l'::'s'::'e'::_::_::'l'::'e'::'t'::' '::l -> rechercheLet l
+| 'e'::'l'::'s'::'e'::_::'l'::'e'::'t'::' '::l -> rechercheLet l
+| 't'::'h'::'e'::'n'::_::_::_::_::_::_'l'::'e'::'t'::' '::l -> rechercheLet l
+| 't'::'h'::'e'::'n'::_::_::_::_::_::'l'::'e'::'t'::' '::l -> rechercheLet l
+| 't'::'h'::'e'::'n'::_::_::_::_'l'::'e'::'t'::' '::l -> rechercheLet l
+| 't'::'h'::'e'::'n'::_::_::_::'l'::'e'::'t'::' '::l -> rechercheLet l
+| 't'::'h'::'e'::'n'::_::_::'l'::'e'::'t'::' '::l -> rechercheLet l
+| 't'::'h'::'e'::'n'::_::'l'::'e'::'t'::' '::l -> rechercheLet l
+| 'i'::'n'::_::_::_::'l'::'e'::'t'::' '::l -> rechercheLet l
+| 'i'::'n'::_::_::'l'::'e'::'t'::' '::l -> rechercheLet l
+| 'i'::'n'::_::'l'::'e'::'t'::' '::l -> rechercheLet l
 | '='::' '::'l'::'e'::'t'::' '::l -> rechercheLet l
 | ' '::'l'::'e'::'t'::' '::l -> 'l'::'e'::'t'::' '::l
 | '\n'::'l'::'e'::'t'::' '::l -> 'l'::'e'::'t'::' '::l
@@ -454,8 +466,7 @@ let () =
         mtime = gettimeofday () } ;
       Dom_html.window##location##assign
       (Js.string "index.html#activity=editor") )
-      else Dom_html.window##location##assign
-      (Js.string "index.html#activity=editor") );
+      else () );
     Lwt.return ()
   end ;
   let messages = Tyxml_js.Html5.ul [] in

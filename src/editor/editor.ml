@@ -5,7 +5,7 @@
  * Learn-OCaml is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
+ * License, or (at your op1tion) any later version.
  *
  * Learn-OCaml is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -20,7 +20,7 @@ open Lwt.Infix
 open Learnocaml_common
 
 let init_tabs, select_tab =
-  let names = [ "text" ; "toplevel" ; "report" ; "editor" ;"template";"test.ml"] in
+  let names = [ "text" ; "toplevel" ; "report" ; "editor" ;"template";"test"] in
   let current = ref "text" in
   let select_tab name =
     set_arg "tab" name ;
@@ -96,7 +96,8 @@ let () =
     | exn -> fatal (Printexc.to_string exn)
   end ;
   Lwt.async @@ fun () ->
-  Learnocaml_local_storage.init () ;
+               Learnocaml_local_storage.init () ;
+               
   (* ---- launch everything --------------------------------------------- *)
   let toplevel_buttons_group = button_group () in
   disable_button_group toplevel_buttons_group (* enabled after init *) ;
@@ -105,9 +106,12 @@ let () =
   let toplevel_toolbar = find_component "learnocaml-exo-toplevel-toolbar" in
   let template_toolbar = find_component "learnocaml-exo-template-toolbar" in
   let editor_toolbar = find_component "learnocaml-exo-editor-toolbar" in
+  let test_toolbar = find_component "learnocaml-exo-test-toolbar" in
   let toplevel_button = button ~container: toplevel_toolbar ~theme: "dark" in
   let template_button = button ~container: template_toolbar ~theme: "dark" in
   let editor_button = button ~container: editor_toolbar ~theme: "light" in
+  let test_button = button ~container: test_toolbar ~theme: "light" in
+
   let id = arg "id" in
   let exercise_fetch = Server_caller.fetch_exercise id in
   let after_init top =
@@ -145,6 +149,7 @@ let () =
       ~on_update
       ~max_size: 99
       ~snapshot () in
+
   let toplevel_launch =
     Learnocaml_toplevel.create
       ~after_init ~timeout_prompt ~flood_prompt
@@ -162,6 +167,8 @@ let () =
     | { Learnocaml_exercise_state.report = None ; solution } ->
         Some solution
     | exception Not_found -> None in
+
+  
   (* ---- toplevel pane ------------------------------------------------- *)
   begin toplevel_button
       ~group: toplevel_buttons_group
@@ -180,43 +187,13 @@ let () =
     Learnocaml_toplevel.execute top ;
     Lwt.return ()
   end ;                     (* text = question*)
+
+  (* ---- text pane ----------------------------------------------------- *)
   let text_container = find_component "learnocaml-exo-tab-text" in
   let text_iframe = Dom_html.createIframe Dom_html.document in
   Manip.replaceChildren text_container
     Tyxml_js.Html5.[ h1 [ pcdata ( Learnocaml_exercise.(get title) exo) ] ;
                      Tyxml_js.Of_dom.of_iFrame text_iframe ] ;
-  
- (* let prelude = Learnocaml_exercise.(get prelude) exo in
-  if prelude <> "" then begin
-    let open Tyxml_js.Html5 in
-    let state = ref (match arg "prelude" with
-        | exception Not_found -> true
-        | "shown" -> true
-        | "hidden" -> false
-        | _ -> failwith "Bad format for argument prelude.") in
-    let prelude_btn = button [] in
-    let prelude_title = h1 [ pcdata "OCaml prelude" ;
-                             prelude_btn ] in
-    let prelude_container =
-     pre ~a: [ a_class [ "toplevel-code" ] ]
-        (Learnocaml_toplevel_output.format_ocaml_code prelude) in
-    let update () =
-      if !state then begin
-        Manip.replaceChildren prelude_btn [ pcdata "↳ Hide" ] ;
-        Manip.SetCss.display prelude_container "" ;
-        set_arg "prelude" "shown"
-      end else begin
-        Manip.replaceChildren prelude_btn [ pcdata "↰ Show" ] ;
-        Manip.SetCss.display prelude_container "none" ;
-        set_arg "prelude" "hidden"
-      end in
-    update () ;
-    Manip.Ev.onclick prelude_btn
-      (fun _ -> state := not !state ; update () ; true) ;
-    Manip.appendChildren text_container
-      Tyxml_js.Html5.[ prelude_title ; prelude_container ]
-    end ;*)
-         (* test pour question *)
   Js.Opt.case                               
     (text_iframe##contentDocument)
     (fun () -> failwith "cannot edit iframe document" )
@@ -241,6 +218,7 @@ let () =
        d##open_ ();
        d##write (Js.string html);
        d##close ()) ;
+  
   (* ---- test pane --------------------------------------------------- *)
   let test_pane = find_component "learnocaml-exo-tab-test.ml" in
   let editor = Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div test_pane) in
@@ -248,6 +226,34 @@ let () =
   Ace.set_contents ace
     (Learnocaml_exercise.(get test) exo) ;
   Ace.set_font_size ace 18;
+    let typecheck set_class =
+    Learnocaml_toplevel.check top (Ace.get_contents ace) >>= fun res ->
+    let error, warnings =
+      match res with
+      | Toploop_results.Ok ((), warnings) -> None, warnings
+      | Toploop_results.Error (err, warnings) -> Some err, warnings in
+    let transl_loc { Toploop_results.loc_start ; loc_end } =
+      { Ocaml_mode.loc_start ; loc_end } in
+    let error = match error with
+      | None -> None
+      | Some { Toploop_results.locs ; msg ; if_highlight } ->
+          Some { Ocaml_mode.locs = List.map transl_loc locs ;
+                 msg = (if if_highlight <> "" then if_highlight else msg) } in
+    let warnings =
+      List.map
+        (fun { Toploop_results.locs ; msg ; if_highlight } ->
+           { Ocaml_mode.loc = transl_loc (List.hd locs) ;
+             msg = (if if_highlight <> "" then if_highlight else msg) })
+        warnings in
+    Ocaml_mode.report_error ~set_class editor error warnings  >>= fun () ->
+    Ace.focus ace ;
+    Lwt.return () in
+  begin test_button
+      ~group: toplevel_buttons_group
+      ~icon: "typecheck" "Check" @@ fun () ->
+    typecheck true
+  end ;
+
 
   (* ---- template pane ------------------------------------------------- *)
   let template_pane = find_component "learnocaml-exo-tab-template" in
@@ -282,7 +288,6 @@ let () =
   Ace.set_font_size ace 18;
   begin editor_button
       ~icon: "sync" "Gen.  template" @@ fun () ->
-    (*Ace.set_contents ace (Learnocaml_exercise.(get template) exo) ;*)
     select_tab "template";
     Lwt.return ()
   end ;

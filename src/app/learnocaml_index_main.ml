@@ -21,6 +21,7 @@ open Learnocaml_index
 open Learnocaml_common
 
 module StringMap = Map.Make (String)
+                            
 
 let exercises_tab _ _ () =
   show_loading ~id:"learnocaml-main-loading"
@@ -90,7 +91,7 @@ let exercises_tab _ _ () =
               acc)
             exercises acc
       | Groups groups ->
-          let h = match lvl with 1 -> h1 | 2 -> h2 | _ -> h3 in
+         let h = match lvl with 1 -> h1 | 2 -> h2 | _ -> h3 in
           StringMap.fold
             (fun _ { group_title ; group_contents } acc ->
                format_contents (succ lvl)
@@ -186,6 +187,8 @@ let editor_tab _ _ () =
   Lwt.return list_div
 ;;
 
+
+
  (*let editor_tab _ _ ()  =
     show_loading ~id:"learnocaml-main-loading"
       Tyxml_js.Html5.[ ul [ li [ pcdata "Loading editor" ] ] ];
@@ -229,7 +232,7 @@ let editor_tab _ _ () =
                     | Some pct when  pct >= 100 -> [ "stats" ; "success" ]
                     | Some _ -> [ "stats" ; "partial" ])
                   pct_signal in
-              a ~a:[ a_href ("editor.html#id=" ^ exercise_id ^ "&action=open") ; 
+              a ~a:[ a_href ("editor.html#id="^exercise_id^"&action=open") ; 
                      a_class [ "exercise" ] ] [
                   div ~a:[ a_class [ "descr" ] ] [
                   h1 [ pcdata exercise_title ] ;

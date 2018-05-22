@@ -5,7 +5,7 @@
  * Learn-OCaml is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
+ * License, or (at your op1tion) any later version.
  *
  * Learn-OCaml is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -85,7 +85,7 @@ let rec genTemplate chaine =
 
 
 let init_tabs, select_tab =
-  let names = [ "text" ; "toplevel" ; "report" ; "editor" ;"template";"test.ml"] in
+  let names = [ "text" ; "toplevel" ; "report" ; "editor" ; "template" ; "test" ] in
   let current = ref "text" in
   let select_tab name =
     set_arg "tab" name ;
@@ -161,14 +161,20 @@ let () =
     | exn -> fatal (Printexc.to_string exn)
   end ;
   Lwt.async @@ fun () ->
-  Learnocaml_local_storage.init () ;
+               Learnocaml_local_storage.init () ;
+               
   (* ---- launch everything --------------------------------------------- *)
   let toplevel_buttons_group = button_group () in
   disable_button_group toplevel_buttons_group (* enabled after init *) ;
   let toplevel_toolbar = find_component "learnocaml-exo-toplevel-toolbar" in
   let editor_toolbar = find_component "learnocaml-exo-editor-toolbar" in
+  let template_toolbar = find_component "learnocaml-exo-template-toolbar" in
+  let test_toolbar = find_component "learnocaml-exo-test-toolbar" in
   let toplevel_button = button ~container: toplevel_toolbar ~theme: "dark" in
   let editor_button = button ~container: editor_toolbar ~theme: "light" in
+  let test_button = button ~container: test_toolbar ~theme: "light" in
+  let template_button = button ~container: template_toolbar ~theme: "light" in
+
   let id = arg "id" in
   let exercise_fetch = Server_caller.fetch_exercise id in
   let after_init top =
@@ -206,6 +212,7 @@ let () =
       ~on_update
       ~max_size: 99
       ~snapshot () in
+
   let toplevel_launch =
     Learnocaml_toplevel.create
       ~after_init ~timeout_prompt ~flood_prompt
@@ -223,6 +230,7 @@ let () =
     | { Learnocaml_exercise_state.report = None ; solution } ->
         Some solution
     | exception Not_found -> None in
+
   let template = match Learnocaml_local_storage.(retrieve (editor_state id)) with
     | { Learnocaml_exercise_state.report = Some report ; template } ->
         let _ : int = display_report exo report in
@@ -265,6 +273,10 @@ let () =
     | { Learnocaml_exercise_state.report = None ; question } ->
         Some question
     | exception Not_found -> None in
+
+
+  
+
   (* ---- toplevel pane ------------------------------------------------- *)
   begin toplevel_button
       ~group: toplevel_buttons_group
@@ -283,9 +295,7 @@ let () =
     Learnocaml_toplevel.execute top ;
     Lwt.return ()
   end ;
-  (*----- test.ml pane -------------------------------------------------- *)
-  (*let text_container =
-    Tyxml_js.Html5.[ pcdata ("je suis la ")] ;*)
+  
   (* ---- text pane ----------------------------------------------------- *)
   let text_container = find_component "learnocaml-exo-tab-text" in
   let text_iframe = Dom_html.createIframe Dom_html.document in
@@ -346,8 +356,14 @@ let () =
        d##open_ ();
        d##write (Js.string html);
        d##close ()) ;
+  
   (* ---- test pane --------------------------------------------------- *)
-  let editor_test = find_component "learnocaml-exo-tab-test.ml" in
+
+
+
+
+
+  let editor_test = find_component "learnocaml-exo-test-pane" in
   let editor_t = Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div editor_test) in
   let ace_t = Ocaml_mode.get_editor editor_t in
   Ace.set_contents ace_t
@@ -355,9 +371,37 @@ let () =
      | Some test -> test
      | None -> Learnocaml_exercise.(get test) exo) ;
   Ace.set_font_size ace_t 18;
+  
+    let typecheck set_class =
+    Learnocaml_toplevel.check top (Ace.get_contents ace_t) >>= fun res ->
+    let error, warnings =
+      match res with
+      | Toploop_results.Ok ((), warnings) -> None, warnings
+      | Toploop_results.Error (err, warnings) -> Some err, warnings in
+    let transl_loc { Toploop_results.loc_start ; loc_end } =
+      { Ocaml_mode.loc_start ; loc_end } in
+    let error = match error with
+      | None -> None
+      | Some { Toploop_results.locs ; msg ; if_highlight } ->
+          Some { Ocaml_mode.locs = List.map transl_loc locs ;
+                 msg = (if if_highlight <> "" then if_highlight else msg) } in
+    let warnings =
+      List.map
+        (fun { Toploop_results.locs ; msg ; if_highlight } ->
+           { Ocaml_mode.loc = transl_loc (List.hd locs) ;
+             msg = (if if_highlight <> "" then if_highlight else msg) })
+        warnings in
+    Ocaml_mode.report_error ~set_class editor_t error warnings  >>= fun () ->
+    Ace.focus ace_t ;
+    Lwt.return () in
+  begin test_button
+      ~group: toplevel_buttons_group
+      ~icon: "typecheck" "Check" @@ fun () ->
+    typecheck true
+  end ;
 
   (* ---- template pane --------------------------------------------------- *)
-  let editor_template = find_component "learnocaml-exo-tab-template" in
+  let editor_template = find_component "learnocaml-exo-template-pane" in
   let editor_temp = Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div editor_template) in
   let ace_temp = Ocaml_mode.get_editor editor_temp in
   Ace.set_contents ace_temp
@@ -365,6 +409,35 @@ let () =
      | Some template -> template
      | None -> Learnocaml_exercise.(get template) exo) ;
   Ace.set_font_size ace_temp 18;
+
+  
+  let typecheck set_class =
+    Learnocaml_toplevel.check top (Ace.get_contents ace_temp) >>= fun res ->
+    let error, warnings =
+      match res with
+      | Toploop_results.Ok ((), warnings) -> None, warnings
+      | Toploop_results.Error (err, warnings) -> Some err, warnings in
+    let transl_loc { Toploop_results.loc_start ; loc_end } =
+      { Ocaml_mode.loc_start ; loc_end } in
+    let error = match error with
+      | None -> None
+      | Some { Toploop_results.locs ; msg ; if_highlight } ->
+          Some { Ocaml_mode.locs = List.map transl_loc locs ;
+                 msg = (if if_highlight <> "" then if_highlight else msg) } in
+    let warnings =
+      List.map
+        (fun { Toploop_results.locs ; msg ; if_highlight } ->
+           { Ocaml_mode.loc = transl_loc (List.hd locs) ;
+             msg = (if if_highlight <> "" then if_highlight else msg) })
+        warnings in
+    Ocaml_mode.report_error ~set_class editor_temp error warnings  >>= fun () ->
+    Ace.focus ace_temp ;
+    Lwt.return () in
+  begin template_button
+      ~group: toplevel_buttons_group
+      ~icon: "typecheck" "Check" @@ fun () ->
+    typecheck true
+  end ;
 
   (* ---- editor pane --------------------------------------------------- *)
   let editor_pane = find_component "learnocaml-exo-editor-pane" in
@@ -377,7 +450,6 @@ let () =
   Ace.set_font_size ace 18;
   begin editor_button
       ~icon: "sync" "Gen.  template" @@ fun () ->
-    (*Ace.set_contents ace (Learnocaml_exercise.(get template) exo) ;*)
     select_tab "template";
     Ace.set_contents ace_temp (genTemplate (Ace.get_contents ace) );
     Lwt.return ()
@@ -530,5 +602,6 @@ let () =
   toplevel_launch >>= fun _ ->
   typecheck false >>= fun () ->
   hide_loading ~id:"learnocaml-exo-loading" () ;
+
   Lwt.return ()
 ;;

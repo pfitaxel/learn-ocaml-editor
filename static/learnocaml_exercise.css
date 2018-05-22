@@ -114,9 +114,20 @@ body {
   #learnocaml-exo-tab-buttons {
     left: 800px; right: 0px; top: 0px;
   }
+  #learnocaml-exo-button-editor.front-tab ~ #learnocaml-exo-button-template {
+    border-bottom: none;
+    background: #bbb;
+  }
   #learnocaml-exo-button-editor.front-tab ~ #learnocaml-exo-button-toplevel {
     border-bottom: none;
     background: #bbb;
+  }
+  #learnocaml-exo-button-editor.front-tab ~ #learnocaml-exo-button-template::after {
+    display: none;
+  }
+  #learnocaml-exo-tab-editor.front-tab ~ #learnocaml-exo-tab-template {
+    z-index: 998;
+    opacity: 1;
   }
   #learnocaml-exo-button-editor.front-tab ~ #learnocaml-exo-button-toplevel::after {
     display: none;
@@ -219,6 +230,61 @@ body {
   #learnocaml-exo-tab-editor > .buttons > button > .label {
     display: none;
   }
+}
+/*--------------------- template ---------------------------------- */
+#learnocaml-exo-tab-template > .template-pane {
+  position: absolute;
+  left: 0; top: 0; bottom: 40px; width: 100%;
+  z-index: 1002;
+  margin: 5px 0 0 0;
+}
+#learnocaml-exo-tab-buttons > #learnocaml-exo-button-template {
+  background: #bbb;
+}
+#learnocaml-exo-tab-template {
+  background: #fff;
+}
+#learnocaml-exo-tab-template > .buttons {
+  position: absolute;
+  left: 80; bottom: 10px; width: 100%; height: 40px;
+  background: linear-gradient(to bottom, #fff 0px, #ddd 10px, #aaa 60px);
+  color: #fff;
+  line-height: 40px;
+  display: flex;
+  flex-direction: row;
+  z-index: 1003;
+}
+#learnocaml-exo-tab-template > .buttons > button {
+  flex: 1;
+  background: none;
+  border: none;
+  color: #222;
+  text-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+  border-top: 1px #666 solid;
+  position: relative;
+  padding: 0;
+}
+#learnocaml-exo-tab-template > .buttons > button:not(:first-child) {
+  border-left: 1px #666 solid;
+}
+@media (max-width: 550px) {
+  #learnocaml-exo-tab-template > .buttons > button > .label {
+    display: none;
+  }
+}
+#learnocaml-exo-template-pane {
+  position: absolute;
+  left: 0; top: 0; bottom: 40px; width: 100%;
+  z-index: 1002;
+  display: flex;
+  flex-direction: column;
+  margin: 5px 0 0 0;
+}
+#learnocaml-exo-tab-template::after {
+  position: absolute;
+  z-index: 1005;
+  left: 0; top: 5px; height: 10px; width: 100%;
+  content: "";
 }
 /* -------------------- toplevel tab ------------------------------ */
 #learnocaml-exo-tab-toplevel > .toplevel-pane {
@@ -348,6 +414,14 @@ body {
   border: none;
   overflow: auto;
   flex: 1 3 auto ;
+}
+#learnocaml-exo-tab-text > pre.template-code {
+  flex: 0 1 auto;
+  max-height: 45%;
+  background: #666;
+  margin: 0;
+  padding: 5px 10px 5px 5px;
+  overflow: auto;
 }
 #learnocaml-exo-tab-text > pre.toplevel-code {
   flex: 0 1 auto;

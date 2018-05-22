@@ -21,64 +21,6 @@ open Learnocaml_index
 open Learnocaml_common
 
 module StringMap = Map.Make (String)
-let a =ref [];;
-(*tentative liste des identifiant ça marche *)
-let task ()=
-let test () =
-  Server_caller.fetch_exercise_index () >>= fun index ->
-  let format_exercise_list all_exercise_states =
-    let rec format_contents lvl acc contents =
-      match contents with
-      | Learnocaml_exercises exercises ->
-          StringMap.fold
-            (fun exercise_id { exercise_kind ;
-                               exercise_title ;
-                               exercise_short_description ;
-                               exercise_stars } acc ->((exercise_id, exercise_title) :: acc)) exercises acc
-      | Groups groups ->
-          StringMap.fold
-            (fun _ { group_title ; group_contents } acc ->
-               format_contents (succ lvl) acc group_contents)
-            groups acc in
-  format_contents 1 [] index in
-  let list_div =
-    (format_exercise_list Learnocaml_local_storage.(retrieve all_exercise_states)) in
-  a:= list_div;
-  Lwt.return list_div
-in
-test ();
-return a
-;;
-
-
-let trye _ _ () =
-  Server_caller.fetch_exercise_index () >>= fun index ->
-  let content_div = find_component "learnocaml-main-content" in
-  let format_exercise_list all_exercise_states =
-    let rec format_contents lvl acc contents =
-      let open Tyxml_js.Html5 in
-      match contents with
-      | Learnocaml_exercises exercises ->
-          StringMap.fold
-            (fun exercise_id { exercise_kind ;
-                               exercise_title ;
-                               exercise_short_description ;
-                               exercise_stars } acc ->(a ~a:[ a_href ("new_exercise.html#&action=open") ;
-                                                             a_class ["exercise"]][
-                                                           div ~a:[a_class ["descr"]][h1 [pcdata (exercise_id^" ; "^exercise_title)];];]) ::  acc) exercises acc
-      | Groups groups ->
-          StringMap.fold
-            (fun _ { group_title ; group_contents } acc ->
-               format_contents (succ lvl) acc group_contents)
-            groups acc in
-    List.rev (format_contents 1 [] index) in
-  let list_div =
-    Tyxml_js.Html5.(div ~a: [ Tyxml_js.Html5.a_id "learnocaml-main-exercise-list" ])
-      (format_exercise_list Learnocaml_local_storage.(retrieve all_exercise_states)) in
-  Manip.appendChild content_div list_div ;
-  hide_loading ~id:"learnocaml-main-loading" () ;
-  Lwt.return list_div
-;;
                             
 
 let exercises_tab _ _ () =

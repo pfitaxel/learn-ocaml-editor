@@ -20,7 +20,7 @@ open Lwt.Infix
 open Learnocaml_common
 
 let init_tabs, select_tab =
-  let names = [ "text" ; "toplevel" ; "report" ; "editor" ;"template";"test"] in
+  let names = [ "text" ; "toplevel" ; "report" ; "editor" ; "template" ; "test" ] in
   let current = ref "text" in
   let select_tab name =
     set_arg "tab" name ;
@@ -101,16 +101,14 @@ let () =
   (* ---- launch everything --------------------------------------------- *)
   let toplevel_buttons_group = button_group () in
   disable_button_group toplevel_buttons_group (* enabled after init *) ;
-  let template_buttons_group = button_group () in
-  disable_button_group template_buttons_group (* enabled after init *) ;
   let toplevel_toolbar = find_component "learnocaml-exo-toplevel-toolbar" in
-  let template_toolbar = find_component "learnocaml-exo-template-toolbar" in
   let editor_toolbar = find_component "learnocaml-exo-editor-toolbar" in
+  let template_toolbar = find_component "learnocaml-exo-template-toolbar" in
   let test_toolbar = find_component "learnocaml-exo-test-toolbar" in
   let toplevel_button = button ~container: toplevel_toolbar ~theme: "dark" in
-  let template_button = button ~container: template_toolbar ~theme: "dark" in
   let editor_button = button ~container: editor_toolbar ~theme: "light" in
   let test_button = button ~container: test_toolbar ~theme: "light" in
+  let template_button = button ~container: template_toolbar ~theme: "light" in
 
   let id = arg "id" in
   let exercise_fetch = Server_caller.fetch_exercise id in
@@ -186,17 +184,47 @@ let () =
       ~icon: "run" "Eval phrase" @@ fun () ->
     Learnocaml_toplevel.execute top ;
     Lwt.return ()
-  end ;                     (* text = question*)
-
+  end ;
+  
   (* ---- text pane ----------------------------------------------------- *)
   let text_container = find_component "learnocaml-exo-tab-text" in
   let text_iframe = Dom_html.createIframe Dom_html.document in
   Manip.replaceChildren text_container
-    Tyxml_js.Html5.[ h1 [ pcdata ( Learnocaml_exercise.(get title) exo) ] ;
+    Tyxml_js.Html5.[ h1 [ pcdata (Learnocaml_exercise.(get title) exo) ] ;
                      Tyxml_js.Of_dom.of_iFrame text_iframe ] ;
-  Js.Opt.case                               
+  let prelude = Learnocaml_exercise.(get prelude) exo in
+  if prelude <> "" then begin
+    let open Tyxml_js.Html5 in
+    let state = ref (match arg "prelude" with
+        | exception Not_found -> true
+        | "shown" -> true
+        | "hidden" -> false
+        | _ -> failwith "Bad format for argument prelude.") in
+    let prelude_btn = button [] in
+    let prelude_title = h1 [ pcdata "OCaml prelude" ;
+                             prelude_btn ] in
+    let prelude_container =
+      pre ~a: [ a_class [ "toplevel-code" ] ]
+        (Learnocaml_toplevel_output.format_ocaml_code prelude) in
+    let update () =
+      if !state then begin
+        Manip.replaceChildren prelude_btn [ pcdata "↳ Hide" ] ;
+        Manip.SetCss.display prelude_container "" ;
+        set_arg "prelude" "shown"
+      end else begin
+        Manip.replaceChildren prelude_btn [ pcdata "↰ Show" ] ;
+        Manip.SetCss.display prelude_container "none" ;
+        set_arg "prelude" "hidden"
+      end in
+    update () ;
+    Manip.Ev.onclick prelude_btn
+      (fun _ -> state := not !state ; update () ; true) ;
+    Manip.appendChildren text_container
+      Tyxml_js.Html5.[ prelude_title ; prelude_container ]
+  end ;
+  Js.Opt.case
     (text_iframe##contentDocument)
-    (fun () -> failwith "cannot edit iframe document" )
+    (fun () -> failwith "cannot edit iframe document")
     (fun d ->
        let mathjax_url =
          "http://cdn.mathjax.org/mathjax/2.1-latest/MathJax.js?config=AM_HTMLorMML-full" in
@@ -220,12 +248,13 @@ let () =
        d##close ()) ;
   
   (* ---- test pane --------------------------------------------------- *)
-  let test_pane = find_component "learnocaml-exo-tab-test.ml" in
-  let editor = Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div test_pane) in
+  let editor_test = find_component "learnocaml-exo-test-pane" in
+  let editor = Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div editor_test) in
   let ace = Ocaml_mode.get_editor editor in
   Ace.set_contents ace
     (Learnocaml_exercise.(get test) exo) ;
   Ace.set_font_size ace 18;
+  
     let typecheck set_class =
     Learnocaml_toplevel.check top (Ace.get_contents ace) >>= fun res ->
     let error, warnings =
@@ -255,28 +284,42 @@ let () =
   end ;
 
 
-  (* ---- template pane ------------------------------------------------- *)
-  let template_pane = find_component "learnocaml-exo-tab-template" in
-  let template =
-    Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div template_pane)   in     (* aller *)
-  let ace = Ocaml_mode.get_editor template in
-    enable_button_group template_buttons_group;
-  Ace.set_contents ace (Learnocaml_exercise.(get template) exo) ;
+  (* ---- template pane ---------------------------------------------------*)
+  let editor_template = find_component "learnocaml-exo-template-pane" in
+  let editor = Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div editor_template) in
+  let ace = Ocaml_mode.get_editor editor in
+  Ace.set_contents ace
+    (Learnocaml_exercise.(get template) exo) ;
   Ace.set_font_size ace 18;
+
+  let typecheck set_class =
+    Learnocaml_toplevel.check top (Ace.get_contents ace) >>= fun res ->
+    let error, warnings =
+      match res with
+      | Toploop_results.Ok ((), warnings) -> None, warnings
+      | Toploop_results.Error (err, warnings) -> Some err, warnings in
+    let transl_loc { Toploop_results.loc_start ; loc_end } =
+      { Ocaml_mode.loc_start ; loc_end } in
+    let error = match error with
+      | None -> None
+      | Some { Toploop_results.locs ; msg ; if_highlight } ->
+          Some { Ocaml_mode.locs = List.map transl_loc locs ;
+                 msg = (if if_highlight <> "" then if_highlight else msg) } in
+    let warnings =
+      List.map
+        (fun { Toploop_results.locs ; msg ; if_highlight } ->
+           { Ocaml_mode.loc = transl_loc (List.hd locs) ;
+             msg = (if if_highlight <> "" then if_highlight else msg) })
+        warnings in
+    Ocaml_mode.report_error ~set_class editor error warnings  >>= fun () ->
+    Ace.focus ace ;
+    Lwt.return () in
   begin template_button
-      ~group: template_buttons_group
-      ~icon: "save" "Save"@@ fun () ->
-    let solution = Ace.get_contents ace in
-    let report, grade =
-      match Learnocaml_local_storage.(retrieve (exercise_state id)) with
-      | { Learnocaml_exercise_state.report ; grade } -> report, grade
-      | exception Not_found -> None, None in
-    Learnocaml_local_storage.(store (exercise_state id))
-      { Learnocaml_exercise_state.report ; grade ; solution ;
-        mtime = gettimeofday () } ;
-    Lwt.return ()
+      ~group: toplevel_buttons_group
+      ~icon: "typecheck" "Check" @@ fun () ->
+    typecheck true
   end ;
- 
+
   (* ---- editor pane --------------------------------------------------- *)
   let editor_pane = find_component "learnocaml-exo-editor-pane" in
   let editor = Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div editor_pane) in
@@ -292,7 +335,7 @@ let () =
     Lwt.return ()
   end ;
   begin editor_button
-    ~icon: "save" "Save"@@ fun () ->
+      ~icon: "save" "Save" @@ fun () ->
     let solution = Ace.get_contents ace in
     let report, grade =
       match Learnocaml_local_storage.(retrieve (exercise_state id)) with
@@ -354,13 +397,13 @@ let () =
   end;                          
   begin toolbar_button
       ~icon: "list" "Exercises" @@ fun () ->(
-    let b =
+  let b =
     Dom_html.window##confirm (Js.string "Save ?") in
     if (Js.to_bool b) then
       Dom_html.window##location##assign
       (Js.string "index.html#activity=editor") 
       else () );
-    Lwt.return () 
+    Lwt.return ()
   end ;
   let messages = Tyxml_js.Html5.ul [] in
   let callback text =
@@ -423,4 +466,6 @@ let () =
   toplevel_launch >>= fun _ ->
   typecheck false >>= fun () ->
   hide_loading ~id:"learnocaml-exo-loading" () ;
-  Lwt.return ();;
+
+  Lwt.return ()
+;;

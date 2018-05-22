@@ -293,22 +293,22 @@ let () =
        d##close ()) ;
   
   (* ---- test pane --------------------------------------------------- *)
-<<<<<<< HEAD
 
 
 
 
-  let editor_test = find_component "learnocaml-exo-tab-test" in
+
+  let editor_test = find_component "learnocaml-exo-test-pane" in
   let editor_t = Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div editor_test) in
   let ace_t = Ocaml_mode.get_editor editor_t in
   Ace.set_contents ace_t
      (match test with
      | Some test -> test
      | None -> Learnocaml_exercise.(get test) exo) ;
-  Ace.set_font_size ace_t 18;;
+  Ace.set_font_size ace_t 18;
   
     let typecheck set_class =
-    Learnocaml_toplevel.check top (Ace.get_contents ace) >>= fun res ->
+    Learnocaml_toplevel.check top (Ace.get_contents ace_t) >>= fun res ->
     let error, warnings =
       match res with
       | Toploop_results.Ok ((), warnings) -> None, warnings
@@ -326,8 +326,8 @@ let () =
            { Ocaml_mode.loc = transl_loc (List.hd locs) ;
              msg = (if if_highlight <> "" then if_highlight else msg) })
         warnings in
-    Ocaml_mode.report_error ~set_class editor error warnings  >>= fun () ->
-    Ace.focus ace ;
+    Ocaml_mode.report_error ~set_class editor_t error warnings  >>= fun () ->
+    Ace.focus ace_t ;
     Lwt.return () in
   begin test_button
       ~group: toplevel_buttons_group
@@ -336,7 +336,7 @@ let () =
   end ;
 
   (* ---- template pane --------------------------------------------------- *)
-  let editor_template = find_component "learnocaml-exo-tab-template" in
+  let editor_template = find_component "learnocaml-exo-template-pane" in
   let editor_temp = Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div editor_template) in
   let ace_temp = Ocaml_mode.get_editor editor_temp in
   Ace.set_contents ace_temp
@@ -347,7 +347,7 @@ let () =
 
   
   let typecheck set_class =
-    Learnocaml_toplevel.check top (Ace.get_contents ace) >>= fun res ->
+    Learnocaml_toplevel.check top (Ace.get_contents ace_temp) >>= fun res ->
     let error, warnings =
       match res with
       | Toploop_results.Ok ((), warnings) -> None, warnings
@@ -365,8 +365,8 @@ let () =
            { Ocaml_mode.loc = transl_loc (List.hd locs) ;
              msg = (if if_highlight <> "" then if_highlight else msg) })
         warnings in
-    Ocaml_mode.report_error ~set_class editor error warnings  >>= fun () ->
-    Ace.focus ace ;
+    Ocaml_mode.report_error ~set_class editor_temp error warnings  >>= fun () ->
+    Ace.focus ace_temp ;
     Lwt.return () in
   begin template_button
       ~group: toplevel_buttons_group

@@ -425,8 +425,16 @@ let () =
   end ;
   begin editor_button
       ~icon: "download" "Download" @@ fun () ->
-    let name = id ^ ".ml" in
-    let contents = Js.string (Ace.get_contents ace) in
+    let name = id ^ ".json" in
+    let content =Learnocaml_local_storage.(retrieve (editor_state id)) in  
+  let json =
+    Json_repr_browser.Json_encoding.construct
+      Learnocaml_exercise_state.editor_state_enc
+      content in
+  let contents =
+      (Js._JSON##stringify (json)) in
+    
+    
     Learnocaml_common.fake_download ~name ~contents ;
     Lwt.return ()
   end ;

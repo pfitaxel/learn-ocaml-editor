@@ -123,10 +123,7 @@ let editor_tab _ _ () =
                                exercise_title ;
                                exercise_short_description ;
                                exercise_stars } acc ->
-              let pct_init =
-                match StringMap.find exercise_id all_exercise_states with
-                | exception Not_found -> None
-                | { Learnocaml_exercise_state.grade } -> grade in
+              let pct_init = Some 0 in
               let pct_signal, pct_signal_set = React.S.create pct_init in
               Learnocaml_local_storage.(listener (exercise_state exercise_id)) :=
                 Some (function
@@ -181,7 +178,7 @@ let editor_tab _ _ () =
       ]] index) in
   let list_div =
     Tyxml_js.Html5.(div ~a: [ Tyxml_js.Html5.a_id "learnocaml-main-exercise-list" ])
-      (format_exercise_list Learnocaml_local_storage.(retrieve all_exercise_states)) in
+      (format_exercise_list Learnocaml_local_storage.(retrieve all_editor_states)) in
   Manip.appendChild content_div list_div ;
   hide_loading ~id:"learnocaml-main-loading" () ;
   Lwt.return list_div

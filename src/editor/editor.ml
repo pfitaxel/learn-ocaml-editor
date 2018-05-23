@@ -23,7 +23,7 @@ open Learnocaml_common
 
 let string_of_char ch = String.make 1 ch ;;
 
-let failchar = ['f';'a';'i';'l';'w';'i';'t';'h';' ';'"';'T';'O';'D';'O';'"';'\n'] ;;
+let failchar = [' ';'f';'a';'i';'l';'w';'i';'t';'h';' ';'"';'T';'O';'D';'O';'"';'\n'] ;;
 
 let tail l = match l with
 |[]->[]
@@ -37,31 +37,43 @@ let rec decompositionSol str n =
 if (n+1= String.length str) then [(str.[n])]
 else ( (str.[n])::(decompositionSol str (n+1)) );;
 
-let premierLet listech = match listech with 
+let rec premierLet listech = match listech with 
 |[]->[]
+|c::'l'::'e'::'t'::' '::l -> if (c='\n'||c=' ') then ('l'::'e'::'t'::' '::l) else premierLet l
 |'l'::'e'::'t'::' '::l -> 'l'::'e'::'t'::' '::l 
+|c::l-> premierLet l
 |_->[];;
 
-let rec rechercheLet listech = match listech with
-| [] -> []
-| 'e'::'l'::'s'::'e'::_::_::_::_::'l'::'e'::'t'::' '::l -> rechercheLet l
-| 'e'::'l'::'s'::'e'::_::_::_::'l'::'e'::'t'::' '::l -> rechercheLet l
-| 'e'::'l'::'s'::'e'::_::_::'l'::'e'::'t'::' '::l -> rechercheLet l
-| 'e'::'l'::'s'::'e'::_::'l'::'e'::'t'::' '::l -> rechercheLet l
-| 't'::'h'::'e'::'n'::_::_::_::_::_::_'l'::'e'::'t'::' '::l -> rechercheLet l
-| 't'::'h'::'e'::'n'::_::_::_::_::_::'l'::'e'::'t'::' '::l -> rechercheLet l
-| 't'::'h'::'e'::'n'::_::_::_::_'l'::'e'::'t'::' '::l -> rechercheLet l
-| 't'::'h'::'e'::'n'::_::_::_::'l'::'e'::'t'::' '::l -> rechercheLet l
-| 't'::'h'::'e'::'n'::_::_::'l'::'e'::'t'::' '::l -> rechercheLet l
-| 't'::'h'::'e'::'n'::_::'l'::'e'::'t'::' '::l -> rechercheLet l
-| 'i'::'n'::_::_::_::'l'::'e'::'t'::' '::l -> rechercheLet l
-| 'i'::'n'::_::_::'l'::'e'::'t'::' '::l -> rechercheLet l
-| 'i'::'n'::_::'l'::'e'::'t'::' '::l -> rechercheLet l
-| '='::' '::'l'::'e'::'t'::' '::l -> rechercheLet l
-| ' '::'l'::'e'::'t'::' '::l -> 'l'::'e'::'t'::' '::l
-| '\n'::'l'::'e'::'t'::' '::l -> 'l'::'e'::'t'::' '::l
-| ';'::';'::'l'::'e'::'t'::' '::l -> 'l'::'e'::'t'::' '::l
-|c::suite -> rechercheLet suite ;;
+
+let rec commentaire listech cpt = match listech with
+|[]->[]
+|'*'::')'::l -> if cpt = 0 then l else commentaire l (cpt-1)
+|'('::'*'::l -> commentaire l (cpt+1) 
+|c::l->commentaire l cpt;;
+
+
+let rec validationLet listech = match listech with
+|[]->false
+|' '::l->validationLet l
+|'\n'::l->validationLet l
+|'('::l->validationLet l
+|'l'::'e'::'t'::l->false
+|_-> true
+;;
+
+let rec rechercheLet listech b = match listech with
+|[] -> []
+|'('::'*'::l -> rechercheLet (commentaire l 0) b
+|';'::';'::l -> rechercheLet l true
+|'='::l -> rechercheLet l (validationLet l)
+|_::'t'::'h'::'e'::'n'::_::l -> rechercheLet l (validationLet l)
+|_::'e'::'l'::'s'::'e'::_::l -> rechercheLet l (validationLet l)
+|_::'i'::'n'::_::l -> rechercheLet l (validationLet l)
+|'-'::'>'::l->rechercheLet l (validationLet l)
+|'l'::'e'::'t'::' '::l ->if b then 'l'::'e'::'t'::' '::l else rechercheLet l false
+|c::suite -> rechercheLet suite b
+;;
+
 
 let rec decomposition2 listech = match listech with
      |[] -> []
@@ -73,7 +85,7 @@ let decompoFirst listech = match listech with
 |_->(decomposition2 listech)@failchar ;;
 
 let rec genLet listech =
-	let liste = rechercheLet listech in
+	let liste = rechercheLet listech false in
 	match liste with
 	|[]->[]
 	|_-> (decomposition2 liste)@failchar@(genLet (tail liste)) ;;

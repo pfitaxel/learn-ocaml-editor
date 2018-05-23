@@ -34,7 +34,7 @@
     </div>
     <h1 id="para">New Exercise</h1>
     <div>
-      <form method="post" action="">
+      <form name="new_exo" method="post" action="">
         <p>
           <label for="identifier">Unique identifier:<br></label>
           <input type="text" id="identifier" name="identifier" maxlength="250"
@@ -64,14 +64,11 @@
         </p>
       </form>
     </div>
-    <div>      
-    <a href="index.html#activity=editor">
-        <input type="reset" id="cancel" name="cancel" value="Cancel" class="tabs" />
-      </a>
-      <a href="editor.html#id=manu&action=open">
-        <input type="submit" id="save2" name="save" value="Save" class="tabs" />
-      </a>
+    <div>
+    	<a href="index.html#activity=editor">
+    		<input type="reset" id="cancel" name="cancel" value="Cancel" class="tabs" />
+    	</a>
+    	<input type="submit" id="save" name="save" value="Save" class="tabs" />
     </div>
-
   </body>
 </html>

@@ -7,7 +7,6 @@ begin program "new_exercise"
     "learnocaml-app-common"
     "learnocaml-toplevel"
     "jsutils"
-    	
     "ppx_metaquot_lib"
     "js_of_ocaml.ppx"
   ]

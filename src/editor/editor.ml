@@ -467,9 +467,21 @@ let () =
   let exo_toolbar = find_component "learnocaml-exo-toolbar" in
   let toolbar_button = button ~container: exo_toolbar ~theme: "light" in
   begin toolbar_button
-      ~icon: "left" "Metadata" @@ fun () ->
-    Dom_html.window##location##assign
-      (Js.string "new_exercise.html");
+          ~icon: "left" "Metadata" @@ fun () ->
+    let solution = Ace.get_contents ace in
+    let titre = Learnocaml_exercise.(get title) exo in
+    let question=" " in
+    let template= Ace.get_contents ace_temp in
+    let test= Ace.get_contents ace_t in
+    let report, diff, description  =
+      match Learnocaml_local_storage.(retrieve (editor_state id)) with
+      | { Learnocaml_exercise_state.report ; diff ; description } -> report, diff, description
+      | exception Not_found -> None, None, None in
+    Learnocaml_local_storage.(store (editor_state id))
+      { Learnocaml_exercise_state.report ; id ; solution ; titre ; question ; template ; diff ; test ; description ;
+        mtime = gettimeofday () } ;
+      Dom_html.window##location##assign
+        (Js.string "new_exercise.html");
     Lwt.return ()
   end;
   

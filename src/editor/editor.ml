@@ -518,9 +518,14 @@ let () =
     Dom_html.window##location##assign
       (Js.string "new_exercise.html");
     Lwt.return ()
-  end;                          
+  end;
+  
+  let messages = Tyxml_js.Html5.ul [] in
+  let callback text =
+    Manip.appendChild messages Tyxml_js.Html5.(li [ pcdata text ]) in
+  let worker = ref (Grading_jsoo.get_grade ~callback exo) in
   begin toolbar_button
-      ~icon: "list" "Exercises" @@ fun () ->(
+      ~icon: "list" "Exercises" @@ fun () ->(*(
   let b =
     Dom_html.window##confirm (Js.string "Save ? (Escape to close)") in
     if (Js.to_bool b) then (
@@ -538,9 +543,83 @@ let () =
         mtime = gettimeofday () } ;
       Dom_html.window##location##assign
       (Js.string "index.html#activity=editor") )
-      else () );
-    Lwt.return ()
+      else () );*)
+                                   
+    let aborted, abort_message =
+      let t, u = Lwt.task () in
+      let btn_cancel = Tyxml_js.Html5.(button [ pcdata "cancel" ]) in
+      Manip.Ev.onclick btn_cancel (fun _ -> Lwt.wakeup u () ; true) ;
+      let btn_yes = Tyxml_js.Html5.(button [ pcdata "yes" ]) in
+      Manip.Ev.onclick btn_yes (fun _ -> let solution = Ace.get_contents ace in
+    let titre = Learnocaml_exercise.(get title) exo in
+    let question=" " in
+    let template= Ace.get_contents ace_temp in
+    let test= Ace.get_contents ace_t in
+    let report, diff, description  =
+      match Learnocaml_local_storage.(retrieve (editor_state id)) with
+      | { Learnocaml_exercise_state.report ; diff ; description } -> report, diff, description
+      | exception Not_found -> None, None, None in
+    Learnocaml_local_storage.(store (editor_state id))
+      { Learnocaml_exercise_state.report ; id ; solution ; titre ; question ; template ; diff ; test ; description ;
+        mtime = gettimeofday () } ;
+      Dom_html.window##location##assign
+        (Js.string "index.html#activity=editor") ; true) ;
+      let btn_no = Tyxml_js.Html5.(button [ pcdata "no" ]) in
+      Manip.Ev.onclick btn_no (fun _ -> 
+      Dom_html.window##location##assign
+        (Js.string "index.html#activity=editor") ; true);
+      let div =
+        Tyxml_js.Html5.(div ~a: [ a_class [ "dialog" ] ]
+                          [ pcdata "Save " ;
+                            btn_yes ;
+                            pcdata " ";
+                            btn_no ;
+                            pcdata " ";
+                            btn_cancel ; 
+                            pcdata " ?" ]) in
+      Manip.SetCss.opacity div (Some "0") ;
+      t, div in 
+    Manip.replaceChildren messages
+      Tyxml_js.Html5.[ li [ pcdata "Launching the grader" ] ] ;
+    show_loading ~id:"learnocaml-exo-loading" [ messages ; abort_message ] ;
+    Lwt_js.sleep 1. >>= fun () ->
+    let solution = Ace.get_contents ace in
+    Learnocaml_toplevel.check top solution >>= fun res ->
+    match res with
+    | Toploop_results.Ok ((), _) ->
+        let grading =
+          !worker solution >>= fun (report, _, _, _) ->
+          Lwt.return report in
+        let abortion =
+          Lwt_js.sleep 5. >>= fun () ->
+          Manip.SetCss.opacity abort_message (Some "1") ;
+          aborted >>= fun () ->
+          Lwt.return Learnocaml_report.[ Message ([ Text "Grading aborted by user." ], Failure) ] in
+        Lwt.pick [ grading ; abortion ] >>= fun report ->
+        let grade = display_report exo report in
+        worker := Grading_jsoo.get_grade ~callback exo ;
+        Learnocaml_local_storage.(store (exercise_state id))
+          { Learnocaml_exercise_state.grade = Some grade ; solution ; report = Some report ;
+            mtime = gettimeofday () } ;
+        select_tab "report" ;
+        Lwt_js.yield () >>= fun () ->
+        hide_loading ~id:"learnocaml-exo-loading" () ;
+        Lwt.return ()
+    | Toploop_results.Error _ ->
+        let msg =
+          Learnocaml_report.[ Text "Error in your code." ; Break ;
+                   Text "Cannot start the grader if your code does not typecheck." ] in
+        let report = Learnocaml_report.[ Message (msg, Failure) ] in
+        let grade = display_report exo report in
+        Learnocaml_local_storage.(store (exercise_state id))
+          { Learnocaml_exercise_state.grade = Some grade ; solution ; report = Some report ;
+            mtime = gettimeofday () } ;
+        select_tab "report" ;
+        Lwt_js.yield () >>= fun () ->
+        hide_loading ~id:"learnocaml-exo-loading" () ;
+        typecheck true
   end ;
+  
   let messages = Tyxml_js.Html5.ul [] in
   let callback text =
     Manip.appendChild messages Tyxml_js.Html5.(li [ pcdata text ]) in

@@ -85,8 +85,8 @@ let rec genTemplate chaine =
 
 
 let init_tabs, select_tab =
-  let names = [ "text" ; "toplevel" ; "report" ; "editor" ; "template" ; "test" ] in
-  let current = ref "text" in
+  let names = [ "toplevel" ; "report" ; "editor" ; "template" ; "test";"question" ] in
+  let current = ref "toplevel" in
   let select_tab name =
     set_arg "tab" name ;
     Manip.removeClass
@@ -109,8 +109,8 @@ let init_tabs, select_tab =
   let init_tabs () =
     current := begin try
         let requested = arg "tab" in
-        if List.mem requested names then requested else "text"
-      with Not_found -> "text"
+        if List.mem requested names then requested else "toplevel"
+      with Not_found -> "toplevel"
     end ;
     List.iter
       (fun name ->
@@ -296,66 +296,6 @@ let () =
     Lwt.return ()
   end ;
   
-  (* ---- text pane ----------------------------------------------------- *)
-  let text_container = find_component "learnocaml-exo-tab-text" in
-  let text_iframe = Dom_html.createIframe Dom_html.document in
-  Manip.replaceChildren text_container
-    Tyxml_js.Html5.[ h1 [ pcdata (Learnocaml_exercise.(get title) exo) ] ;
-                     Tyxml_js.Of_dom.of_iFrame text_iframe ] ;
-  let prelude = Learnocaml_exercise.(get prelude) exo in
-  if prelude <> "" then begin
-    let open Tyxml_js.Html5 in
-    let state = ref (match arg "prelude" with
-        | exception Not_found -> true
-        | "shown" -> true
-        | "hidden" -> false
-        | _ -> failwith "Bad format for argument prelude.") in
-    let prelude_btn = button [] in
-    let prelude_title = h1 [ pcdata "OCaml prelude" ;
-                             prelude_btn ] in
-    let prelude_container =
-      pre ~a: [ a_class [ "toplevel-code" ] ]
-        (Learnocaml_toplevel_output.format_ocaml_code prelude) in
-    let update () =
-      if !state then begin
-        Manip.replaceChildren prelude_btn [ pcdata "↳ Hide" ] ;
-        Manip.SetCss.display prelude_container "" ;
-        set_arg "prelude" "shown"
-      end else begin
-        Manip.replaceChildren prelude_btn [ pcdata "↰ Show" ] ;
-        Manip.SetCss.display prelude_container "none" ;
-        set_arg "prelude" "hidden"
-      end in
-    update () ;
-    Manip.Ev.onclick prelude_btn
-      (fun _ -> state := not !state ; update () ; true) ;
-    Manip.appendChildren text_container
-      Tyxml_js.Html5.[ prelude_title ; prelude_container ]
-  end ;
-  Js.Opt.case
-    (text_iframe##contentDocument)
-    (fun () -> failwith "cannot edit iframe document")
-    (fun d ->
-       let mathjax_url =
-         "http://cdn.mathjax.org/mathjax/2.1-latest/MathJax.js?config=AM_HTMLorMML-full" in
-       let html = Format.asprintf
-           "<!DOCTYPE html>\
-            <html><head>\
-            <title>%s - exercise text</title>\
-            <meta charset='UTF-8'>\
-            <link rel='stylesheet' href='learnocaml_standalone_description.css'>\
-            <script type='text/javascript' src='%s'></script>\
-            </head>\
-            <body>\
-            %s\
-            </body>\
-            </html>"
-           (Learnocaml_exercise.(get title) exo)
-           mathjax_url
-           (Learnocaml_exercise.(get descr) exo) in
-       d##open_ ();
-       d##write (Js.string html);
-       d##close ()) ;
   
   (* ---- test pane --------------------------------------------------- *)
 
@@ -438,7 +378,19 @@ let () =
       ~icon: "typecheck" "Check" @@ fun () ->
     typecheck true
   end ;
+  (*-------question pane  -------------------------------------------------*)
 
+  let editor_question = find_component "learnocaml-exo-question-pane" in
+  
+  let ace_quest = Ace.create_editor (Tyxml_js.To_dom.of_div editor_question ) in
+  Ace.set_contents ace_temp
+    (match question with
+     | Some question -> question
+     | None -> " ") ;
+  Ace.set_font_size ace_temp 18;
+
+
+  
   (* ---- editor pane --------------------------------------------------- *)
   let editor_pane = find_component "learnocaml-exo-editor-pane" in
   let editor = Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div editor_pane) in
@@ -458,7 +410,7 @@ let () =
       ~icon: "save" "Save" @@ fun () ->
     let solution = Ace.get_contents ace in
     let titre = Learnocaml_exercise.(get title) exo in
-    let question=" " in
+    let question=Ace.get_contents ace_quest in
     let template= Ace.get_contents ace_temp in
     let test= Ace.get_contents ace_t in
     let report, diff, description  =

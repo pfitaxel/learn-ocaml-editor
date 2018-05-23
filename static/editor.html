@@ -54,12 +54,13 @@
            Don't set the editor to .front-tab initially. -->
       <button id="learnocaml-exo-button-template">Template</button>
       <button id="learnocaml-exo-button-toplevel" class="front-tab">Toplevel</button>
+      
       <!-- When graded, apply one of .partial, .success or .failure.
            The score must be put in a span.score. -->
-      <button id="learnocaml-exo-button-text">Question</button>
+      <button id="learnocaml-exo-button-question">Question</button>
       <button id="learnocaml-exo-button-test" class="front-tab">Test.ml</button>
       <button id="learnocaml-exo-button-report">Report</button>
-      
+          
       <!-- Any other button can be added. -->
     </div>
     <div id="learnocaml-exo-tabs">
@@ -112,10 +113,7 @@
           <!-- </button> -->
         </div>
       </div>
-      <div id="learnocaml-exo-tab-text">
-        <!-- <h1>title</h1> -->
-        <!-- <iframe src="standalone-descr.html"></iframe> -->
-      </div>
+
       <div id="learnocaml-exo-tab-report">
         <!-- Using an iframe is the easiest way to isolate the CSSs. -->
         <!-- <iframe src="mockup_report.html"></iframe> -->
@@ -133,10 +131,18 @@
 	<div id="learnocaml-exo-template-pane" class="template-pane"></div>
         <div id="learnocaml-exo-template-toolbar" class="buttons"></div>
       </div>
+      <div id="learnocaml-exo-tab-question">
+	<div id="learnocaml-exo-question-pane" ></div>
+        <div id="learnocaml-exo-question-toolbar" class="buttons"></div>
+      </div>
+    
+    
       <div id="learnocaml-exo-tab-test">
-	<div id="learnocaml-exo-test-pane" class="test-pane"></div>
-        <div id="learnocaml-exo-test-toolbar" class="buttons"></div>
-      </div>   
+        <div id="learnocaml-exo-test-pane" class="test-pane">Editor</div>
+        <div id="learnocaml-exo-test-toolbar" class="buttons">
+      </div>
+      
+      
 
       <!-- Any tab can be added. -->
     </div>

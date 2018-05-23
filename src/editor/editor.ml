@@ -380,14 +380,15 @@ let () =
   end ;
   (*-------question pane  -------------------------------------------------*)
 
-  let editor_question = find_component "learnocaml-exo-question-pane" in
+  let editor_question = find_component "learnocaml-exo-tab-question" in
   
   let ace_quest = Ace.create_editor (Tyxml_js.To_dom.of_div editor_question ) in
-  Ace.set_contents ace_temp
+  Ace.set_contents ace_quest
     (match question with
      | Some question -> question
-     | None -> " ") ;
-  Ace.set_font_size ace_temp 18;
+     | None -> "marche pas "
+    ) ;
+  Ace.set_font_size ace_quest 18;
 
 
   
@@ -415,7 +416,7 @@ let () =
     let test= Ace.get_contents ace_t in
     let report, diff, description  =
       match Learnocaml_local_storage.(retrieve (editor_state id)) with
-      | { Learnocaml_exercise_state.report ; diff ; description } -> report, diff, description
+      | { Learnocaml_exercise_state.report ; diff ; description} -> report, diff, description
       | exception Not_found -> None, None, None in
     Learnocaml_local_storage.(store (editor_state id))
       { Learnocaml_exercise_state.report ; id ; solution ; titre ; question ; template ; diff ; test ; description ;
@@ -478,7 +479,7 @@ let () =
     if (Js.to_bool b) then (
     let solution = Ace.get_contents ace in
     let titre = Learnocaml_exercise.(get title) exo in
-    let question=" " in
+    let question=Ace.get_contents ace_quest in
     let template= Ace.get_contents ace_temp in
     let test= Ace.get_contents ace_t in
     let report, diff, description  =

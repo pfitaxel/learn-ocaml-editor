@@ -19,7 +19,7 @@ TUTORIALS_DIR ?= ${REPO_DIR}/tutorials
 
 build:
 	@ocp-build init
-	@ocp-build --scan
+	@ocp-build -scan
 	@mkdir -p ${DEST_DIR}
 	@${MAKE} -C  static
 	cp static/* ${DEST_DIR}

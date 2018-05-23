@@ -268,8 +268,8 @@ let editor_tab _ _ () =
     List.rev (format_contents 1 [a ~a:[ a_href ("new_exercise.html#&action=open") ; 
         a_class [ "exercise" ] ] [
       div ~a:[ a_class [ "descr" ] ] [
-        h1 [ pcdata "Create new exo" ];
-        p [pcdata "Create a new exercise with our great builder"];];
+        h1 [ pcdata "New exercise" ];
+        p [pcdata "Create a new exercise"];];
       ]] index) in
   let list_div =
     Tyxml_js.Html5.(div ~a: [ Tyxml_js.Html5.a_id "learnocaml-main-exercise-list" ])

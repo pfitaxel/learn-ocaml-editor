@@ -23,7 +23,7 @@ open Learnocaml_common
 
 let string_of_char ch = String.make 1 ch ;;
 
-let failchar = ['f';'a';'i';'l';'w';'i';'t';'h';' ';'"';'T';'O';'D';'O';'"';'\n'] ;;
+let failchar = [' ';'f';'a';'i';'l';'w';'i';'t';'h';' ';'"';'T';'O';'D';'O';'"';'\n'] ;;
 
 let tail l = match l with
 |[]->[]
@@ -37,31 +37,51 @@ let rec decompositionSol str n =
 if (n+1= String.length str) then [(str.[n])]
 else ( (str.[n])::(decompositionSol str (n+1)) );;
 
-let premierLet listech = match listech with 
+let rec commentaire listech cpt = match listech with
 |[]->[]
+|'*'::')'::l -> if cpt = 0 then l else commentaire l (cpt-1)
+|'('::'*'::l -> commentaire l (cpt+1) 
+|c::l->commentaire l cpt;;
+
+let rec premierLet listech = match listech with 
+|[]->[]
+|'('::'*'::l -> premierLet (commentaire l 0)
+|c::'l'::'e'::'t'::' '::l -> if (c='\n'||c=' ') then ('l'::'e'::'t'::' '::l) else premierLet l
 |'l'::'e'::'t'::' '::l -> 'l'::'e'::'t'::' '::l 
+|' '::l-> premierLet l
+|'\n'::l-> premierLet l
 |_->[];;
 
-let rec rechercheLet listech = match listech with
-| [] -> []
-| 'e'::'l'::'s'::'e'::_::_::_::_::'l'::'e'::'t'::' '::l -> rechercheLet l
-| 'e'::'l'::'s'::'e'::_::_::_::'l'::'e'::'t'::' '::l -> rechercheLet l
-| 'e'::'l'::'s'::'e'::_::_::'l'::'e'::'t'::' '::l -> rechercheLet l
-| 'e'::'l'::'s'::'e'::_::'l'::'e'::'t'::' '::l -> rechercheLet l
-| 't'::'h'::'e'::'n'::_::_::_::_::_::_'l'::'e'::'t'::' '::l -> rechercheLet l
-| 't'::'h'::'e'::'n'::_::_::_::_::_::'l'::'e'::'t'::' '::l -> rechercheLet l
-| 't'::'h'::'e'::'n'::_::_::_::_'l'::'e'::'t'::' '::l -> rechercheLet l
-| 't'::'h'::'e'::'n'::_::_::_::'l'::'e'::'t'::' '::l -> rechercheLet l
-| 't'::'h'::'e'::'n'::_::_::'l'::'e'::'t'::' '::l -> rechercheLet l
-| 't'::'h'::'e'::'n'::_::'l'::'e'::'t'::' '::l -> rechercheLet l
-| 'i'::'n'::_::_::_::'l'::'e'::'t'::' '::l -> rechercheLet l
-| 'i'::'n'::_::_::'l'::'e'::'t'::' '::l -> rechercheLet l
-| 'i'::'n'::_::'l'::'e'::'t'::' '::l -> rechercheLet l
-| '='::' '::'l'::'e'::'t'::' '::l -> rechercheLet l
-| ' '::'l'::'e'::'t'::' '::l -> 'l'::'e'::'t'::' '::l
-| '\n'::'l'::'e'::'t'::' '::l -> 'l'::'e'::'t'::' '::l
-| ';'::';'::'l'::'e'::'t'::' '::l -> 'l'::'e'::'t'::' '::l
-|c::suite -> rechercheLet suite ;;
+
+let rec validationLet listech = match listech with
+|[]->false
+|' '::l->validationLet l
+|'\n'::l->validationLet l
+|'('::l->validationLet l
+|'l'::'e'::'t'::l->false
+|_-> true
+;;
+
+let rec rechercheEgal listech = match listech with
+|[]->0
+|'='::l->1
+|' '::'l'::'e'::'t'::' '::l->2
+|'\n'::'l'::'e'::'t'::' '::l->2
+|c::l->rechercheEgal l ;;
+
+let rec rechercheLet listech b = match listech with
+|[] -> []
+|'('::'*'::l -> rechercheLet (commentaire l 0) b
+|';'::';'::l -> rechercheLet l true
+|'='::l -> rechercheLet l (validationLet l)
+|_::'t'::'h'::'e'::'n'::_::l -> rechercheLet l (validationLet l)
+|_::'e'::'l'::'s'::'e'::_::l -> rechercheLet l (validationLet l)
+|_::'i'::'n'::_::l -> rechercheLet l (validationLet l)
+|'-'::'>'::l->rechercheLet l (validationLet l)
+|'l'::'e'::'t'::' '::l ->if b && ((rechercheEgal l)=1) then 'l'::'e'::'t'::' '::l else (if ((rechercheEgal l)=0) then rechercheLet l false else rechercheLet l true)
+|c::suite -> rechercheLet suite b
+;;
+
 
 let rec decomposition2 listech = match listech with
      |[] -> []
@@ -73,15 +93,13 @@ let decompoFirst listech = match listech with
 |_->(decomposition2 listech)@failchar ;;
 
 let rec genLet listech =
-	let liste = rechercheLet listech in
+	let liste = rechercheLet listech true in
 	match liste with
 	|[]->[]
 	|_-> (decomposition2 liste)@failchar@(genLet (tail liste)) ;;
 
 let rec genTemplate chaine = 
-	concatenation ( (decompoFirst (premierLet (decompositionSol chaine 0)))@(genLet (decompositionSol chaine 0)));;
-
-
+	concatenation (genLet (decompositionSol chaine 0));;
 
 
 let init_tabs, select_tab =
@@ -479,13 +497,18 @@ let () =
     Dom_html.window##location##assign
       (Js.string "new_exercise.html");
     Lwt.return ()
-  end;                          
+  end;
+  
+  let messages = Tyxml_js.Html5.ul [] in
   begin toolbar_button
-      ~icon: "list" "Exercises" @@ fun () ->(
-  let b =
-    Dom_html.window##confirm (Js.string "Save ? (Escape to close)") in
-    if (Js.to_bool b) then (
-    let solution = Ace.get_contents ace in
+      ~icon: "list" "Exercises" @@ fun () ->
+    let aborted, abort_message =
+      let t, u = Lwt.task () in
+      let btn_cancel = Tyxml_js.Html5.(button [ pcdata "Cancel" ]) in
+      Manip.Ev.onclick btn_cancel ( fun _ ->
+        hide_loading ~id:"learnocaml-exo-loading" () ; true) ;
+      let btn_yes = Tyxml_js.Html5.(button [ pcdata "Yes" ]) in
+      Manip.Ev.onclick btn_yes (fun _ -> let solution = Ace.get_contents ace in
     let titre = Learnocaml_exercise.(get title) exo in
     let question=Ace.get_contents ace_quest in
     let template= Ace.get_contents ace_temp in
@@ -498,10 +521,28 @@ let () =
       { Learnocaml_exercise_state.report ; id ; solution ; titre ; question ; template ; diff ; test ; description ;
         mtime = gettimeofday () } ;
       Dom_html.window##location##assign
-      (Js.string "index.html#activity=editor") )
-      else () );
-    Lwt.return ()
+        (Js.string "index.html#activity=editor") ; true) ;
+      let btn_no = Tyxml_js.Html5.(button [ pcdata "No" ]) in
+      Manip.Ev.onclick btn_no (fun _ -> 
+      Dom_html.window##location##assign
+        (Js.string "index.html#activity=editor") ; true);
+      let div =
+        Tyxml_js.Html5.(div ~a: [ a_class [ "dialog" ] ]
+                          [ pcdata "Do you want to save before closing?\n" ;
+                            btn_yes ;
+                            pcdata " " ;
+                            btn_no ;
+                            pcdata " " ;
+                            btn_cancel ]) in
+      Manip.SetCss.opacity div (Some "0") ;
+      t, div in 
+    Manip.replaceChildren messages
+      Tyxml_js.Html5.[ li [ pcdata "" ] ] ;
+    show_loading ~id:"learnocaml-exo-loading" [ abort_message ] ;
+    Manip.SetCss.opacity abort_message (Some "1") ;
+    typecheck true
   end ;
+  
   let messages = Tyxml_js.Html5.ul [] in
   let callback text =
     Manip.appendChild messages Tyxml_js.Html5.(li [ pcdata text ]) in

@@ -478,10 +478,10 @@ let () =
       ~icon: "list" "Exercises" @@ fun () ->
     let aborted, abort_message =
       let t, u = Lwt.task () in
-      let btn_cancel = Tyxml_js.Html5.(button [ pcdata "cancel" ]) in
+      let btn_cancel = Tyxml_js.Html5.(button [ pcdata "Cancel" ]) in
       Manip.Ev.onclick btn_cancel ( fun _ ->
         hide_loading ~id:"learnocaml-exo-loading" () ; true) ;
-      let btn_yes = Tyxml_js.Html5.(button [ pcdata "yes" ]) in
+      let btn_yes = Tyxml_js.Html5.(button [ pcdata "Yes" ]) in
       Manip.Ev.onclick btn_yes (fun _ -> let solution = Ace.get_contents ace in
     let titre = Learnocaml_exercise.(get title) exo in
     let question=Ace.get_contents ace_quest in
@@ -496,23 +496,22 @@ let () =
         mtime = gettimeofday () } ;
       Dom_html.window##location##assign
         (Js.string "index.html#activity=editor") ; true) ;
-      let btn_no = Tyxml_js.Html5.(button [ pcdata "no" ]) in
+      let btn_no = Tyxml_js.Html5.(button [ pcdata "No" ]) in
       Manip.Ev.onclick btn_no (fun _ -> 
       Dom_html.window##location##assign
         (Js.string "index.html#activity=editor") ; true);
       let div =
         Tyxml_js.Html5.(div ~a: [ a_class [ "dialog" ] ]
-                          [ pcdata "Save " ;
+                          [ pcdata "Do you want to save before closing?\n" ;
                             btn_yes ;
-                            pcdata " ";
+                            pcdata " " ;
                             btn_no ;
-                            pcdata " ";
-                            btn_cancel ; 
-                            pcdata " ?" ]) in
+                            pcdata " " ;
+                            btn_cancel ]) in
       Manip.SetCss.opacity div (Some "0") ;
       t, div in 
     Manip.replaceChildren messages
-      Tyxml_js.Html5.[ li [ pcdata "Launching the grader" ] ] ;
+      Tyxml_js.Html5.[ li [ pcdata "" ] ] ;
     show_loading ~id:"learnocaml-exo-loading" [ abort_message ] ;
     Manip.SetCss.opacity abort_message (Some "1") ;
     typecheck true

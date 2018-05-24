@@ -20,7 +20,6 @@ open Lwt.Infix
 open Learnocaml_common
 
 
-module StringMap = Map.Make (String)
 
 let string_of_char ch = String.make 1 ch ;;
 
@@ -578,7 +577,7 @@ let () =
     show_loading ~id:"learnocaml-exo-loading" [ messages ; abort_message ] ;
     Lwt_js.sleep 1. >>= fun () ->
     let solution = Ace.get_contents ace in
-    let solutionBis = solution in
+    let solutionBis = StringMap.singleton solution in
     Learnocaml_toplevel.check top solution >>= fun res ->
     match res with
     | Toploop_results.Ok ((), _) ->

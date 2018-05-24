@@ -433,18 +433,7 @@ let () =
     let question=Ace.get_contents ace_quest in
     let template= Ace.get_contents ace_temp in
     let test= Ace.get_contents ace_t in
-    let exercise_title="Manu's Demo" in
-    let exercise_stars=1.0 in
-    let open Learnocaml_index in
-    let exercise_kind=Learnocaml_exercise in
-    let exercise_short_description= Some "test" in
-    let manuexo={exercise_kind;exercise_stars;exercise_title;exercise_short_description} in
- 
-    let exoss =StringMap.singleton "manu" manuexo in
-    let exosss=StringMap.add "manu2" manuexo in
-      let exos=exosss exoss in
-    let index={Learnocaml_exercise_state.exos;mtime = gettimeofday ()} in
-    Learnocaml_local_storage.(store (index_state "index")) index ;
+  
     let report, diff, description  =
       match Learnocaml_local_storage.(retrieve (editor_state id)) with
       | { Learnocaml_exercise_state.report ; diff ; description} -> report, diff, description

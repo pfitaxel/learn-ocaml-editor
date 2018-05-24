@@ -40,7 +40,7 @@ build:
 
 clean:
 	@ocp-build clean
-	@${MAKE} -C  static clean
+	@${MAKE} -C static clean
 	-rm -rf ${DEST_DIR}
 	-rm -f src/grader/embedded_cmis.ml
 	-rm -f src/grader/embedded_grading_cmis.ml
@@ -49,3 +49,4 @@ clean:
                             ${EXERCISES_DIR}/%.*, \
                             ${wildcard ${EXERCISES_DIR}/*/meta.json}}
 	-find -name \*~ -delete
+	-find -name \#\*# -delete

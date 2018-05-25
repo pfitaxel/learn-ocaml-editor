@@ -16,7 +16,11 @@
       a:link 
       { 
       text-decoration:none; 
-      } 
+      }
+      input:invalid
+      {
+      border: 1px solid red;
+  	  }
     </style>
     <div style="display:none">
       <!-- preload -->
@@ -42,7 +46,7 @@
         </p>
         <p id="title_para">
           <label for="title">Title (unique too):<br></label>
-          <input type="text" id="title" name="title" size="40" required pattern=".*[^ \t]" />
+          <input type="text" id="title" name="title" size="40" required pattern="[^ \t].*[^ \t]" />
         </p>
         <p>
           <label for="description">Description of the exercise:<br></label>

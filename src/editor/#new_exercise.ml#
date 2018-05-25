@@ -72,7 +72,7 @@ save##onclick <- handler (fun _ ->
                   let exercise_stars= stars in
                   let open Learnocaml_index in
                   let exercise_kind=Learnocaml_exercise in
-                  let exercise_short_description=  description in
+                  let exercise_short_description= description in
                   let exo={exercise_kind;exercise_stars;exercise_title;exercise_short_description} in
                      
                   

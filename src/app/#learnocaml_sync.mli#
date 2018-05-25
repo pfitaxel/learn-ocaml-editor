@@ -15,33 +15,19 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>. *)
 
-type exercise_state =
-  { solution : string ;
-    grade : int (* \in [0, 100] *) option ;
-    report : Learnocaml_report.report option ;
-    mtime : float }
 
-val exercise_state_enc : exercise_state Json_encoding.encoding
-
-type editor_state =
-  { id : string ;
-    titre : string;
-    description : string option ;
-    diff : float option;
-    solution : string ;
-    question : string ;
-    template : string ;
-    test : string ;
-    report : Learnocaml_report.report option ;    
-    mtime : float }
-
-val editor_state_enc : editor_state Json_encoding.encoding
-open Learnocaml_index
-type index_state =
+type save_file =
   {
-     exos : Learnocaml_index.exercise Map.Make(String).t;
-     mtime : float;
-  }
-  
+    all_editor_states :
+      Learnocaml_exercise_state.editor_state Map.Make (String).t  ;      
+    all_exercise_states :      
+      Learnocaml_exercise_state.exercise_state Map.Make (String).t  ;
+    all_toplevel_histories :
+      Learnocaml_toplevel_history.snapshot Map.Make (String).t ;
+    all_exercise_toplevel_histories :
+      Learnocaml_toplevel_history.snapshot Map.Make (String).t }
 
-val index_state_enc : index_state Json_encoding.encoding
+
+val save_file_enc : save_file Json_encoding.encoding
+
+val sync : save_file -> save_file -> save_file

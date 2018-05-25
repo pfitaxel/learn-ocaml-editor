@@ -18,7 +18,9 @@
 module StringMap = Map.Make (String)
 
 type save_file =
-  { all_editor_states :
+  { all_index_states:
+       Learnocaml_exercise_state.index_state Map.Make (String).t  ;  
+    all_editor_states :
       Learnocaml_exercise_state.editor_state Map.Make (String).t  ;      
     all_exercise_states :      
       Learnocaml_exercise_state.exercise_state Map.Make (String).t  ;
@@ -39,23 +41,28 @@ let map_enc enc =
 let save_file_enc =
   let open Json_encoding in
   conv
-    (fun { all_editor_states ;
+    (fun { all_index_states ;
+           all_editor_states ;
            all_exercise_states ;
            all_toplevel_histories ;
            all_exercise_toplevel_histories } ->
-      (all_editor_states ,
+      (all_index_states ,
+       all_editor_states ,
        all_exercise_states,
        all_toplevel_histories,
        all_exercise_toplevel_histories))
-    (fun (all_editor_states,
+    (fun (all_index_states ,
+          all_editor_states,
           all_exercise_states,
           all_toplevel_histories,
           all_exercise_toplevel_histories) ->
-      { all_editor_states ;
+      { all_index_states ;
+        all_editor_states ;
         all_exercise_states ;
         all_toplevel_histories ;
         all_exercise_toplevel_histories }) @@
-  (obj4
+  (obj5
+     (dft "index" (map_enc Learnocaml_exercise_state.index_state_enc) StringMap.empty )
      (dft "editor" (map_enc Learnocaml_exercise_state.editor_state_enc) StringMap.empty)  
      (dft "exercises" (map_enc Learnocaml_exercise_state.exercise_state_enc) StringMap.empty)
      (dft "toplevel-histories" (map_enc Learnocaml_toplevel_history.snapshot_enc) StringMap.empty)
@@ -63,11 +70,13 @@ let save_file_enc =
 
 let sync
   
-    { all_editor_states =all_editor_states_a ;
+    { all_index_states =all_index_states_a ;
+      all_editor_states =all_editor_states_a ;
       all_exercise_states = all_exercise_states_a ;
       all_toplevel_histories = all_toplevel_histories_a ;
       all_exercise_toplevel_histories = all_exercise_toplevel_histories_a }
-    { all_editor_states= all_editor_states_b ;
+    { all_index_states= all_index_states_b;
+      all_editor_states= all_editor_states_b ;
       all_exercise_states = all_exercise_states_b ;
       all_toplevel_histories = all_toplevel_histories_b ;
       all_exercise_toplevel_histories = all_exercise_toplevel_histories_b } =
@@ -83,12 +92,18 @@ let sync
       state_a
     else
       state_b in
-  let sync_editor_state state_a state_b =
+  let sync_editor_state (state_a:Learnocaml_exercise_state.editor_state) (state_b:Learnocaml_exercise_state.editor_state) =
     let open Learnocaml_exercise_state in
     if state_a.mtime > state_b.mtime then
       state_a
     else
       state_b in
+  let sync_index_state (state_a :Learnocaml_exercise_state.index_state) (state_b : Learnocaml_exercise_state.index_state) =
+    let open Learnocaml_exercise_state in
+    if state_a.mtime > state_b.mtime then
+      state_a
+    else
+      state_b in    
   
   let sync_map sync_item index_a index_b =
     let open Learnocaml_exercise_state in
@@ -98,7 +113,11 @@ let sync
          | None, Some i | Some i, None -> Some i
          | Some a, Some b -> Some (sync_item a b))
       index_a index_b in
-  { all_editor_states =
+  { all_index_states=
+    sync_map sync_index_state
+      all_index_states_a
+      all_index_states_b ;      
+    all_editor_states =
     sync_map sync_editor_state
       all_editor_states_a
       all_editor_states_b ;      

@@ -78,4 +78,11 @@ let editor_state_enc =
        (opt "report" Learnocaml_report.report_enc)
        (dft "mtime" float 0.))
 
-
+open Learnocaml_index;;
+type index_state=
+  {
+    exos: exercise Map.Make (String).t ;
+        mtime :float
+        
+  }
+let index_state_enc = conv (fun {exos;mtime}->(exos,mtime) ) (fun (exos,mtime)->{exos;mtime}) (obj2 (req "exercises" (map_enc exercise_enc)) (dft "mtime" float 0.))

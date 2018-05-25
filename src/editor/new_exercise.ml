@@ -13,7 +13,7 @@ let setInnerHtml elt s =
 let transResultOption= function
   |None -> false
   |Some s-> true;;
-let idOk s =transResultOption (Regexp.string_match (Regexp.regexp "[a-z0-9_-]+$") s 0);;
+let idOk s =transResultOption (Regexp.string_match (Regexp.regexp "^[a-z0-9_-]+$") s 0);;
 let titreOk s =(transResultOption (Regexp.string_match (Regexp.regexp "^[^ \t]") s 0))  &&  (transResultOption (Regexp.string_match (Regexp.regexp ".+[^ \t]$") s 0));;
 
 (* conversion *)

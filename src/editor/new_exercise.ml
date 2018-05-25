@@ -71,6 +71,7 @@ save##onclick <- handler (fun _ ->
         let index = {Learnocaml_exercise_state.exos;mtime = gettimeofday ()} in
         Learnocaml_local_storage.(store (index_state "index")) index in
 
-  if titre_unique () then let ()=store (); store2 () in (); else  setInnerHtml id_error "id pas unique" ;
-  Dom_html.window##location##assign (Js.string ("editor.html#id="^id^"&action=open")); Js._true);;
+  if titre_unique () then let ()=store (); store2 () in ();
+    Dom_html.window##location##assign (Js.string ("editor.html#id="^id^"&action=open"));
+  else  setInnerHtml id_error "id pas unique" ; Js._true);;
 

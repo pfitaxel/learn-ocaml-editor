@@ -13,9 +13,8 @@ let setInnerHtml elt s =
 let transResultOption= function
   |None -> false
   |Some s-> true;;
-let idOk s =transResultOption( Regexp.string_match (regexp "[a-z0-9_-]+$") s 0);;
-let titreOk s =transResultOption( (Regexp.string_match (regexp "^[^ \t]") s 0)  && (Regexp.string_match (regexp ".+[^ \t]$") s 0));;
-*)
+let idOk s =transResultOption (Regexp.string_match (Regexp.regexp "[a-z0-9_-]+$") s 0);;
+let titreOk s =(transResultOption (Regexp.string_match (Regexp.regexp "^[^ \t]") s 0))  &&  (transResultOption (Regexp.string_match (Regexp.regexp ".+[^ \t]$") s 0));;
 
 (* conversion *)
 let toString = function
@@ -39,6 +38,9 @@ let solution = "" in
 let question = "" in
 let template = "" in
 let test = "" in
+
+
+
 save##onclick <- handler (fun _ ->
   (* récupération des informations *)
   let id = toString identifier in
@@ -48,7 +50,6 @@ save##onclick <- handler (fun _ ->
   let store () = Learnocaml_local_storage.(store (editor_state id))
       { Learnocaml_exercise_state.report ; id ; solution ; titre ; question ; template ; diff ; test ; description ;
         mtime = gettimeofday () } in
-
   let store2 () =
     let exercise_title = titre in
     let stars = match diff with None -> failwith "" | Some f -> f in
@@ -67,6 +68,6 @@ save##onclick <- handler (fun _ ->
         let exos = StringMap.singleton id exo in
         let index = {Learnocaml_exercise_state.exos;mtime = gettimeofday ()} in
         Learnocaml_local_storage.(store (index_state "index")) index in
-
-  Learnocaml_local_storage.init (); store (); store2 ();
-  Dom_html.window##location##assign (Js.string ("editor.html#id="^id^"&action=open")); Js._true);;
+  if (idOk id && titreOk titre) then (
+   store (); store2 ();
+  Dom_html.window##location##assign (Js.string ("editor.html#id="^id^"&action=open"))) else (); Js._true);;

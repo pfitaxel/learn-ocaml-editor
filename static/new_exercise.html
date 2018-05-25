@@ -16,7 +16,11 @@
       a:link 
       { 
       text-decoration:none; 
-      } 
+      }
+      input:invalid
+      {
+      border: 1px solid red;
+  	  }
     </style>
     <div style="display:none">
       <!-- preload -->
@@ -32,17 +36,17 @@
         <img src="logo_ocp.svg">
       </div>
     </div>
-    <h1 id="para">New Exercise</h1>
-    <div>
-      <form method="post" action="">
-        <p>
+    <div style="margin: 0 5%;">
+      <h1>New Exercise</h1>
+      <form name="new_exo" method="post" action="">
+        <p id="id_para">
           <label for="identifier">Unique identifier:<br></label>
           <input type="text" id="identifier" name="identifier" maxlength="250"
           size="40" required pattern="[a-z0-9_-]+" autofocus />
         </p>
-        <p>
+        <p id="title_para">
           <label for="title">Title (unique too):<br></label>
-          <input type="text" id="title" name="title" size="40" required />
+          <input type="text" id="title" name="title" size="40" required pattern="[^ \t].*[^ \t]" />
         </p>
         <p>
           <label for="description">Description of the exercise:<br></label>
@@ -51,27 +55,22 @@
         <p>
           <label for="difficulty">Difficulty level:<br></label>
           <select name="difficulty" id="difficulty" size="1" required />
-            <option value = "0">0</option>
-            <option value = "0.5">0.5</option>
-            <option value = "1">1</option>
-            <option value = "1.5">1.5</option>
-            <option value = "2">2</option>
-            <option value = "2.5"   >2.5</option>
-            <option value = "3.0">3</option>
-            <option value = "3.5">3.5</option>
-            <option value = "4.0">4</option>
+            <option value="0.">0</option>
+            <option value="0.5">0.5</option>
+            <option value="1.">1</option>
+            <option value="1.5">1.5</option>
+            <option value="2.">2</option>
+            <option value="2.5">2.5</option>
+            <option value="3.">3</option>
+            <option value="3.5">3.5</option>
+            <option value="4.">4</option>
           </select>
         </p>
       </form>
-    </div>
-    <div>      
-    <a href="index.html#activity=editor">
+      <a href="index.html#activity=editor">
         <input type="reset" id="cancel" name="cancel" value="Cancel" class="tabs" />
       </a>
-      
-        <input type="submit" id="save" name="save" value="Save" class="tabs" />
-      
+      <input type="submit" id="save" name="save" value="Save" class="tabs" />
     </div>
-
   </body>
 </html>

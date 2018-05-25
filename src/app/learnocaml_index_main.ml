@@ -118,12 +118,28 @@ let exercises_tab _ _ () =
     Lwt.return div;; *)
 
 
+
+
+let init ()= Learnocaml_local_storage.(store (index_state "index")) {Learnocaml_exercise_state.exos=StringMap.empty;mtime=gettimeofday ()};; 
+
 (*test*)
 let editor_tab _ _ () =
+  Learnocaml_local_storage.init ();
+  let pct_init=None in
+    let pct_signal, pct_signal_set = React.S.create pct_init in
+              Learnocaml_local_storage.(listener (index_state "index")) :=
+                Some (fun _-> pct_signal_set None) ;
+       
+  let ()=
+  match Learnocaml_local_storage.(retrieve (index_state "index")) with
+  |exception Not_found -> init ()
+  |_->() 
+  in  
+    Server_caller.fetch_editor_index () >>= fun index ->  
   show_loading ~id:"learnocaml-main-loading"
     Tyxml_js.Html5.[ ul [ li [ pcdata "Loading editor" ] ] ] ;
+
   Lwt_js.sleep 0.5 >>= fun () ->
-  Server_caller.fetch_editor_index () >>= fun index ->
   let content_div = find_component "learnocaml-main-content" in
   let format_exercise_list all_exercise_states =
     let rec format_contents lvl acc contents =

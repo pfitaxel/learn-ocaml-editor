@@ -48,6 +48,10 @@ save##onclick <- handler (fun _ ->
   let store () = Learnocaml_local_storage.(store (editor_state id))
       { Learnocaml_exercise_state.report ; id ; solution ; titre ; question ; template ; diff ; test ; description ;
         mtime = gettimeofday () } in
+  let titre_unique () =
+    match Learnocaml_local_storage.(retrieve (editor_state id)) with
+    exception Not_found->true
+    |_->false in
   let store2 () =
     let exercise_title = titre in
     let stars = match diff with None -> failwith "" | Some f -> f in
@@ -67,5 +71,5 @@ save##onclick <- handler (fun _ ->
         let index = {Learnocaml_exercise_state.exos;mtime = gettimeofday ()} in
         Learnocaml_local_storage.(store (index_state "index")) index in
 
-   store (); store2 ();
+  if titre_unique () then let ()=store (); store2 () in (); else  () ;
   Dom_html.window##location##assign (Js.string ("editor.html#id="^id^"&action=open")); Js._true);;

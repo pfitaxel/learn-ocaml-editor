@@ -26,7 +26,7 @@ let toFloatOpt = function
   | None -> None
   | Some input -> float_of_string_opt (Js.to_string input##value)
 
-(* Élement à récupérer *)
+(* Élements à récupérer *)
 let save = getElementById "save" in
 let identifier = getElementById_coerce "identifier" CoerceTo.input in
 let title = getElementById_coerce "title" CoerceTo.input in
@@ -37,7 +37,6 @@ let solution = "" in
 let question = "" in
 let template = "" in
 let test = "" in
-
 
 save##onclick <- handler (fun _ ->
   (* récupération des informations *)

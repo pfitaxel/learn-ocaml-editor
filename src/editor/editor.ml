@@ -18,9 +18,38 @@
 open Js_utils
 open Lwt.Infix
 open Learnocaml_common
+         
+(*module Report = Learnocaml_report
 
+let test_lib ?callback ?(timeout: int option)
+ (module Introspection : Introspection_intf.INTROSPECTION) =
+ let set_progress =
+   match callback with
+   | None -> (fun _ -> ())
+   | Some set_progress -> set_progress in
 
+ let results : Learnocaml_report.report option ref = ref None in
 
+ let module M (* : Params *) = struct
+   let results = results
+   let set_progress = set_progress
+   let timeout = timeout
+   module Introspection = Introspection
+ end in
+ let module TL = Test_lib.Make(M) in
+(module TL : Test_lib.S)*)
+
+module Dummy_Functor (Introspection :
+                        Introspection_intf.INTROSPECTION) = struct
+  module Dummy_Params = struct
+    let results = ref None
+    let set_progress _ = ()
+    module Introspection = Introspection            
+  end       
+  module Test_lib = Test_lib.Make(Dummy_Params)
+  module Report = Learnocaml_report
+         
+         
 let string_of_char ch = String.make 1 ch ;;
 
 let failchar = [' ';'f';'a';'i';'l';'w';'i';'t';'h';' ';'"';'T';'O';'D';'O';'"';'\n'] ;;
@@ -318,9 +347,6 @@ let () =
   (* ---- test pane --------------------------------------------------- *)
 
 
-
-
-
   let editor_test = find_component "learnocaml-exo-test-pane" in
   let editor_t = Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div editor_test) in
   let ace_t = Ocaml_mode.get_editor editor_t in
@@ -456,8 +482,13 @@ let () =
     Learnocaml_common.fake_download ~name ~contents ;
     Lwt.return ()
   end ;
+  let lib = " module Test_lib = Test_lib.Make(struct\n\
+        \  let results = results\n\
+        \  let set_progress = set_progress\n\
+        \  module Introspection = Introspection\n\
+              end)" in
   let typecheck set_class =
-    Learnocaml_toplevel.check top (Ace.get_contents ace) >>= fun res ->
+    Learnocaml_toplevel.check top ((Ace.get_contents ace)^lib) >>= fun res ->
     let error, warnings =
       match res with
       | Toploop_results.Ok ((), warnings) -> None, warnings
@@ -619,3 +650,4 @@ let () =
 
   Lwt.return ()
 ;;
+end

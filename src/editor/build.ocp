@@ -37,7 +37,7 @@ begin program "editor"
     "learnocaml-repository"
     "learnocaml-app-common"
     "learnocaml-toplevel"
-    
+	"testing"
   ]
   files = [
     "editor.ml" ( pp = camlp4_js )

@@ -70,7 +70,8 @@ save##onclick <- handler (fun _ ->
         let exos = StringMap.singleton id exo in
         let index = {Learnocaml_exercise_state.exos;mtime = gettimeofday ()} in
         Learnocaml_local_storage.(store (index_state "index")) index in
-
+  if (idOk id && titreOk titre) then (
   if titre_unique () then let ()=store (); store2 () in (); else  setInnerHtml id_error "id pas unique" ;
-  Dom_html.window##location##assign (Js.string ("editor.html#id="^id^"&action=open")); Js._true);;
+  Dom_html.window##location##assign (Js.string ("editor.html#id="^id^"&action=open")))
+  else (); Js._true);;
 

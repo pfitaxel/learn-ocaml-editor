@@ -31,7 +31,7 @@ let identifier = getElementById_coerce "identifier" CoerceTo.input in
 let title = getElementById_coerce "title" CoerceTo.input in
 let descr = getElementById_coerce "description" CoerceTo.textarea in
 let difficulty = getElementById_coerce "difficulty" CoerceTo.select in
-let para=getElementById "para" in
+
 let report = None in
 let solution = "" in
 let question = "" in
@@ -42,8 +42,7 @@ save##onclick <- handler (fun _ ->
   let id =transToString identifier in
   let titre= transToString title in
   let description=transToStringOpt descr in
-  let diff= transToFloatOpt difficulty in
-  let setPara =setInnerHtml para  in 
+  let diff= transToFloatOpt difficulty in 
   let store () =Learnocaml_local_storage.(store (editor_state id))
            { Learnocaml_exercise_state.report ; id ; solution ; titre ; question ; template ; diff ; test ; description ;
              mtime = gettimeofday () }
@@ -80,7 +79,7 @@ save##onclick <- handler (fun _ ->
   
   in
 
-              Learnocaml_local_storage.init ();   
+               
               store () ;
               store2 ();
 

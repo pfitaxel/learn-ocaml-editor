@@ -40,7 +40,7 @@ open Learnocaml_index
 type index_state =
   {
      exos : Learnocaml_index.exercise Map.Make(String).t;
-     mtime : float;
+     mtime : float ;
   }
   
 

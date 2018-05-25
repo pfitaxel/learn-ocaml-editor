@@ -17,7 +17,9 @@
 
 
 type save_file =
-  { all_editor_states :
+  { all_index_states :
+      Learnocaml_exercise_state.index_state Map.Make(String).t;
+    all_editor_states :
       Learnocaml_exercise_state.editor_state Map.Make (String).t  ;      
     all_exercise_states :      
       Learnocaml_exercise_state.exercise_state Map.Make (String).t  ;

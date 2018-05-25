@@ -21,7 +21,7 @@ val fetch : string -> string Lwt.t
 
 val fetch_exercise_index : unit -> Learnocaml_index.group_contents Lwt.t
     
-val fetch_editor_index  : unit -> Learnocaml_index.group_contents Lwt.t (*copyright manu*) 
+val fetch_editor_index  : unit -> Learnocaml_index.group_contents Lwt.t  
 
 
 val fetch_exercise : string -> Learnocaml_exercise.t Lwt.t

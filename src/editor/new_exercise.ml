@@ -27,7 +27,7 @@ let toFloatOpt = function
   | None -> None
   | Some input -> float_of_string_opt (Js.to_string input##value)
 
-(* Élement à récupérer *)
+(* Élements à récupérer *)
 let save = getElementById "save" in
 let identifier = getElementById_coerce "identifier" CoerceTo.input in
 let title = getElementById_coerce "title" CoerceTo.input in
@@ -39,8 +39,6 @@ let question = "" in
 let template = "" in
 let test = "" in
 
-
-
 save##onclick <- handler (fun _ ->
   (* récupération des informations *)
   let id = toString identifier in
@@ -50,6 +48,10 @@ save##onclick <- handler (fun _ ->
   let store () = Learnocaml_local_storage.(store (editor_state id))
       { Learnocaml_exercise_state.report ; id ; solution ; titre ; question ; template ; diff ; test ; description ;
         mtime = gettimeofday () } in
+  let titre_unique () =
+    match Learnocaml_local_storage.(retrieve (editor_state id)) with
+    exception Not_found->true
+    |_->false in
   let store2 () =
     let exercise_title = titre in
     let stars = match diff with None -> failwith "" | Some f -> f in
@@ -68,6 +70,7 @@ save##onclick <- handler (fun _ ->
         let exos = StringMap.singleton id exo in
         let index = {Learnocaml_exercise_state.exos;mtime = gettimeofday ()} in
         Learnocaml_local_storage.(store (index_state "index")) index in
-  if (idOk id && titreOk titre) then (
-   store (); store2 ();
-  Dom_html.window##location##assign (Js.string ("editor.html#id="^id^"&action=open"))) else (); Js._true);;
+
+  if titre_unique () then let ()=store (); store2 () in (); else  () ;
+  Dom_html.window##location##assign (Js.string ("editor.html#id="^id^"&action=open")); Js._true);;
+

@@ -10,9 +10,11 @@ let setInnerHtml elt s =
   elt##innerHTML <- Js.string s
 
 (* test de validité de l'id et du titre *)
-(*
-let idOk s = string_match (regexp "[a-z0-9_-]+$") s 0;;
-let titreOk s = (string_match (regexp "^[^ \t]") s 0)  && (string_match (regexp ".+[^ \t]$") s 0);;
+let transResultOption= function
+  |None -> false
+  |Some s-> true;;
+let idOk s =transResultOption( Regexp.string_match (regexp "[a-z0-9_-]+$") s 0);;
+let titreOk s =transResultOption( (Regexp.string_match (regexp "^[^ \t]") s 0)  && (Regexp.string_match (regexp ".+[^ \t]$") s 0));;
 *)
 
 (* conversion *)
@@ -37,7 +39,6 @@ let solution = "" in
 let question = "" in
 let template = "" in
 let test = "" in
-
 save##onclick <- handler (fun _ ->
   (* récupération des informations *)
   let id = toString identifier in

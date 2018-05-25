@@ -10,10 +10,11 @@ let setInnerHtml elt s =
   elt##innerHTML <- Js.string s
 
 (* test de validité de l'id et du titre *)
-(*
-let idOk s = string_match (regexp "[a-z0-9_-]+$") s 0;;
-let titreOk s = (string_match (regexp "^[^ \t]") s 0)  && (string_match (regexp ".+[^ \t]$") s 0);;
-*)
+let transResultOption= function
+  |None -> false
+  |Some s-> true;;
+let idOk s =transResultOption (Regexp.string_match (Regexp.regexp "[a-z0-9_-]+$") s 0);;
+let titreOk s =(transResultOption (Regexp.string_match (Regexp.regexp "^[^ \t]") s 0))  &&  (transResultOption (Regexp.string_match (Regexp.regexp ".+[^ \t]$") s 0));;
 
 (* conversion *)
 let toString = function
@@ -65,6 +66,6 @@ save##onclick <- handler (fun _ ->
         let exos = StringMap.singleton id exo in
         let index = {Learnocaml_exercise_state.exos;mtime = gettimeofday ()} in
         Learnocaml_local_storage.(store (index_state "index")) index in
-
+  if (idOk id && titreOk titre) then (
    store (); store2 ();
-  Dom_html.window##location##assign (Js.string ("editor.html#id="^id^"&action=open")); Js._true);;
+  Dom_html.window##location##assign (Js.string ("editor.html#id="^id^"&action=open"))) else (); Js._true);;

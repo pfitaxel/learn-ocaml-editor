@@ -49,4 +49,4 @@ clean:
                             ${EXERCISES_DIR}/%.*, \
                             ${wildcard ${EXERCISES_DIR}/*/meta.json}}
 	-find -name \*~ -delete
-	-find -name \#\*# -delete
+	-find -name \#\*\# -delete

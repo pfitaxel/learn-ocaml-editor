@@ -39,6 +39,7 @@ let question = "" in
 let template = "" in
 let test = "" in
 let id_error= getElementById "id_error" in
+let title_error= getElementById "title_error" in
 save##onclick <- handler (fun _ ->
   (* récupération des informations *)
   let id = toString identifier in
@@ -70,8 +71,8 @@ save##onclick <- handler (fun _ ->
         let exos = StringMap.singleton id exo in
         let index = {Learnocaml_exercise_state.exos;mtime = gettimeofday ()} in
         Learnocaml_local_storage.(store (index_state "index")) index in
-  if (not (idOk id)) then setInnerHtml id_error "id pas accepter" else
-    if (not (titreOk titre)) then setInnerHtml title_error "titre pas accepter" else
+  if (not (idOk id)) then setInnerHtml id_error "id pas accepté" else
+    if (not (titreOk titre)) then setInnerHtml title_error "titre pas accepté" else
   if titre_unique () then let ()=store (); store2 () in ();
     Dom_html.window##location##assign (Js.string ("editor.html#id="^id^"&action=open"));
   else  setInnerHtml id_error "id pas unique" ; Js._true);;

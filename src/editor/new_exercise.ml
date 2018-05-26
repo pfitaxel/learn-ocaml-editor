@@ -9,14 +9,13 @@ module StringMap = Map.Make (String)
 let setInnerHtml elt s =    
   elt##innerHTML <- Js.string s
 
-(* test de validité de l'id et du titre *)
-let transResultOption= function
+let transResultOption = function
   |None -> false
   |Some s-> true;;
-let idOk s =transResultOption (Regexp.string_match (Regexp.regexp "^[a-z0-9_-]+$") s 0);;
-let titreOk s =(transResultOption (Regexp.string_match (Regexp.regexp "^[^ \t]") s 0))  &&  (transResultOption (Regexp.string_match (Regexp.regexp ".+[^ \t]$") s 0));;
+let idOk s = transResultOption (Regexp.string_match (Regexp.regexp "^[a-z0-9_-]+$") s 0);;
+let titreOk s = (transResultOption (Regexp.string_match (Regexp.regexp "^[^ \t]") s 0)) &&
+                (transResultOption (Regexp.string_match (Regexp.regexp ".+[^ \t]$") s 0));;
 
-(* conversion *)
 let toString = function
   |None -> failwith "incorrect_input"
   |Some input -> Js.to_string input##value
@@ -27,21 +26,20 @@ let toFloatOpt = function
   | None -> None
   | Some input -> float_of_string_opt (Js.to_string input##value)
 
-(* Élements à récupérer *)
-let save = getElementById "save" in
-let identifier = getElementById_coerce "identifier" CoerceTo.input in
-let title = getElementById_coerce "title" CoerceTo.input in
-let descr = getElementById_coerce "description" CoerceTo.textarea in
-let difficulty = getElementById_coerce "difficulty" CoerceTo.select in
-let report = None in
-let solution = "" in
-let question = "" in
-let template = "" in
-let test = "" in
-let id_error= getElementById "id_error" in
-let title_error= getElementById "title_error" in
-save##onclick <- handler (fun _ ->
-  (* récupération des informations *)
+let save = getElementById "save"
+let identifier = getElementById_coerce "identifier" CoerceTo.input
+let title = getElementById_coerce "title" CoerceTo.input
+let descr = getElementById_coerce "description" CoerceTo.textarea
+let difficulty = getElementById_coerce "difficulty" CoerceTo.select
+let report = None
+let solution = ""
+let question = ""
+let template = ""
+let test = ""
+let id_error = getElementById "id_error"
+let title_error = getElementById "title_error"
+
+let _ = save##onclick <- handler (fun _ ->
   let id = toString identifier in
   let titre = toString title in
   let description = toStringOpt descr in
@@ -49,10 +47,14 @@ save##onclick <- handler (fun _ ->
   let store () = Learnocaml_local_storage.(store (editor_state id))
       { Learnocaml_exercise_state.report ; id ; solution ; titre ; question ; template ; diff ; test ; description ;
         mtime = gettimeofday () } in
-  let titre_unique () =
+  let idUnique () =
     match Learnocaml_local_storage.(retrieve (editor_state id)) with
-    exception Not_found->true
-    |_->false in
+    | exception Not_found -> true
+    | _ -> false in
+  let titleUnique () =
+    match Learnocaml_local_storage.(retrieve (editor_state titre)) with
+    | exception Not_found -> true
+    | _ -> false in
   let store2 () =
     let exercise_title = titre in
     let stars = match diff with None -> failwith "" | Some f -> f in
@@ -62,31 +64,73 @@ save##onclick <- handler (fun _ ->
     let exercise_short_description = description in
     let exo = {exercise_kind; exercise_stars; exercise_title; exercise_short_description} in
     match Learnocaml_local_storage.(retrieve (index_state "index")) with
-    | {Learnocaml_exercise_state.exos;mtime} ->
+    | {Learnocaml_exercise_state.exos; mtime} ->
         let anciensexos = exos in
         let exos = StringMap.add id exo anciensexos in
         let index = {Learnocaml_exercise_state.exos; mtime = gettimeofday ()} in
-        Learnocaml_local_storage.(store (index_state "index")) index
+        Learnocaml_local_storage.(store (index_state "index")) index;
     | exception Not_found ->
         let exos = StringMap.singleton id exo in
         let index = {Learnocaml_exercise_state.exos;mtime = gettimeofday ()} in
         Learnocaml_local_storage.(store (index_state "index")) index in
-  if (not (idOk id)) then
+  let id_correct = idOk id in
+  let id_unique = idUnique () in
+  let title_correct = titreOk titre in
+  let title_unique = titleUnique () in
+  if not id_correct && not title_correct then
     begin
-      setInnerHtml id_error "id pas accepté";
-      setInnerHtml title_error " "
+      setInnerHtml id_error "Incorrect identifier: an identifier can't be empty, \
+                             and only lower case letters, numerals, dashes \
+                             and underscores are allowed";
+      setInnerHtml title_error "Incorrect title: a title can't be empty, \
+                                or begin or end with a space or a tab"
+    end
+  else if not id_correct && title_correct && not title_unique then
+    begin
+      setInnerHtml id_error "Incorrect identifier: an identifier can't be empty, \
+                             and only lower case letters, numerals, dashes \
+                             and underscores are allowed";
+      setInnerHtml title_error "This title is already used, please choose another one"
+    end
+  else if not id_correct && title_correct && title_unique then
+    begin
+      setInnerHtml id_error "Incorrect identifier: an identifier can't be empty, \
+                             and only lower case letters, numerals, dashes \
+                             and underscores are allowed";
+      setInnerHtml title_error ""
+    end
+  else if id_correct && not id_unique && not title_correct then
+    begin
+      setInnerHtml id_error "This identifier is already used, please choose another one";
+      setInnerHtml title_error "Incorrect title: a title can't be empty, \
+                                or begin or end with a space or a tab"
+    end
+  else if id_correct && not id_unique && title_correct && not title_unique then
+    begin
+      setInnerHtml id_error "This identifier is already used, please choose another one";
+      setInnerHtml title_error "This title is already used, please choose another one"
+    end
+  else if id_correct && not id_unique && title_correct && title_unique then
+    begin
+      setInnerHtml id_error "This identifier is already used, please choose another one";
+      setInnerHtml title_error ""
+    end
+  else if id_correct && id_unique && not title_correct then
+    begin
+      setInnerHtml id_error "";
+      setInnerHtml title_error "Incorrect title: a title can't be empty, \
+                                or begin or end with a space or a tab"
+    end
+  else if id_correct && id_unique && title_correct && not title_unique then
+    begin
+      setInnerHtml id_error "";
+      setInnerHtml title_error "This title is already used, please choose another one"
     end
   else
-    if (not (titreOk titre)) then
-      begin
-        setInnerHtml id_error " " ;setInnerHtml title_error "titre pas accepté"
-      end
-    else
-      if titre_unique () then
-        begin
-          store ();
-          store2 () ;
-          Dom_html.window##location##assign (Js.string ("editor.html#id="^id^"&action=open"));
-        end
-  else  (setInnerHtml id_error "id pas unique";setInnerHtml title_error " ") ; Js._true);;
-
+    begin
+      store ();
+      store2 ();
+      Dom_html.window##location##assign (Js.string ("editor.html#id="^id^"&action=open"))
+    end
+  ; Js._true
+)

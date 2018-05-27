@@ -14,7 +14,7 @@ let transResultOption = function
   |Some s-> true;;
 let idOk s = transResultOption (Regexp.string_match (Regexp.regexp "^[a-z0-9_-]+$") s 0);;
 let titreOk s = (transResultOption (Regexp.string_match (Regexp.regexp "^[^ \t]") s 0)) &&
-                (transResultOption (Regexp.string_match (Regexp.regexp ".+[^ \t]$") s 0));;
+                (transResultOption (Regexp.string_match (Regexp.regexp ".*[^ \t]$") s 0));;
 
 let toString = function
   |None -> failwith "incorrect_input"
@@ -128,6 +128,8 @@ let _ = save##onclick <- handler (fun _ ->
     end
   else
     begin
+      setInnerHtml id_error "";
+      setInnerHtml title_error "";
       store ();
       store2 ();
       Dom_html.window##location##assign (Js.string ("editor.html#id="^id^"&action=open"))

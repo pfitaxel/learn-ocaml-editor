@@ -52,7 +52,7 @@
         </p>
         <p>
           <label for="title">Title (unique too):<br></label>
-          <input type="text" id="title" name="title" size="40" required pattern="[^ \t].*[^ \t]" />
+          <input type="text" id="title" name="title" size="40" required pattern="[^ \t]|([^ \t].*[^ \t])" />
           <span id="title_error" class="error" aria-live="polite"></span>
         </p>
         <p>

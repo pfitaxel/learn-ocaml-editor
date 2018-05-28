@@ -33,13 +33,21 @@ let identifier = getElementById_coerce "identifier" CoerceTo.input
 let title = getElementById_coerce "title" CoerceTo.input
 let descr = getElementById_coerce "description" CoerceTo.textarea
 let difficulty = getElementById_coerce "difficulty" CoerceTo.select
-let report,solution,question,template,test,previousTitre=match Learnocaml_local_storage.(retrieve (editor_state previousId)) with
-  |exception Not_found -> None,"","","","",""
-  |{Learnocaml_exercise_state.report ; id ; solution ; titre ; question ; template ; diff ; test ; description ;
-    mtime } -> report,solution,question,template,test,titre
+let report, solution, question, template, test, previousTitre, previousDescr =
+  match Learnocaml_local_storage.(retrieve (editor_state previousId)) with
+  | exception Not_found -> None, "", "", "", "", "", None
+  | {Learnocaml_exercise_state.report ; id ; solution ; titre ; question ; template ; diff ; test ; description ;
+     mtime } -> report, solution, question, template, test, titre, description
 let id_error = getElementById "id_error"
 let title_error = getElementById "title_error"
-                                 
+
+
+(* let _ = setInnertHml (getElementById "id")##value previousId
+   let _ = setInnerHtml (getElementById "title")##value previousTitre *)
+let _ = match previousDescr with
+  | Some d -> setInnerHtml (getElementById "description") d
+  | None -> setInnerHtml (getElementById "description") ""
+
 let _ = save##onclick <- handler (fun _ ->
   let id = toString identifier in
   let titre = toString title in

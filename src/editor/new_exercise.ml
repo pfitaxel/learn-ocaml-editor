@@ -33,11 +33,11 @@ let identifier = getElementById_coerce "identifier" CoerceTo.input
 let title = getElementById_coerce "title" CoerceTo.input
 let descr = getElementById_coerce "description" CoerceTo.textarea
 let difficulty = getElementById_coerce "difficulty" CoerceTo.select
-let report, solution, question, template, test, previousTitre, previousDescr =
+let report, solution, question, template, test, previousTitre, previousDescr,previousDiff =
   match Learnocaml_local_storage.(retrieve (editor_state previousId)) with
-  | exception Not_found -> None, "", "", "", "", "", None
+  | exception Not_found -> None, "", "", "", "", "", None,None
   | {Learnocaml_exercise_state.report ; id ; solution ; titre ; question ; template ; diff ; test ; description ;
-     mtime } -> report, solution, question, template, test, titre, description
+     mtime } -> report, solution, question, template, test, titre, description,diff
 let id_error = getElementById "id_error"
 let title_error = getElementById "title_error"
     
@@ -52,6 +52,14 @@ let _= match identifier with
 let _= match title with
     None ->()
   | Some input->input##value<-Js.string previousTitre
+          
+let d=match previousDiff with
+    None-> 0.0
+  |Some f->f
+      
+let _ =match difficulty with
+  |None-> ()
+  |Some select->select##value<-Js.string (string_of_float d)
 
 let _ = save##onclick <- handler (fun _ ->
   let id = toString identifier in

@@ -327,7 +327,7 @@ let () =
     | exception Not_found -> None in
 
 
-  
+ 
 
   (* ---- toplevel pane ------------------------------------------------- *)
   begin toplevel_button
@@ -504,10 +504,10 @@ let () =
       ~icon: "download" "Download" @@ fun () ->
     let solution = Ace.get_contents ace in
     let titre = "" (*Learnocaml_exercise.(get title) exo*) in
-    let question=Ace.get_contents ace_quest in
-    let template= Ace.get_contents ace_temp in
-    let test= Ace.get_contents ace_t in
-    let report, diff, description  =
+    let question = Ace.get_contents ace_quest in
+    let template = Ace.get_contents ace_temp in
+    let test = Ace.get_contents ace_t in
+    let report, diff, description =
       match Learnocaml_local_storage.(retrieve (editor_state id)) with
       | { Learnocaml_exercise_state.report ; diff ; description} -> report, diff, description
       | exception Not_found -> None, None, None in
@@ -572,7 +572,7 @@ let () =
           ~icon: "left" "Metadata" @@ fun () ->
     let solution = Ace.get_contents ace in
     let titre ="" (*Learnocaml_exercise.(get title) exo*) in
-    let question=" " in
+    let question= Ace.get_contents ace_quest in
     let template= Ace.get_contents ace_temp in
     let test= Ace.get_contents ace_t in
     let report, diff, description  =

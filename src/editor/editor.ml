@@ -38,7 +38,7 @@ let test_lib ?callback ?(timeout: int option)
  end in
  let module TL = Test_lib.Make(M) in
 (module TL : Test_lib.S)*)
-
+(*
 module Dummy_Functor (Introspection :
                         Introspection_intf.INTROSPECTION) = struct
   module Dummy_Params = struct
@@ -48,7 +48,7 @@ module Dummy_Functor (Introspection :
   end       
   module Test_lib = Test_lib.Make(Dummy_Params)
   module Report = Learnocaml_report
-         
+ *)    
        
 
 
@@ -386,7 +386,7 @@ let () =
   begin test_button
       ~group: toplevel_buttons_group
       ~icon: "typecheck" "Check" @@ fun () ->
-    typecheck true
+    Lwt.return ()
   end ;
 
   (* ---- template pane --------------------------------------------------- *)
@@ -501,13 +501,13 @@ let () =
     Learnocaml_common.fake_download ~name ~contents ;
     Lwt.return ()
   end ;
-  let lib = " module Test_lib = Test_lib.Make(struct\n\
+ (* let lib = " module Test_lib = Test_lib.Make(struct\n\
         \  let results = results\n\
         \  let set_progress = set_progress\n\
         \  module Introspection = Introspection\n\
-              end)" in
+              end)" in*)
   let typecheck set_class =
-    Learnocaml_toplevel.check top ((Ace.get_contents ace)^lib) >>= fun res ->
+    Learnocaml_toplevel.check top (Ace.get_contents ace) >>= fun res ->
     let error, warnings =
       match res with
       | Toploop_results.Ok ((), warnings) -> None, warnings
@@ -531,7 +531,7 @@ let () =
   begin editor_button
       ~group: toplevel_buttons_group
       ~icon: "typecheck" "Check" @@ fun () ->
-    typecheck true
+                                    typecheck true
   end ;
   begin toplevel_button
       ~group: toplevel_buttons_group
@@ -670,4 +670,4 @@ let () =
 
   Lwt.return ()
 ;;
-end
+

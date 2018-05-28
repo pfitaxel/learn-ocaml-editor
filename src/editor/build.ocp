@@ -38,7 +38,6 @@ begin program "editor"
     "learnocaml-repository"
     "learnocaml-app-common"
     "learnocaml-toplevel"
-	"testing"
   ]
   files = [
     "editor.ml" ( pp = camlp4_js )
@@ -51,7 +50,7 @@ begin program "editor"
         "js_of_ocaml"
            "+weak.js"
            "+cstruct/cstruct.js"
-           "%{ace_FULL_SRC_DIR}%/ace_bindings.js"
+	   "%{ace_FULL_SRC_DIR}%/ace_bindings.js"
            %byte_exe( p = "editor" )
       } ]
     )

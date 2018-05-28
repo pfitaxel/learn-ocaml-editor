@@ -51,10 +51,17 @@ let _ = save##onclick <- handler (fun _ ->
     match Learnocaml_local_storage.(retrieve (editor_state id)) with
     | exception Not_found -> true
     | _ -> false in
+  
   let titleUnique () =
-    match Learnocaml_local_storage.(retrieve (editor_state titre)) with
-    | exception Not_found -> true
-    | _ -> false in
+    let exos=
+    match Learnocaml_local_storage.(retrieve (index_state "index")) with
+    |{Learnocaml_exercise_state.exos ;mtime}-> exos
+    in
+    let open Learnocaml_index in
+    match StringMap.find_first_opt (fun key->(StringMap.find key exos).exercise_title=titre) exos with
+      None->true
+    | _ -> false 
+  in
   let store2 () =
     let exercise_title = titre in
     let stars = match diff with None -> failwith "" | Some f -> f in

@@ -40,13 +40,18 @@ let report, solution, question, template, test, previousTitre, previousDescr =
      mtime } -> report, solution, question, template, test, titre, description
 let id_error = getElementById "id_error"
 let title_error = getElementById "title_error"
-
-
-(* let _ = setInnertHml (getElementById "id")##value previousId
-   let _ = setInnerHtml (getElementById "title")##value previousTitre *)
+    
 let _ = match previousDescr with
   | Some d -> setInnerHtml (getElementById "description") d
   | None -> setInnerHtml (getElementById "description") ""
+
+let _= match identifier with
+    None ->()
+  | Some input->input##value<-Js.string previousId
+
+let _= match title with
+    None ->()
+  | Some input->input##value<-Js.string previousTitre
 
 let _ = save##onclick <- handler (fun _ ->
   let id = toString identifier in

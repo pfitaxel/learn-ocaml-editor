@@ -226,7 +226,7 @@ let () =
   let template_button = button ~container: template_toolbar ~theme: "light" in
 
   let id = arg "id" in
-  let exercise_fetch = Server_caller.fetch_exercise id in
+ (* let exercise_fetch = Server_caller.fetch_exercise id in*)
   let after_init top =
     (*exercise_fetch >>= fun exo ->*)
     begin (*match Learnocaml_exercise.(get prelude) exo with

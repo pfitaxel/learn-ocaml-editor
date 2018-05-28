@@ -361,7 +361,7 @@ let () =
      | None -> "" (*Learnocaml_exercise.(get test) exo*)) ;
   Ace.set_font_size ace_t 18;
   
-    let typecheck set_class =
+   (* let typecheck set_class =
     Learnocaml_toplevel.check top (Ace.get_contents ace_t) >>= fun res ->
     let error, warnings =
       match res with
@@ -382,7 +382,7 @@ let () =
         warnings in
     Ocaml_mode.report_error ~set_class editor_t error warnings  >>= fun () ->
     Ace.focus ace_t ;
-    Lwt.return () in
+    Lwt.return () in*)
   begin test_button
       ~group: toplevel_buttons_group
       ~icon: "typecheck" "Check" @@ fun () ->
@@ -450,10 +450,36 @@ let () =
      | Some solution -> solution
      | None -> ""(*Learnocaml_exercise.(get solution) exo*)) ;
   Ace.set_font_size ace 18;
+  let messages = Tyxml_js.Html5.ul [] in
   begin editor_button
       ~icon: "sync" "Gen.  template" @@ fun () ->
     select_tab "template";
-    Ace.set_contents ace_temp (genTemplate (Ace.get_contents ace) );
+    if (Ace.get_contents ace_temp) = "" then        
+        Ace.set_contents ace_temp (genTemplate (Ace.get_contents ace) )
+    else
+      begin
+       let aborted, abort_message =
+         let t, u = Lwt.task () in
+         let btn_cancel = Tyxml_js.Html5.(button [ pcdata "Cancel" ]) in
+         Manip.Ev.onclick btn_cancel ( fun _ ->
+                                       hide_loading ~id:"learnocaml-exo-loading" () ; true) ;
+         let btn_yes = Tyxml_js.Html5.(button [ pcdata "Yes" ]) in
+         Manip.Ev.onclick btn_yes (fun _ -> Ace.set_contents ace_temp (genTemplate (Ace.get_contents ace) );
+                                            hide_loading ~id:"learnocaml-exo-loading" ();
+                                            true) ;
+         let div =
+           Tyxml_js.Html5.(div ~a: [ a_class [ "dialog" ] ]
+                             [ pcdata "Do you want to crush template ?\n" ;
+                               btn_yes ;
+                               pcdata " " ;
+                               btn_cancel ]) in
+         Manip.SetCss.opacity div (Some "0") ;
+         t, div in
+       Manip.replaceChildren messages
+         Tyxml_js.Html5.[ li [ pcdata "" ] ] ;
+       show_loading ~id:"learnocaml-exo-loading" [ abort_message ] ;
+       Manip.SetCss.opacity abort_message (Some "1") 
+      end;
     Lwt.return ()
   end ;
 

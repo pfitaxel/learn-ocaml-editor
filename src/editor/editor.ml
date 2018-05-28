@@ -18,7 +18,7 @@
 open Js_utils
 open Lwt.Infix
 open Learnocaml_common
-         
+open Learnocaml_exercise_state
 (*module Report = Learnocaml_report
 
 let test_lib ?callback ?(timeout: int option)
@@ -297,13 +297,7 @@ let () =
     | { Learnocaml_exercise_state.report = None ; test } ->
         Some test
     | exception Not_found -> None in
-  let titre = match Learnocaml_local_storage.(retrieve (editor_state id)) with
-    | { Learnocaml_exercise_state.report = Some report ; titre } ->
-        let _ : int = display_report (*exo*) report in
-        Some titre
-    | { Learnocaml_exercise_state.report = None ; titre } ->
-        Some titre
-    | exception Not_found -> None in
+
   let description = match Learnocaml_local_storage.(retrieve (editor_state id)) with
     | { Learnocaml_exercise_state.report = Some report ; description } ->
         let _ : int = display_report (*exo*) report in
@@ -486,7 +480,7 @@ let () =
   begin editor_button
       ~icon: "save" "Save" @@ fun () ->
     let solution = Ace.get_contents ace in
-    let titre = "" (*Learnocaml_exercise.(get title) exo *) in
+    let titre =  Learnocaml_local_storage.(retrieve (editor_state id)).titre in
     let question=Ace.get_contents ace_quest in
     let template= Ace.get_contents ace_temp in
     let test= Ace.get_contents ace_t in
@@ -503,7 +497,7 @@ let () =
   begin editor_button
       ~icon: "download" "Download" @@ fun () ->
     let solution = Ace.get_contents ace in
-    let titre = "" (*Learnocaml_exercise.(get title) exo*) in
+    let titre =  Learnocaml_local_storage.(retrieve (editor_state id)).titre in
     let question=Ace.get_contents ace_quest in
     let template= Ace.get_contents ace_temp in
     let test= Ace.get_contents ace_t in
@@ -571,7 +565,7 @@ let () =
   begin toolbar_button
           ~icon: "left" "Metadata" @@ fun () ->
     let solution = Ace.get_contents ace in
-    let titre ="" (*Learnocaml_exercise.(get title) exo*) in
+    let titre =  Learnocaml_local_storage.(retrieve (editor_state id)).titre in
     let question=Ace.get_contents ace_quest in
     let template= Ace.get_contents ace_temp in
     let test= Ace.get_contents ace_t in
@@ -597,7 +591,7 @@ let () =
         hide_loading ~id:"learnocaml-exo-loading" () ; true) ;
       let btn_yes = Tyxml_js.Html5.(button [ pcdata "Yes" ]) in
       Manip.Ev.onclick btn_yes (fun _ -> let solution = Ace.get_contents ace in
-    let titre = ""(*Learnocaml_exercise.(get title) exo*) in
+    let titre =  Learnocaml_local_storage.(retrieve (editor_state id)).titre in
     let question=Ace.get_contents ace_quest in
     let template= Ace.get_contents ace_temp in
     let test= Ace.get_contents ace_t in

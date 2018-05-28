@@ -3,6 +3,7 @@ begin program "new_exercise"
     "ezjsonm"
     "grading-jsoo"
     "ace"
+    "learnocaml-state"
     "learnocaml-repository"
     "learnocaml-app-common"
     "learnocaml-toplevel"
@@ -10,10 +11,10 @@ begin program "new_exercise"
     "jsutils"
     "ppx_metaquot_lib"
     "js_of_ocaml.ppx"
-    "str"
+    
   ]
   files = [
-    "new_exercise.ml" ( pp = camlp4_optcomp_js )
+    "new_exercise.ml" ( pp = camlp4_js )
   ]
     build_rules = [
     "%{new_exercise_FULL_DST_DIR}%/new_exercise.js" (

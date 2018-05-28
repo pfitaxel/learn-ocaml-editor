@@ -39,7 +39,6 @@ let report,solution,question,template,test,previousTitre=match Learnocaml_local_
     mtime } -> report,solution,question,template,test,titre
 let id_error = getElementById "id_error"
 let title_error = getElementById "title_error"
-
                                  
 let _ = save##onclick <- handler (fun _ ->
   let id = toString identifier in

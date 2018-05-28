@@ -572,7 +572,7 @@ let () =
           ~icon: "left" "Metadata" @@ fun () ->
     let solution = Ace.get_contents ace in
     let titre ="" (*Learnocaml_exercise.(get title) exo*) in
-    let question=" " in
+    let question=Ace.get_contents ace_quest in
     let template= Ace.get_contents ace_temp in
     let test= Ace.get_contents ace_t in
     let report, diff, description  =

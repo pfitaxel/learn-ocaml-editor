@@ -46,7 +46,8 @@ let _ = save##onclick <- handler (fun _ ->
   let titre = toString title in
   let description = toStringOpt descr in
   let diff = toFloatOpt difficulty in
-  let store () = Learnocaml_local_storage.(store (editor_state id))
+  let store () =if (previousId!="") then Learnocaml_local_storage.(delete (editor_state previousId));
+    Learnocaml_local_storage.(store (editor_state id))
       { Learnocaml_exercise_state.report ; id ; solution ; titre ; question ; template ; diff ; test ; description ;
         mtime = gettimeofday () } in
   let idUnique () =if id = previousId then true else
@@ -75,7 +76,7 @@ let _ = save##onclick <- handler (fun _ ->
     let exo = {exercise_kind; exercise_stars; exercise_title; exercise_short_description} in
     match Learnocaml_local_storage.(retrieve (index_state "index")) with
     | {Learnocaml_exercise_state.exos; mtime} ->
-        let anciensexos = exos in
+        let anciensexos = if (previousId!="") then StringMap.remove previousId exos else exos in
         let exos = StringMap.add id exo anciensexos in
         let index = {Learnocaml_exercise_state.exos; mtime = gettimeofday ()} in
         Learnocaml_local_storage.(store (index_state "index")) index;

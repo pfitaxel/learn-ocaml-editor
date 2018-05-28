@@ -76,10 +76,7 @@ let _ = save##onclick <- handler (fun _ ->
         let exos = StringMap.add id exo anciensexos in
         let index = {Learnocaml_exercise_state.exos; mtime = gettimeofday ()} in
         Learnocaml_local_storage.(store (index_state "index")) index;
-    | exception Not_found ->
-        let exos = StringMap.singleton id exo in
-        let index = {Learnocaml_exercise_state.exos;mtime = gettimeofday ()} in
-        Learnocaml_local_storage.(store (index_state "index")) index in
+  in
   let id_correct = idOk id in
   let id_unique = idUnique () in
   let title_correct = titreOk titre in

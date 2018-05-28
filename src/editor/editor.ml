@@ -226,7 +226,7 @@ let () =
   let template_button = button ~container: template_toolbar ~theme: "light" in
 
   let id = arg "id" in
-  let exercise_fetch = Server_caller.fetch_exercise id in
+  (* let exercise_fetch = Server_caller.fetch_exercise id in*)
   let after_init top =
     (*exercise_fetch >>= fun exo ->*)
     begin (*match Learnocaml_exercise.(get prelude) exo with
@@ -296,7 +296,7 @@ let () =
         Some test
     | exception Not_found -> None in
   let titre =Learnocaml_local_storage.(retrieve (editor_state id)).titre  in
-  let description = match Learnocaml_local_storage.(retrieve (editor_state id)) with
+ (* let description = match Learnocaml_local_storage.(retrieve (editor_state id)) with
     | { Learnocaml_exercise_state.report = Some report ; description } ->
         let _ : int = display_report (*exo*) report in
         Some description
@@ -309,7 +309,7 @@ let () =
         Some diff
     | { Learnocaml_exercise_state.report = None ; diff } ->
         Some diff
-    | exception Not_found -> None in
+    | exception Not_found -> None in*)
   let question = match Learnocaml_local_storage.(retrieve (editor_state id)) with
     | { Learnocaml_exercise_state.report = Some report ; question } ->
         let _ : int = display_report (*exo*) report in
@@ -478,7 +478,6 @@ let () =
   begin editor_button
       ~icon: "save" "Save" @@ fun () ->
     let solution = Ace.get_contents ace in
-   (* let titre = "" (*Learnocaml_exercise.(get title) exo *) in*)
     let question=Ace.get_contents ace_quest in
     let template= Ace.get_contents ace_temp in
     let test= Ace.get_contents ace_t in
@@ -495,7 +494,6 @@ let () =
   begin editor_button
       ~icon: "download" "Download" @@ fun () ->
     let solution = Ace.get_contents ace in
-    (* let titre = "" (*Learnocaml_exercise.(get title) exo*) in*)
     let question = Ace.get_contents ace_quest in
     let template = Ace.get_contents ace_temp in
     let test = Ace.get_contents ace_t in
@@ -549,7 +547,7 @@ let () =
   begin editor_button
       ~group: toplevel_buttons_group
       ~icon: "typecheck" "Check" @@ fun () ->
-                                    typecheck true
+    typecheck true
   end ;
   begin toplevel_button
       ~group: toplevel_buttons_group
@@ -563,7 +561,6 @@ let () =
   begin toolbar_button
           ~icon: "left" "Metadata" @@ fun () ->
     let solution = Ace.get_contents ace in
-    (* let titre ="" (*Learnocaml_exercise.(get title) exo*) in*)
     let question= Ace.get_contents ace_quest in
     let template= Ace.get_contents ace_temp in
     let test= Ace.get_contents ace_t in
@@ -589,7 +586,6 @@ let () =
         hide_loading ~id:"learnocaml-exo-loading" () ; true) ;
       let btn_yes = Tyxml_js.Html5.(button [ pcdata "Yes" ]) in
       Manip.Ev.onclick btn_yes (fun _ -> let solution = Ace.get_contents ace in
-    (*  let titre = ""(*Learnocaml_exercise.(get title) exo*) in*)
     let question=Ace.get_contents ace_quest in
     let template= Ace.get_contents ace_temp in
     let test= Ace.get_contents ace_t in
@@ -645,7 +641,7 @@ let () =
     show_loading ~id:"learnocaml-exo-loading" [ messages ; abort_message ] ;
     Lwt_js.sleep 1. >>= fun () ->
     let solution = Ace.get_contents ace in
-    let solutionBis = solution in
+   (* let solutionBis = solution in*)
     Learnocaml_toplevel.check top solution >>= fun res ->
     match res with
     | Toploop_results.Ok ((), _) ->

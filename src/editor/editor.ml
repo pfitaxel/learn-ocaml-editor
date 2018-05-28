@@ -583,7 +583,7 @@ let () =
       { Learnocaml_exercise_state.report ; id ; solution ; titre ; question ; template ; diff ; test ; description ;
         mtime = gettimeofday () } ;
       Dom_html.window##location##assign
-        (Js.string "new_exercise.html");
+        (Js.string ("new_exercise.html#id=" ^ id ^ "&action=open"));
     Lwt.return ()
   end;
   

@@ -19,7 +19,7 @@ TUTORIALS_DIR ?= ${REPO_DIR}/tutorials
 
 build:
 	@ocp-build init
-	@ocp-build
+	@ocp-build -scan
 	@mkdir -p ${DEST_DIR}
 	@${MAKE} -C  static
 	cp static/* ${DEST_DIR}
@@ -28,6 +28,8 @@ build:
 	@cp _obuild/*/learnocaml-exercise.js ${DEST_DIR}/
 	@cp _obuild/*/learnocaml-toplevel-worker.js ${DEST_DIR}/
 	@cp _obuild/*/learnocaml-grader-worker.js ${DEST_DIR}/
+	@cp _obuild/*/new_exercise.js ${DEST_DIR}/
+	@cp _obuild/*/editor.js ${DEST_DIR}/
 	@mkdir -p $(DEST_DIR)
 	_obuild/*/learnocaml-process-repository.byte -j ${PROCESSING_JOBS} \
           -exercises-dir ${EXERCISES_DIR} \
@@ -38,7 +40,7 @@ build:
 
 clean:
 	@ocp-build clean
-	@${MAKE} -C  static clean
+	@${MAKE} -C static clean
 	-rm -rf ${DEST_DIR}
 	-rm -f src/grader/embedded_cmis.ml
 	-rm -f src/grader/embedded_grading_cmis.ml
@@ -47,3 +49,4 @@ clean:
                             ${EXERCISES_DIR}/%.*, \
                             ${wildcard ${EXERCISES_DIR}/*/meta.json}}
 	-find -name \*~ -delete
+	-find -name \#\*\# -delete

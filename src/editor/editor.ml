@@ -556,7 +556,7 @@ let () =
       Tyxml_js.Html5.[ li [ pcdata "" ] ] ;
     show_loading ~id:"learnocaml-exo-loading" [ abort_message ] ;
     Manip.SetCss.opacity abort_message (Some "1") ;
-    typecheck true
+    Lwt.return ()
   end ;
 
   

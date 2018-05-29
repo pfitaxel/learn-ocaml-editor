@@ -19,6 +19,7 @@ open Js_utils
 open Lwt.Infix
 open Learnocaml_common
 open Learnocaml_exercise_state
+       
 (*module Report = Learnocaml_report
 
 let test_lib ?callback ?(timeout: int option)
@@ -97,7 +98,6 @@ let rec premierLet listech = match listech with
 |'\n'::l-> premierLet l
 |_->[];;
 
-
 let rec validationLet listech = match listech with
 |[]->false
 |' '::l->validationLet l
@@ -127,7 +127,6 @@ let rec rechercheLet listech b = match listech with
 |c::suite -> rechercheLet suite b
 ;;
 
-
 let rec decomposition2 listech = match listech with
      |[] -> []
      |'='::l -> ['=']
@@ -145,7 +144,6 @@ let rec genLet listech =
 
 let rec genTemplate chaine = if chaine="" then "" else
 	concatenation (genLet (decompositionSol chaine 0));;
-
 
 let init_tabs, select_tab =
   let names = [ "toplevel" ; "report" ; "editor" ; "template" ; "test";"question" ] in
@@ -239,7 +237,7 @@ let () =
   let template_button = button ~container: template_toolbar ~theme: "light" in
 
   let id = arg "id" in
-  
+
   let after_init top =
     begin 
        Lwt.return true
@@ -280,9 +278,11 @@ let () =
       ~history () in
   init_tabs () ;
   toplevel_launch >>= fun top ->
+
  
 
-  
+
+ 
 
   (* ---- toplevel pane ------------------------------------------------- *)
   begin toplevel_button
@@ -433,24 +433,8 @@ let () =
     let question=Ace.get_contents ace_quest in
     let template= Ace.get_contents ace_temp in
     let test= Ace.get_contents ace_t in
-  
     let report, diff, description  =
-      match Learnocaml_local_storage.(retrieve (editor_state id)) with
-      | { Learnocaml_exercise_state.report ; diff ; description} -> report, diff, description
-      | exception Not_found -> None, None, None in
-    Learnocaml_local_storage.(store (editor_state id))
-      { Learnocaml_exercise_state.report ; id ; solution ; titre ; question ; template ; diff ; test ; description ;
-        mtime = gettimeofday () } ;
-    Lwt.return ()
-  end ;
-  begin editor_button
-      ~icon: "download" "Download" @@ fun () ->
-    let solution = Ace.get_contents ace in
-    let titre = get_titre id  in
-    let question=Ace.get_contents ace_quest in
-    let template= Ace.get_contents ace_temp in
-    let test= Ace.get_contents ace_t in
-    let report, diff, description  =
+
       match Learnocaml_local_storage.(retrieve (editor_state id)) with
       | { Learnocaml_exercise_state.report ; diff ; description} -> report, diff, description
       | exception Not_found -> None, None, None in
@@ -500,7 +484,7 @@ let () =
   begin editor_button
       ~group: toplevel_buttons_group
       ~icon: "typecheck" "Check" @@ fun () ->
-                                    typecheck true
+    typecheck true
   end ;
   begin toplevel_button
       ~group: toplevel_buttons_group
@@ -514,8 +498,8 @@ let () =
   begin toolbar_button
           ~icon: "left" "Metadata" @@ fun () ->
     let solution = Ace.get_contents ace in
-    let titre =  Learnocaml_local_storage.(retrieve (editor_state id)).titre in
-    let question=Ace.get_contents ace_quest in
+    let titre =get_titre id in
+    let question= Ace.get_contents ace_quest in
     let template= Ace.get_contents ace_temp in
     let test= Ace.get_contents ace_t in
     let report, diff, description  =
@@ -540,6 +524,7 @@ let () =
         hide_loading ~id:"learnocaml-exo-loading" () ; true) ;
       let btn_yes = Tyxml_js.Html5.(button [ pcdata "Yes" ]) in
       Manip.Ev.onclick btn_yes (fun _ -> let solution = Ace.get_contents ace in
+
     let titre =  get_titre id in
     let question=Ace.get_contents ace_quest in
     let template= Ace.get_contents ace_temp in

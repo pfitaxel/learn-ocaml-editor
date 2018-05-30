@@ -434,7 +434,23 @@ let () =
     let template= Ace.get_contents ace_temp in
     let test= Ace.get_contents ace_t in
     let report, diff, description  =
-
+      match Learnocaml_local_storage.(retrieve (editor_state id)) with
+      | { Learnocaml_exercise_state.report ; diff ; description} -> report, diff, description
+      | exception Not_found -> None, None, None in
+    Learnocaml_local_storage.(store (editor_state id))
+      { Learnocaml_exercise_state.report ; id ; solution ; titre ; question ; template ; diff ; test ; description ;
+        mtime = gettimeofday () } ;
+    Lwt.return ()
+  end ;
+  
+  begin editor_button
+      ~icon: "download" "Download" @@ fun () ->
+    let solution = Ace.get_contents ace in
+    let titre = get_titre id  in
+    let question=Ace.get_contents ace_quest in
+    let template= Ace.get_contents ace_temp in
+    let test= Ace.get_contents ace_t in
+    let report, diff, description  =
       match Learnocaml_local_storage.(retrieve (editor_state id)) with
       | { Learnocaml_exercise_state.report ; diff ; description} -> report, diff, description
       | exception Not_found -> None, None, None in

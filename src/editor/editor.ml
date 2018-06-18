@@ -188,7 +188,7 @@ let init_tabs, select_tab =
     select_tab !current in
   init_tabs, select_tab
 
-let display_report (*exo*) report =
+let display_report exo report =
   let score, failed = Learnocaml_report.result_of_report report in
   let report_button = find_component "learnocaml-exo-button-report" in
   Manip.removeClass report_button "success" ;
@@ -525,7 +525,7 @@ let () =
     Learnocaml_local_storage.(store (editor_state id))
       { Learnocaml_exercise_state.report ; id ; solution ; titre ; question ; template ; diff ; test ; description ;
         mtime = gettimeofday () } ;
-      Dom_html.window##location##assign
+      Dom_html.window##.location##assign
         (Js.string ("new_exercise.html#id=" ^ id ^ "&action=open"));
     Lwt.return ()
   end;
@@ -552,11 +552,11 @@ let () =
     Learnocaml_local_storage.(store (editor_state id))
       { Learnocaml_exercise_state.report ; id ; solution ; titre ; question ; template ; diff ; test ; description ;
         mtime = gettimeofday () } ;
-      Dom_html.window##location##assign
+      Dom_html.window##.location##assign
         (Js.string "index.html#activity=editor") ; true) ;
       let btn_no = Tyxml_js.Html5.(button [ pcdata "No" ]) in
       Manip.Ev.onclick btn_no (fun _ -> 
-      Dom_html.window##location##assign
+      Dom_html.window##.location##assign
         (Js.string "index.html#activity=editor") ; true);
       let div =
         Tyxml_js.Html5.(div ~a: [ a_class [ "dialog" ] ]
@@ -631,8 +631,8 @@ let () =
           aborted >>= fun () ->
           Lwt.return Learnocaml_report.[ Message ([ Text "Grading aborted by user." ], Failure) ] in
         Lwt.pick [ grading ; abortion ] >>= fun report ->
-        let grade = display_report (*exo*) report in
-        (worker() ) := Grading_jsoo.get_grade2 ~callback (*exo*) ;
+        let grade = display_report (exo () ) report in
+        (worker() ) := Grading_jsoo.get_grade ~callback ( exo () ) ;
         Learnocaml_local_storage.(store (exercise_state id))
           { Learnocaml_exercise_state.grade = Some grade ; solution ; report = Some report ;
             mtime = gettimeofday () } ;
@@ -645,7 +645,7 @@ let () =
           Learnocaml_report.[ Text "Error in your code." ; Break ;
                    Text "Cannot start the grader if your code does not typecheck." ] in
         let report = Learnocaml_report.[ Message (msg, Failure) ] in
-        let grade = display_report (*exo*) report in
+        let grade = display_report (exo () ) report in
         Learnocaml_local_storage.(store (exercise_state id))
           { Learnocaml_exercise_state.grade = Some grade ; solution ; report = Some report ;
             mtime = gettimeofday () } ;

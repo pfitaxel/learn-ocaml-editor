@@ -53,6 +53,10 @@ install: static
 	@cp _obuild/*/learnocaml-simple-server.byte .
 
 
+	@cp _obuild/*/editor.js ${DEST_DIR}/js/
+	@cp _obuild/*/new_exercise.js ${DEST_DIR}/js/
+
+
 .PHONY: learn-ocaml.install travis
 learn-ocaml.install: static
 	@echo 'bin: [' >$@

@@ -575,52 +575,6 @@ let () =
     Lwt.return ()
   end ;
 
-
-   let messages = Tyxml_js.Html5.ul [] in
-  begin toolbar_button
-      ~icon: "list" "Exercises" @@ fun () ->
-    let aborted, abort_message =
-      let t, u = Lwt.task () in
-      let btn_cancel = Tyxml_js.Html5.(button [ pcdata "Cancel" ]) in
-      Manip.Ev.onclick btn_cancel ( fun _ ->
-        hide_loading ~id:"learnocaml-exo-loading" () ; true) ;
-      let btn_yes = Tyxml_js.Html5.(button [ pcdata "Yes" ]) in
-      Manip.Ev.onclick btn_yes (fun _ -> let solution = Ace.get_contents ace in
-
-    let titre =  get_titre id in
-    let question=Ace.get_contents ace_quest in
-    let template= Ace.get_contents ace_temp in
-    let test= Ace.get_contents ace_t in
-    let report, diff, description  =
-      match Learnocaml_local_storage.(retrieve (editor_state id)) with
-      | { Learnocaml_exercise_state.report ; diff ; description } -> report, diff, description
-      | exception Not_found -> None, None, None in
-    Learnocaml_local_storage.(store (editor_state id))
-      { Learnocaml_exercise_state.report ; id ; solution ; titre ; question ; template ; diff ; test ; description ;
-        mtime = gettimeofday () } ;
-      Dom_html.window##.location##assign
-        (Js.string "exercise.html#id=id") ; true) ;
-      let btn_no = Tyxml_js.Html5.(button [ pcdata "No" ]) in
-      Manip.Ev.onclick btn_no (fun _ -> 
-      Dom_html.window##.location##assign
-        (Js.string "exercise.html#id=id") ; true);
-      let div =
-        Tyxml_js.Html5.(div ~a: [ a_class [ "dialog" ] ]
-                          [ pcdata "Do you want to save before closing?\n" ;
-                            btn_yes ;
-                            pcdata " " ;
-                            btn_no ;
-                            pcdata " " ;
-                            btn_cancel ]) in
-      Manip.SetCss.opacity div (Some "0") ;
-      t, div in 
-    Manip.replaceChildren messages
-      Tyxml_js.Html5.[ li [ pcdata "" ] ] ;
-    show_loading ~id:"learnocaml-exo-loading" [ abort_message ] ;
-    Manip.SetCss.opacity abort_message (Some "1") ;
-    Lwt.return ()
-  end ;
-
   
   let messages = Tyxml_js.Html5.ul [] in
   let callback text =

@@ -330,7 +330,7 @@ let () =
     Dom_html.window##location##assign
       (Js.string "index.html#activity=exercises") ;
     Lwt.return ()
-  end ;                          (*    marque fin de la barre au dessus de celle a creer   ééé   *)
+  end; (*   marque fin de la barre au dessus de celle a creer   ééé   *)
   let messages = Tyxml_js.Html5.ul [] in
   let callback text =
     Manip.appendChild messages Tyxml_js.Html5.(li [ pcdata text ]) in

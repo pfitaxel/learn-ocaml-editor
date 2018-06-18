@@ -498,14 +498,19 @@ let () =
   begin toolbar_button
       ~icon: "left" "Metadata" @@ fun () ->
       recovering () ;
-      Dom_html.window##location##assign
+      Dom_html.window##.location##assign
         (Js.string ("new_exercise.html#id=" ^ id ^ "&action=open"));
     Lwt.return ()
   end;
   
   begin toolbar_button
-    ~icon: "upload" "Export"
-
+      ~icon: "upload" "Export" @@ fun ()->
+    recovering () ;
+     Dom_html.window##.location##assign
+        (Js.string ("exercise.html#id=" ^ id ^ "&action=open"));
+    Lwt.return_unit
+  end;
+  
     
   let messages = Tyxml_js.Html5.ul [] in
   begin toolbar_button
@@ -518,7 +523,7 @@ let () =
       let btn_yes = Tyxml_js.Html5.(button [ pcdata "Yes" ]) in
       Manip.Ev.onclick btn_yes (fun _ ->
       recovering () ;
-      Dom_html.window##location##assign
+      Dom_html.window##.location##assign
         (Js.string "index.html#activity=editor") ; true) ;
       let btn_no = Tyxml_js.Html5.(button [ pcdata "No" ]) in
       Manip.Ev.onclick btn_no (fun _ -> 

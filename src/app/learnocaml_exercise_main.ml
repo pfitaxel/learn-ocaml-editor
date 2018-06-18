@@ -18,6 +18,16 @@
 open Js_utils
 open Lwt.Infix
 open Learnocaml_common
+open Learnocaml_exercise_state
+let get_titre id = Learnocaml_local_storage.(retrieve (editor_state id)).titre
+let get_description id = Learnocaml_local_storage.(retrieve (editor_state id)).description
+let get_diff id = Learnocaml_local_storage.(retrieve (editor_state id)).diff
+let get_solution id = Learnocaml_local_storage.(retrieve (editor_state id)).solution
+let get_question id = Learnocaml_local_storage.(retrieve (editor_state id)).question
+let get_template id = Learnocaml_local_storage.(retrieve (editor_state id)).template
+let get_test id = Learnocaml_local_storage.(retrieve (editor_state id)).test
+let get_report id = Learnocaml_local_storage.(retrieve (editor_state id)).report
+
 
 let init_tabs, select_tab =
   let names = [ "text" ; "toplevel" ; "report" ; "editor" ] in
@@ -122,9 +132,32 @@ let () =
   let toplevel_button = button ~container: toplevel_toolbar ~theme: "dark" in
   let editor_button = button ~container: editor_toolbar ~theme: "light" in
   let id = arg "id" in
-  let exercise_fetch = Server_caller.fetch_exercise id in
+  (*let exercise_fetch = Server_caller.fetch_exercise id in*)
+  let exercise_fetch2 =
+  let exo0 ()=
+  let titre =  get_titre id in
+  let description=
+    match get_description id with
+      None->""
+    |Some s->s
+  in
+ 
+  let exo1= Learnocaml_exercise.set  Learnocaml_exercise.id id Learnocaml_exercise.empty in
+  let exo2= Learnocaml_exercise.set Learnocaml_exercise.title titre exo1 in
+  let exo3 =Learnocaml_exercise.set Learnocaml_exercise.max_score 1 exo2 in
+  let exo4 =Learnocaml_exercise.set Learnocaml_exercise.prepare "" exo3 in
+  let exo5 =Learnocaml_exercise.set Learnocaml_exercise.prelude "" exo4 in
+  let exo6 =Learnocaml_exercise.set Learnocaml_exercise.solution (get_solution id) exo5 in
+  let exo7 =Learnocaml_exercise.set Learnocaml_exercise.test (get_test id) exo6 in
+  let exo8 =Learnocaml_exercise.set Learnocaml_exercise.template (get_template id) exo7 in
+  Learnocaml_exercise.set Learnocaml_exercise.descr description exo8
+  in
+   Lwt.return (exo0 () )
+in
+
+(* in*)
   let after_init top =
-    exercise_fetch >>= fun exo ->
+    exercise_fetch2 >>= fun exo ->
     begin match Learnocaml_exercise.(get prelude) exo with
       | "" -> Lwt.return true
       | prelude ->
@@ -167,7 +200,7 @@ let () =
       ~history () in
   init_tabs () ;
   toplevel_launch >>= fun top ->
-  exercise_fetch >>= fun exo ->
+  exercise_fetch2 >>= fun exo ->
   let solution = match Learnocaml_local_storage.(retrieve (exercise_state id)) with
     | { Learnocaml_exercise_state.report = Some report ; solution } ->
         let _ : int = display_report exo report in

@@ -121,8 +121,15 @@ let () =
   let editor_toolbar = find_component "learnocaml-exo-editor-toolbar" in
   let toplevel_button = button ~container: toplevel_toolbar ~theme: "dark" in
   let editor_button = button ~container: editor_toolbar ~theme: "light" in
+  let transResultOption = function
+  |None -> false
+  |Some s-> true in
+  let idEditor s = transResultOption (Regexp.string_match (Regexp.regexp "^[\.]+") s 0) in
   let id = arg "id" in
-  let exercise_fetch = Server_caller.fetch_exercise id in
+  
+  let exercise_fetch = match idEditor id with
+    | false -> Server_caller.fetch_exercise id
+    | _ -> failwith "TODO" in
   let after_init top =
     exercise_fetch >>= fun exo ->
     begin match Learnocaml_exercise.(get prelude) exo with

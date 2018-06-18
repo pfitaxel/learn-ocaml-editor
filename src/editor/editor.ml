@@ -529,6 +529,8 @@ let () =
         (Js.string ("new_exercise.html#id=" ^ id ^ "&action=open"));
     Lwt.return ()
   end;
+  begin toolbar_button
+    ~icon: "upload" "Export"
   
   let messages = Tyxml_js.Html5.ul [] in
   begin toolbar_button

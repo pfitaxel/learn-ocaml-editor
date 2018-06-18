@@ -503,6 +503,15 @@ let () =
     Lwt.return ()
   end;
   
+  begin toolbar_button
+      ~icon: "upload" "Export" @@ fun ()->
+    recovering () ;
+     Dom_html.window##.location##assign
+        (Js.string ("exercise.html#id=." ^ id ^ "&action=open"));
+    Lwt.return_unit
+  end;
+  
+    
   let messages = Tyxml_js.Html5.ul [] in
   begin toolbar_button
       ~icon: "list" "Exercises" @@ fun () ->
@@ -536,46 +545,6 @@ let () =
     Manip.SetCss.opacity abort_message (Some "1") ;
     Lwt.return ()
   end ;
-
-
-  (*eryu*)
-  
-   let messages = Tyxml_js.Html5.ul [] in
-  begin toolbar_button
-      ~icon: "upload" "Export" @@ fun () ->
-    let aborted, abort_message =
-      let t, u = Lwt.task () in
-      let btn_cancel = Tyxml_js.Html5.(button [ pcdata "Cancel" ]) in
-      Manip.Ev.onclick btn_cancel ( fun _ ->
-        hide_loading ~id:"learnocaml-exo-loading" () ; true) ;
-      let btn_yes = Tyxml_js.Html5.(button [ pcdata "Yes" ]) in
-      Manip.Ev.onclick btn_yes (fun _ ->
-      recovering () ;
-      Dom_html.window##.location##assign
-        (Js.string ("exercise.html#id=" ^ id ^ "&action=open")) ; true) ;
-      let btn_no = Tyxml_js.Html5.(button [ pcdata "No" ]) in
-      Manip.Ev.onclick btn_no (fun _ -> 
-      Dom_html.window##.location##assign
-        (Js.string ("exercise.html#id=" ^ id ^ "&action=open")) ; true);
-      let div =
-        Tyxml_js.Html5.(div ~a: [ a_class [ "dialog" ] ]
-                          [ pcdata "Do you want to save before closing?\n" ;
-                            btn_yes ;
-                            pcdata " " ;
-                            btn_no ;
-                            pcdata " " ;
-                            btn_cancel ]) in
-      Manip.SetCss.opacity div (Some "0") ;
-      t, div in 
-    Manip.replaceChildren messages
-      Tyxml_js.Html5.[ li [ pcdata "" ] ] ;
-    show_loading ~id:"learnocaml-exo-loading" [ abort_message ] ;
-    Manip.SetCss.opacity abort_message (Some "1") ;
-    Lwt.return ()
-  end ;
-
-  (*ertyu*)
-
   
   let messages = Tyxml_js.Html5.ul [] in
   let callback text =

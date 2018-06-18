@@ -21,6 +21,7 @@ open Learnocaml_index
 open Learnocaml_common
 
 module StringMap = Map.Make (String)
+                            
 
 let exercises_tab _ _ () =
   show_loading ~id:"learnocaml-main-loading"
@@ -62,7 +63,7 @@ let exercises_tab _ _ () =
                     | Some pct when  pct >= 100 -> [ "stats" ; "success" ]
                     | Some _ -> [ "stats" ; "partial" ])
                   pct_signal in
-              a ~a:[ a_href ("exercise.html#id=" ^ exercise_id ^ "&action=open") ;
+              a ~a:[ a_href ("exercise.html#id=" ^ exercise_id ^ "&action=open") ; 
                      a_class [ "exercise" ] ] [
                 div ~a:[ a_class [ "descr" ] ] [
                   h1 [ pcdata exercise_title ] ;
@@ -90,7 +91,7 @@ let exercises_tab _ _ () =
               acc)
             exercises acc
       | Groups groups ->
-          let h = match lvl with 1 -> h1 | 2 -> h2 | _ -> h3 in
+         let h = match lvl with 1 -> h1 | 2 -> h2 | _ -> h3 in
           StringMap.fold
             (fun _ { group_title ; group_contents } acc ->
                format_contents (succ lvl)
@@ -106,11 +107,39 @@ let exercises_tab _ _ () =
  Lwt.return list_div
 ;;
 
+
+
+ (*let editor_tab _ _ ()  =
+    show_loading ~id:"learnocaml-main-loading"
+      Tyxml_js.Html5.[ ul [ li [ pcdata "Loading editor" ] ] ];
+     Lwt_js.sleep 0.5 >>= fun () ->
+    let div = Tyxml_js.Html5.(div ~a: [ a_id "learnocaml-main-editor" ]) [] in
+    hide_loading ~id:"learnocaml-main-loading" ();
+    Lwt.return div;; *)
+
+
+
+
+let init ()= Learnocaml_local_storage.(store (index_state "index")) {Learnocaml_exercise_state.exos=StringMap.empty;mtime=gettimeofday ()};; 
+
+(*test*)
 let editor_tab _ _ () =
+  Learnocaml_local_storage.init ();
+  let pct_init=None in
+    let pct_signal, pct_signal_set = React.S.create pct_init in
+              Learnocaml_local_storage.(listener (index_state "index")) :=
+                Some (fun _-> pct_signal_set None) ;
+       
+  let ()=
+  match Learnocaml_local_storage.(retrieve (index_state "index")) with
+  |exception Not_found -> init ()
+  |_->() 
+  in  
+    Server_caller.fetch_editor_index () >>= fun index ->  
   show_loading ~id:"learnocaml-main-loading"
     Tyxml_js.Html5.[ ul [ li [ pcdata "Loading editor" ] ] ] ;
+
   Lwt_js.sleep 0.5 >>= fun () ->
-  Server_caller.fetch_exercise_index () >>= fun index ->
   let content_div = find_component "learnocaml-main-content" in
   let format_exercise_list all_exercise_states =
     let rec format_contents lvl acc contents =
@@ -122,15 +151,10 @@ let editor_tab _ _ () =
                                exercise_title ;
                                exercise_short_description ;
                                exercise_stars } acc ->
-              let pct_init =
-                match StringMap.find exercise_id all_exercise_states with
-                | exception Not_found -> None
-                | { Learnocaml_exercise_state.grade } -> grade in
-              let pct_signal, pct_signal_set = React.S.create pct_init in
-              Learnocaml_local_storage.(listener (exercise_state exercise_id)) :=
-                Some (function
-                    | Some { Learnocaml_exercise_state.grade } -> pct_signal_set grade
-                    | None -> pct_signal_set None) ;
+              let pct_init =None in
+                let pct_signal, pct_signal_set = React.S.create pct_init in
+              Learnocaml_local_storage.(listener (editor_state exercise_id)) :=
+                Some (fun _-> pct_signal_set None) ;
               let status_classes_signal =
                 React.S.map
                   (function
@@ -139,7 +163,7 @@ let editor_tab _ _ () =
                     | Some pct when  pct >= 100 -> [ "stats" ; "success" ]
                     | Some _ -> [ "stats" ; "partial" ])
                   pct_signal in
-              a ~a:[ a_href ("try.html#&action=open") ; 
+              a ~a:[ a_href ("editor.html#id="^exercise_id^"&action=open") ; 
                      a_class [ "exercise" ] ] [
                   div ~a:[ a_class [ "descr" ] ] [
                   h1 [ pcdata exercise_title ] ;
@@ -336,6 +360,10 @@ let lessons_tab select (arg, set_arg, delete_arg) () =
   hide_loading ~id:"learnocaml-main-loading" () ;
   Lwt.return lesson_div
 ;;
+
+
+
+
 
 let tryocaml_tab select (arg, set_arg, delete_arg) () =
   let open Learnocaml_tutorial in
@@ -654,10 +682,17 @@ let init_sync_token button_state =
        Lwt.return ())
     (fun _ -> Lwt.return ())
 
-let set_state_from_save_file
-    { Learnocaml_sync.all_exercise_states ;
-      all_toplevel_histories ;
-      all_exercise_toplevel_histories } =
+let set_state_from_save_file {
+    Learnocaml_sync.all_index_states;
+    all_editor_states;
+    all_exercise_states ;
+    all_toplevel_histories ;
+    all_exercise_toplevel_histories
+  } =
+  Learnocaml_local_storage.(store all_index_states)
+    all_index_states ;
+  Learnocaml_local_storage.(store all_editor_states)
+    all_editor_states ;
   Learnocaml_local_storage.(store all_exercise_states)
     all_exercise_states ;
   Learnocaml_local_storage.(store all_toplevel_histories)
@@ -666,7 +701,12 @@ let set_state_from_save_file
     all_exercise_toplevel_histories
 
 let get_state_as_save_file () =
-  { Learnocaml_sync.all_exercise_states =
+  {Learnocaml_sync.all_index_states =
+     Learnocaml_local_storage.(retrieve all_index_states);
+    Learnocaml_sync.all_editor_states =
+      Learnocaml_local_storage.(retrieve all_editor_states) ;
+
+    Learnocaml_sync.all_exercise_states =
       Learnocaml_local_storage.(retrieve all_exercise_states) ;
     all_toplevel_histories =
       Learnocaml_local_storage.(retrieve all_toplevel_histories) ;
@@ -747,6 +787,7 @@ let () =
     [ "tryocaml", ("Try OCaml", tryocaml_tab) ;
       "lessons", ("Lessons", lessons_tab) ;
       "exercises", ("Exercises", exercises_tab) ;
+
       "toplevel", ("Toplevel", toplevel_tab) ;
       "editor", ("Editor", editor_tab)] in
   let tabs =

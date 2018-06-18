@@ -1,13 +1,36 @@
 begin library "jsutils"
   files = [
-    "js_utils.ml"    ( pp = camlp4_optcomp_js )
-    "lwt_request.ml" ( pp = camlp4_optcomp_js )
+    "js_utils.ml" ( comp = ppx_js )
+    "lwt_request.ml" ( comp = ppx_js )
   ]
   requires = [
     "lwt"
+    "js_of_ocaml.ppx"
     "js_of_ocaml.tyxml"
   ]
 end
+
+begin program "ppx_ocplib_i18n"
+  has_asm = true
+  has_byte = false
+  requires = [
+    "compiler-libs.common"
+  ]
+  files = [
+    "ppx_ocplib_i18n.ml" ( more_deps = [ "../../translations/fr.po" ] )
+  ]
+end
+
+begin library "ocplib_i18n"
+  comp_requires = "ppx_ocplib_i18n:asm"
+  requires = "ppx_ocplib_i18n"
+  has_asm = true
+  has_byte = true
+  files = [
+    "ocplib_i18n.ml" ( comp = ppx_ocplib_i18n )
+  ]
+end
+
 
 begin library "xor"
   has_asm = true

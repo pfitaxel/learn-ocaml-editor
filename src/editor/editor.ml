@@ -532,8 +532,7 @@ let () =
      Dom_html.window##.location##assign
         (Js.string ("exercise.html#id=." ^ id ^ "&action=open"));
     Lwt.return_unit
-  end;
-  
+  end; 
     
   let messages = Tyxml_js.Html5.ul [] in
   begin toolbar_button

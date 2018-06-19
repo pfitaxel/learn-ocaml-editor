@@ -408,7 +408,6 @@ let () =
     let solution = Ace.get_contents ace in
     let titre = get_titre id  in
     let question = Ace.get_contents ace_quest in
-    let question =Omd.to_html (Omd.of_string question) in
     let template = Ace.get_contents ace_temp in
     let test = Ace.get_contents ace_t in
     let prepare= Ace.get_contents ace_prep in

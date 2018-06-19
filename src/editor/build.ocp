@@ -46,7 +46,7 @@ begin program "editor"
     "ocplib_i18n"
     "js_of_ocaml.ppx"
     "ocplib-json-typed.browser"
-
+    "omd"
  ]
   files = [
     "editor.ml" ( comp = [ ppx_js ppx_ocplib_i18n]  )

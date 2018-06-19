@@ -58,15 +58,14 @@ module Dummy_Functor (Introspection :
 module StringMap = Map.Make (String)
 
 let get_titre id = Learnocaml_local_storage.(retrieve (editor_state id)).titre
-let get_description id = Learnocaml_local_storage.(retrieve (editor_state id)).description
+
 let get_diff id = Learnocaml_local_storage.(retrieve (editor_state id)).diff
 let get_solution id = Learnocaml_local_storage.(retrieve (editor_state id)).solution
 let get_question id = Learnocaml_local_storage.(retrieve (editor_state id)).question
 let get_template id = Learnocaml_local_storage.(retrieve (editor_state id)).template
 let get_test id = Learnocaml_local_storage.(retrieve (editor_state id)).test
-let get_report id = Learnocaml_local_storage.(retrieve (editor_state id)).report
-(*let get_prelude id = Learnocaml_local_storage.(retrieve (editor_state id)).prelude
-let get_prepare id = Learnocaml_local_storage.(retrieve (editor_state id)).prepare*)
+let get_prelude id = Learnocaml_local_storage.(retrieve (editor_state id)).prelude
+let get_prepare id = Learnocaml_local_storage.(retrieve (editor_state id)).prepare
 
 
 let string_of_char ch = String.make 1 ch ;;
@@ -388,7 +387,7 @@ let () =
   let editor_prel = Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div editor_prelude) in
   let ace_prel = Ocaml_mode.get_editor editor_prel in
   Ace.set_contents ace_prel
-    ( get_template id ) ;
+    ( get_prelude id ) ;
   Ace.set_font_size ace_prel 18;
  
 
@@ -397,7 +396,7 @@ let () =
   let editor_prep = Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div editor_prepare) in
   let ace_prep = Ocaml_mode.get_editor editor_prep in
   Ace.set_contents ace_prep
-    ( get_template id ) ;
+    ( get_prepare id ) ;
   Ace.set_font_size ace_prep 18;
 
   (* ---- editor pane --------------------------------------------------- *)
@@ -411,12 +410,14 @@ let () =
     let question = Ace.get_contents ace_quest in
     let template = Ace.get_contents ace_temp in
     let test = Ace.get_contents ace_t in
-    let report, diff, description =
+    let prepare= Ace.get_contents ace_prep in
+    let prelude =Ace.get_contents ace_prel in 
+    let  diff =
       match Learnocaml_local_storage.(retrieve (editor_state id)) with
-      | { Learnocaml_exercise_state.report ; diff ; description } -> report, diff, description
-      | exception Not_found -> None, None, None in
+      | { Learnocaml_exercise_state.diff } -> diff
+      | exception Not_found -> None in
     Learnocaml_local_storage.(store (editor_state id))
-      { Learnocaml_exercise_state.report ; id ; solution ; titre ; question ; template ; diff ; test ; description ;
+      { Learnocaml_exercise_state.id ; solution ; titre ; question ; template ; diff ; test ;prepare;prelude;
         mtime = gettimeofday () } in
 
   Ace.set_contents ace (get_solution id);
@@ -530,8 +531,7 @@ let () =
      Dom_html.window##.location##assign
         (Js.string ("exercise.html#id=." ^ id ^ "&action=open"));
     Lwt.return_unit
-  end;
-  
+  end; 
     
   let messages = Tyxml_js.Html5.ul [] in
   begin toolbar_button
@@ -572,17 +572,13 @@ let () =
     Manip.appendChild messages Tyxml_js.Html5.(li [ pcdata text ]) in
   let exo ()=
   let titre =  get_titre id in
-  let description=
-    match get_description id with
-      None->""
-    |Some s->s
-  in
+  let description="" in
   
   let exo1= Learnocaml_exercise.set  Learnocaml_exercise.id id Learnocaml_exercise.empty in
   let exo2= Learnocaml_exercise.set Learnocaml_exercise.title titre exo1 in
-  let exo3 =Learnocaml_exercise.set Learnocaml_exercise.max_score 0 exo2 in
-  let exo4 =Learnocaml_exercise.set Learnocaml_exercise.prepare "" exo3 in
-  let exo5 =Learnocaml_exercise.set Learnocaml_exercise.prelude "" exo4 in
+  let exo3 =Learnocaml_exercise.set Learnocaml_exercise.max_score 1 exo2 in
+  let exo4 =Learnocaml_exercise.set Learnocaml_exercise.prepare (get_prepare id) exo3 in
+  let exo5 =Learnocaml_exercise.set Learnocaml_exercise.prelude (get_prelude id) exo4 in
   let exo6 =Learnocaml_exercise.set Learnocaml_exercise.solution (get_solution id) exo5 in
   let exo7 =Learnocaml_exercise.set Learnocaml_exercise.test (get_test id) exo6 in
   let exo8 =Learnocaml_exercise.set Learnocaml_exercise.template (get_template id) exo7 in

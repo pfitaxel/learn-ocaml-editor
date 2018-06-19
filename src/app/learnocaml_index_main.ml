@@ -163,6 +163,54 @@ let editor_tab _ _ () =
                     | Some pct when  pct >= 100 -> [ "stats" ; "success" ]
                     | Some _ -> [ "stats" ; "partial" ])
                   pct_signal in
+              (div ~a:[a_id ("button_delete")] [
+                  let button =button ~a:[a_id exercise_id]  [img ~src:("icons/icon_cleanup_dark.svg") ~alt:"" () ; pcdata "" ]in 
+                   Manip.Ev.onclick button
+                   (fun _ ->
+                    (* begin
+                       let messages = Tyxml_js.Html5.ul [] in
+                       let aborted, abort_message =
+                         let t, u = Lwt.task () in
+                         let btn_no = Tyxml_js.Html5.(button [ pcdata "No" ]) in
+                         Manip.Ev.onclick btn_no ( fun _ ->
+                                                       hide_loading ~id:"learnocaml-exo-loading" () ; true) ;
+                         let btn_yes = Tyxml_js.Html5.(button [ pcdata "Yes" ]) in
+                         Manip.Ev.onclick btn_yes (fun _ ->
+                             let rmv=
+                               match Learnocaml_local_storage.(retrieve (index_state "index")) with
+                               |{Learnocaml_exercise_state.exos ;mtime}-> exos
+                             in
+                             let exos = StringMap.remove exercise_id rmv in
+                             let index = {Learnocaml_exercise_state.exos; mtime = gettimeofday ()} in
+                             Learnocaml_local_storage.(store (index_state "index")) index;
+                             Learnocaml_local_storage.(delete (editor_state exercise_id));
+                             Dom_html.window##.location##reload ; true) ;
+                         let div =
+                           Tyxml_js.Html5.(div ~a: [ a_class [ "dialog" ] ]
+                                             [ pcdata "Are you sure you want to delete the exercise ?\n" ;
+                                               btn_yes ;
+                                               pcdata " " ;
+                                               btn_no ]) in
+                         Manip.SetCss.opacity div (Some "0") ;
+                         t, div in 
+                       Manip.replaceChildren messages
+                         Tyxml_js.Html5.[ li [ pcdata "" ] ] ;
+                       show_loading ~id:"learnocaml-exo-loading" [ abort_message ] ;
+                       Manip.SetCss.opacity abort_message (Some "1") ;
+                     *) 
+                       let rmv=
+                         match Learnocaml_local_storage.(retrieve (index_state "index")) with
+                         |{Learnocaml_exercise_state.exos ;mtime}-> exos
+                       in
+                       let exos = StringMap.remove exercise_id rmv in
+                       let index = {Learnocaml_exercise_state.exos; mtime = gettimeofday ()} in
+                       Learnocaml_local_storage.(store (index_state "index")) index;
+                       Learnocaml_local_storage.(delete (editor_state exercise_id));
+                       Dom_html.window##.location##reload ;
+(*
+                     end ;*)
+                      true) ;button
+                ] ) ::
               a ~a:[ a_href ("editor.html#id="^exercise_id^"&action=open") ; 
                      a_class [ "exercise" ] ] [
                   div ~a:[ a_class [ "descr" ] ] [
@@ -170,7 +218,9 @@ let editor_tab _ _ () =
                   p [ match exercise_short_description with
                       | None -> pcdata "No description available."
                       | Some text -> pcdata text ] ;
-                ] ;
+
+                    ] ;       
+
                 div ~a:[ Tyxml_js.R.Html5.a_class status_classes_signal ] [
                   div ~a:[ a_class [ "stars" ] ] [
                     let num = 5 * int_of_float (exercise_stars *. 2.) in
@@ -184,7 +234,10 @@ let editor_tab _ _ () =
                     | Project -> pcdata "editor project"
                     | Problem -> pcdata "editor problem"
                     | Learnocaml_exercise -> pcdata "editor exercise" ] ;
-                ] ] ::
+
+                ]; 
+
+              ] ::
               acc)
             exercises acc
       | Groups groups ->

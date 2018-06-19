@@ -1,11 +1,14 @@
 *~
 
 _obuild
-
+_opam
 .opam-switch
 Makefile.local
 
 src/ppx-metaquot/ast_lifter.ml
+
+learnocaml-simple-server.byte
+learn-ocaml.install
 
 src/grader/embedded_cmis.ml
 src/grader/embedded_grading_cmis.ml
@@ -24,3 +27,5 @@ static/*_dark.svg
 static/*_light.svg
 static/*_white.svg
 static/Fontin*
+
+translations/*.pot

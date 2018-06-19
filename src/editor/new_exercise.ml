@@ -7,7 +7,7 @@ open Learnocaml_common
 module StringMap = Map.Make (String)
 
 let setInnerHtml elt s =    
-  elt##innerHTML <- Js.string s
+  elt##.innerHTML:= Js.string s
 
 let transResultOption = function
   |None -> false
@@ -18,13 +18,13 @@ let titreOk s = (transResultOption (Regexp.string_match (Regexp.regexp "^[^ \t]"
 
 let toString = function
   |None -> failwith "incorrect_input"
-  |Some input -> Js.to_string input##value
+  |Some input -> Js.to_string input##.value
 let toStringOpt = function
   | None -> None
-  | Some input -> Some (Js.to_string input##value)
+  | Some input -> Some (Js.to_string input##.value)
 let toFloatOpt = function
   | None -> None
-  | Some input -> float_of_string_opt (Js.to_string input##value)
+  | Some input -> float_of_string_opt (Js.to_string input##.value)
 let previousId = match (arg "id") with
   |exception Not_found -> ""
   |s -> s
@@ -47,11 +47,11 @@ let _ = match previousDescr with
 
 let _= match identifier with
     None ->()
-  | Some input->input##value<-Js.string previousId
+  | Some input->input##.value:=Js.string previousId
 
 let _= match title with
     None ->()
-  | Some input->input##value<-Js.string previousTitre
+  | Some input->input##.value:=Js.string previousTitre
           
 let d=match previousDiff with
     None-> 0.0
@@ -59,9 +59,9 @@ let d=match previousDiff with
       
 let _ =match difficulty with
   |None-> ()
-  |Some select->select##value<-Js.string (string_of_float d)
+  |Some select->select##.value:=Js.string (string_of_float d)
 
-let _ = save##onclick <- handler (fun _ ->
+let _ = save##.onclick:= handler (fun _ ->
   let id = toString identifier in
   let titre = toString title in
   let description = toStringOpt descr in
@@ -160,7 +160,8 @@ let _ = save##onclick <- handler (fun _ ->
       setInnerHtml title_error "";
       store ();
       store2 ();
-      Dom_html.window##location##assign (Js.string ("editor.html#id="^id^"&action=open"))
+      Dom_html.window##.location##assign
+        (Js.string ("editor.html#id=" ^ id ^ "&action=open"));
     end
   ; Js._true
 )

@@ -33,14 +33,25 @@ let identifier = getElementById_coerce "identifier" CoerceTo.input
 let title = getElementById_coerce "title" CoerceTo.input
 let descr = getElementById_coerce "description" CoerceTo.textarea
 let difficulty = getElementById_coerce "difficulty" CoerceTo.select
-let report, solution, question, template, test, previousTitre, previousDescr,previousDiff =
+let  solution, question, template, test, previousTitre, previousDiff, prelude, prepare =
   match Learnocaml_local_storage.(retrieve (editor_state previousId)) with
-  | exception Not_found -> None, "", "", "", "", "", None,None
-  | {Learnocaml_exercise_state.report ; id ; solution ; titre ; question ; template ; diff ; test ; description ;
-     mtime } -> report, solution, question, template, test, titre, description,diff
+  | exception Not_found ->  "", "", "", "", "",None,"",""
+  | {Learnocaml_exercise_state.id ; solution ; titre ; question ; template ; diff ; test ; 
+     mtime;prelude;prepare } ->  solution, question, template, test, titre, diff, prelude, prepare
+                                 
 let id_error = getElementById "id_error"
 let title_error = getElementById "title_error"
-    
+
+let previousDescr=
+  let open Learnocaml_exercise_state in
+  let exos=Learnocaml_local_storage.(retrieve (index_state "index")).exos in
+  let open Learnocaml_index in
+  let exo =
+    match (StringMap.find_opt previousId exos) with
+          |None -> {exercise_kind=Learnocaml_exercise;exercise_title="";exercise_short_description=None;exercise_stars=1.5}
+          |Some s->s
+  in  exo.exercise_short_description
+
 let _ = match previousDescr with
   | Some d -> setInnerHtml (getElementById "description") d
   | None -> setInnerHtml (getElementById "description") ""
@@ -68,7 +79,7 @@ let _ = save##.onclick:= handler (fun _ ->
   let diff = toFloatOpt difficulty in
   let store () =if (previousId!="") then Learnocaml_local_storage.(delete (editor_state previousId));
     Learnocaml_local_storage.(store (editor_state id))
-      { Learnocaml_exercise_state.report ; id ; solution ; titre ; question ; template ; diff ; test ; description ;
+      { Learnocaml_exercise_state.id ; solution ; titre ; question ; template ; diff ; test ;  prelude;prepare;
         mtime = gettimeofday () } in
   let idUnique () =if id = previousId then true else
     match Learnocaml_local_storage.(retrieve (editor_state id)) with

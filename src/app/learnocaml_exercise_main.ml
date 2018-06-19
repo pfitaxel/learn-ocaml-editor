@@ -142,11 +142,7 @@ let () =
     | _ -> let id = String.sub id 1 ((String.length id)-1) in
   let exo0 ()=
   let titre =  get_titre id in
-  let description=
-    match get_description id with
-      None->""
-    |Some s->s
-  in
+
  
   let exo1= Learnocaml_exercise.set  Learnocaml_exercise.id id Learnocaml_exercise.empty in
   let exo2= Learnocaml_exercise.set Learnocaml_exercise.title titre exo1 in
@@ -156,7 +152,7 @@ let () =
   let exo6 =Learnocaml_exercise.set Learnocaml_exercise.solution (get_solution id) exo5 in
   let exo7 =Learnocaml_exercise.set Learnocaml_exercise.test (get_test id) exo6 in
   let exo8 =Learnocaml_exercise.set Learnocaml_exercise.template (get_template id) exo7 in
-  Learnocaml_exercise.set Learnocaml_exercise.descr description exo8
+  Learnocaml_exercise.set Learnocaml_exercise.descr (get_question id) exo8
   in
    Lwt.return (exo0 () )
 in

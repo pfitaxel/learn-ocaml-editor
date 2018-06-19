@@ -104,6 +104,7 @@ clean:
                             ${EXERCISES_DIR}/%.*, \
                             ${wildcard ${EXERCISES_DIR}/*/meta.json}}
 	-find -name \*~ -delete
+	-find -name \#\*\# -delete
 
 travis: # From https://stackoverflow.com/questions/21053657/how-to-run-travis-ci-locally
 	BUILDID="build-$$RANDOM";					\

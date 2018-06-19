@@ -48,13 +48,13 @@ let exercise_state_enc =
 type editor_state =
   { id : string ;
     titre : string;
-    description : string option;
+    prepare :string;
     diff : float option ;
     solution : string ;
     question : string ;
     template : string ;
     test : string ;
-    report : Learnocaml_report.report option ;    
+    prelude : string;    
     mtime : float }
 
 open Json_encoding
@@ -62,20 +62,20 @@ open Json_encoding
 let editor_state_enc =
   
   conv
-    (fun {id ; titre ; description; diff;solution ; question ;template ; test; report ; mtime } ->
-       (id , titre , description, diff, solution , question , template , test, report , mtime))
-    (fun (id , titre , description, diff, solution , question , template , test, report , mtime) ->
-       {id ; titre ; description; diff;solution ; question ;template ; test; report ; mtime })
+    (fun {id ; titre ; prepare; diff;solution ; question ;template ; test;prelude ; mtime } ->
+       (id , titre , prepare, diff, solution , question , template , test, prelude , mtime))
+    (fun (id , titre , prepare, diff, solution , question , template , test, prelude , mtime) ->
+       {id ; titre ; prepare; diff;solution ; question ;template ; test; prelude ; mtime })
     (obj10
        (req "id" string)
        (req "titre" string)
-       (opt "description" string)
+       (req "prepare" string)
        (opt "diff" float )
        (req "solution" string)
        (req "question" string)
        (req "template" string)
        (req "test" string)
-       (opt "report" Learnocaml_report.report_enc)
+       (req "prelude" string)
        (dft "mtime" float 0.))
 
 open Learnocaml_index;;

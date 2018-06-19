@@ -170,7 +170,7 @@ let editor_tab _ _ () =
                   p [ match exercise_short_description with
                       | None -> pcdata "No description available."
                       | Some text -> pcdata text ] ;
-                ] ;
+                    ] ;       
                 div ~a:[ Tyxml_js.R.Html5.a_class status_classes_signal ] [
                   div ~a:[ a_class [ "stars" ] ] [
                     let num = 5 * int_of_float (exercise_stars *. 2.) in
@@ -184,7 +184,17 @@ let editor_tab _ _ () =
                     | Project -> pcdata "editor project"
                     | Problem -> pcdata "editor problem"
                     | Learnocaml_exercise -> pcdata "editor exercise" ] ;
+                (*  a ~a:[ a_href ("index.html#activity=editor") ;
+                         a_class [ "exercise" ] ] [
+                       div ~a:[ a_class [ "descr" ] ] [
+                    let alt = Format.asprintf "Delete" in
+                    let src = Format.asprintf "icons/icon_cleanup_dark.svg" in
+                    img ~alt ~src ()
+                         ] ; ] ;*)
                 ] ] ::
+
+                 
+             
               acc)
             exercises acc
       | Groups groups ->

@@ -531,7 +531,22 @@ let () =
         (Js.string ("exercise.html#id=." ^ id ^ "&action=open"));
     Lwt.return_unit
   end;
-  
+
+  begin toolbar_button
+      ~icon: "cleanup" "Remove" @@ fun () ->
+      recovering () ;
+      let rmv=
+        match Learnocaml_local_storage.(retrieve (index_state "index")) with
+        |{Learnocaml_exercise_state.exos ;mtime}-> exos
+      in
+      let exos = StringMap.remove id rmv in
+      let index = {Learnocaml_exercise_state.exos; mtime = gettimeofday ()} in
+      Learnocaml_local_storage.(store (index_state "index")) index;
+      Learnocaml_local_storage.(delete (editor_state id));
+      Dom_html.window##.location##assign
+        (Js.string ( "index.html#activity=editor"));
+    Lwt.return ()
+  end;  
     
   let messages = Tyxml_js.Html5.ul [] in
   begin toolbar_button

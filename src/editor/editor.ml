@@ -65,6 +65,8 @@ let get_question id = Learnocaml_local_storage.(retrieve (editor_state id)).ques
 let get_template id = Learnocaml_local_storage.(retrieve (editor_state id)).template
 let get_test id = Learnocaml_local_storage.(retrieve (editor_state id)).test
 let get_report id = Learnocaml_local_storage.(retrieve (editor_state id)).report
+(*let get_prelude id = Learnocaml_local_storage.(retrieve (editor_state id)).prelude
+let get_prepare id = Learnocaml_local_storage.(retrieve (editor_state id)).prepare*)
 
 
 let string_of_char ch = String.make 1 ch ;;
@@ -146,7 +148,7 @@ let rec genTemplate chaine = if chaine="" then "" else
 	concatenation (genLet (decompositionSol chaine 0));;
 
 let init_tabs, select_tab =
-  let names = [ "toplevel" ; "report" ; "editor" ; "template" ; "test";"question" ] in
+  let names = [ "toplevel" ; "report" ; "editor" ; "template" ; "test" ; "question" ; "prelude" ; "prepare" ] in
   let current = ref "toplevel" in
   let select_tab name =
     set_arg "tab" name ;
@@ -230,12 +232,15 @@ let () =
   let toplevel_toolbar = find_component "learnocaml-exo-toplevel-toolbar" in
   let editor_toolbar = find_component "learnocaml-exo-editor-toolbar" in
   let template_toolbar = find_component "learnocaml-exo-template-toolbar" in
+  let prelude_toolbar = find_component "learnocaml-exo-prelude-toolbar" in
+  let prepare_toolbar = find_component "learnocaml-exo-prepare-toolbar" in
   let test_toolbar = find_component "learnocaml-exo-test-toolbar" in
   let toplevel_button = button ~container: toplevel_toolbar ~theme: "dark" in
   let editor_button = button ~container: editor_toolbar ~theme: "light" in
   let test_button = button ~container: test_toolbar ~theme: "light" in
   let template_button = button ~container: template_toolbar ~theme: "light" in
-
+  let prelude_button = button ~container: prelude_toolbar ~theme: "light" in
+  let prepare_button = button ~container: prepare_toolbar ~theme: "light" in
   let id = arg "id" in
 
   let after_init top =
@@ -378,6 +383,22 @@ let () =
   Ace.set_contents ace_quest (get_question id) ;
   Ace.set_font_size ace_quest 18;
 
+  (* ---- prelude pane --------------------------------------------------- *)
+  let editor_prelude = find_component "learnocaml-exo-prelude-pane" in
+  let editor_prel = Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div editor_prelude) in
+  let ace_prel = Ocaml_mode.get_editor editor_prel in
+  Ace.set_contents ace_prel
+    ( get_template id ) ;
+  Ace.set_font_size ace_prel 18;
+ 
+
+    (* ---- prepare pane --------------------------------------------------- *)
+  let editor_prepare = find_component "learnocaml-exo-prepare-pane" in
+  let editor_prep = Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div editor_prepare) in
+  let ace_prep = Ocaml_mode.get_editor editor_prep in
+  Ace.set_contents ace_prep
+    ( get_template id ) ;
+  Ace.set_font_size ace_prep 18;
 
   (* ---- editor pane --------------------------------------------------- *)
   let editor_pane = find_component "learnocaml-exo-editor-pane" in

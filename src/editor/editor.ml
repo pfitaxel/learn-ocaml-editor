@@ -148,7 +148,7 @@ let rec genTemplate chaine = if chaine="" then "" else
 
 let init_tabs, select_tab =
   let names = [ "toplevel" ; "report" ; "editor" ; "template" ; "test" ; "question" ; "prelude" ; "prepare" ] in
-  let current = ref "toplevel" in
+  let current = ref "question" in
   let select_tab name =
     set_arg "tab" name ;
     Manip.removeClass
@@ -171,8 +171,8 @@ let init_tabs, select_tab =
   let init_tabs () =
     current := begin try
         let requested = arg "tab" in
-        if List.mem requested names then requested else "toplevel"
-      with Not_found -> "toplevel"
+        if List.mem requested names then requested else "question"
+      with Not_found -> "question"
     end ;
     List.iter
       (fun name ->
@@ -526,7 +526,7 @@ let () =
   end;
   
   begin toolbar_button
-      ~icon: "upload" "Export" @@ fun ()->
+      ~icon: "upload" "Experiment" @@ fun ()->
     recovering () ;
      Dom_html.window##.location##assign
         (Js.string ("exercise.html#id=." ^ id ^ "&action=open"));
@@ -633,9 +633,9 @@ let () =
                    Text "Cannot start the grader if your code does not typecheck." ] in
         let report = Learnocaml_report.[ Message (msg, Failure) ] in
         let grade = display_report (exo () ) report in
-        Learnocaml_local_storage.(store (exercise_state id))
+        (*Learnocaml_local_storage.(store (exercise_state id))
           { Learnocaml_exercise_state.grade = Some grade ; solution ; report = Some report ;
-            mtime = gettimeofday () } ;
+            mtime = gettimeofday () } ;*)
         select_tab "report" ;
         Lwt_js.yield () >>= fun () ->
         hide_loading ~id:"learnocaml-exo-loading" () ;

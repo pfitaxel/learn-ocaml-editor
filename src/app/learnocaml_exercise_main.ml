@@ -363,6 +363,17 @@ in
   (* ---- main toolbar -------------------------------------------------- *)
   let exo_toolbar = find_component "learnocaml-exo-toolbar" in
   let toolbar_button = button ~container: exo_toolbar ~theme: "light" in
+  let () = if idEditor id then
+    begin
+    let id = String.sub id 1 ((String.length id)-1) in
+    begin toolbar_button
+       ~icon: "upload" "Editor" @@ fun ()->
+       Dom_html.window##.location##assign
+       (Js.string ("editor.html#id=" ^ id ^ "&action=open"));                                    
+       Lwt.return_unit 
+    end;
+    end;
+  in 
   begin toolbar_button
       ~icon: "list" [%i"Exercises"] @@ fun () ->
     Dom_html.window##.location##assign

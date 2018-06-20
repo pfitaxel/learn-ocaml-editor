@@ -158,8 +158,7 @@ let () =
   in
    Lwt.return (exo0 () )
 in
- let id =if idEditor id then String.sub id 1 ((String.length id)-1) else id in
-   
+    
   let after_init top =
     exercise_fetch >>= fun exo ->
     begin match Learnocaml_exercise.(get prelude) exo with

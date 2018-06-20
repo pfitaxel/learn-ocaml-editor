@@ -20,7 +20,8 @@ open Lwt.Infix
 open Learnocaml_common
 open Learnocaml_exercise_state
        
-(*module Report = Learnocaml_report
+(*
+module Report = Learnocaml_report
 
 let test_lib ?callback ?(timeout: int option)
  (module Introspection : Introspection_intf.INTROSPECTION) =
@@ -38,7 +39,9 @@ let test_lib ?callback ?(timeout: int option)
    module Introspection = Introspection
  end in
  let module TL = Test_lib.Make(M) in
-(module TL : Test_lib.S)*)
+(module TL : Test_lib.S)
+*)
+
 (*
 module Dummy_Functor (Introspection :
                         Introspection_intf.INTROSPECTION) = struct
@@ -49,22 +52,20 @@ module Dummy_Functor (Introspection :
   end       
   module Test_lib = Test_lib.Make(Dummy_Params)
   module Report = Learnocaml_report
- *)    
-       
+*)
 
 
 module StringMap = Map.Make (String)
 
 let get_titre id = Learnocaml_local_storage.(retrieve (editor_state id)).titre
-let get_description id = Learnocaml_local_storage.(retrieve (editor_state id)).description
+
 let get_diff id = Learnocaml_local_storage.(retrieve (editor_state id)).diff
 let get_solution id = Learnocaml_local_storage.(retrieve (editor_state id)).solution
 let get_question id = Learnocaml_local_storage.(retrieve (editor_state id)).question
 let get_template id = Learnocaml_local_storage.(retrieve (editor_state id)).template
 let get_test id = Learnocaml_local_storage.(retrieve (editor_state id)).test
-let get_report id = Learnocaml_local_storage.(retrieve (editor_state id)).report
-
-                     
+let get_prelude id = Learnocaml_local_storage.(retrieve (editor_state id)).prelude
+let get_prepare id = Learnocaml_local_storage.(retrieve (editor_state id)).prepare
 
 
 let string_of_char ch = String.make 1 ch ;;
@@ -146,8 +147,8 @@ let rec genTemplate chaine = if chaine="" then "" else
 	concatenation (genLet (decompositionSol chaine 0));;
 
 let init_tabs, select_tab =
-  let names = [ "toplevel" ; "report" ; "editor" ; "template" ; "test";"question" ] in
-  let current = ref "toplevel" in
+  let names = [ "toplevel" ; "report" ; "editor" ; "template" ; "test" ; "question" ; "prelude" ; "prepare" ] in
+  let current = ref "question" in
   let select_tab name =
     set_arg "tab" name ;
     Manip.removeClass
@@ -170,8 +171,8 @@ let init_tabs, select_tab =
   let init_tabs () =
     current := begin try
         let requested = arg "tab" in
-        if List.mem requested names then requested else "toplevel"
-      with Not_found -> "toplevel"
+        if List.mem requested names then requested else "question"
+      with Not_found -> "question"
     end ;
     List.iter
       (fun name ->
@@ -188,13 +189,13 @@ let init_tabs, select_tab =
     select_tab !current in
   init_tabs, select_tab
 
-let display_report (*exo*) report =
+let display_report exo report =
   let score, failed = Learnocaml_report.result_of_report report in
   let report_button = find_component "learnocaml-exo-button-report" in
   Manip.removeClass report_button "success" ;
   Manip.removeClass report_button "failure" ;
   Manip.removeClass report_button "partial" ;
-  let grade = score * 100 / 100(*(Learnocaml_exercise.(get max_score) exo)*) in
+  let grade = score * 100 / 100 (*(Learnocaml_exercise.(get max_score) exo)*) in
   if grade >= 100 then begin
     Manip.addClass report_button "success" ;
     Manip.replaceChildren report_button
@@ -230,12 +231,15 @@ let () =
   let toplevel_toolbar = find_component "learnocaml-exo-toplevel-toolbar" in
   let editor_toolbar = find_component "learnocaml-exo-editor-toolbar" in
   let template_toolbar = find_component "learnocaml-exo-template-toolbar" in
+  let prelude_toolbar = find_component "learnocaml-exo-prelude-toolbar" in
+  let prepare_toolbar = find_component "learnocaml-exo-prepare-toolbar" in
   let test_toolbar = find_component "learnocaml-exo-test-toolbar" in
   let toplevel_button = button ~container: toplevel_toolbar ~theme: "dark" in
   let editor_button = button ~container: editor_toolbar ~theme: "light" in
   let test_button = button ~container: test_toolbar ~theme: "light" in
   let template_button = button ~container: template_toolbar ~theme: "light" in
-
+  let prelude_button = button ~container: prelude_toolbar ~theme: "light" in
+  let prepare_button = button ~container: prepare_toolbar ~theme: "light" in
   let id = arg "id" in
 
   let after_init top =
@@ -279,10 +283,6 @@ let () =
   init_tabs () ;
   toplevel_launch >>= fun top ->
 
- 
-
-
- 
 
   (* ---- toplevel pane ------------------------------------------------- *)
   begin toplevel_button
@@ -302,11 +302,9 @@ let () =
     Learnocaml_toplevel.execute top ;
     Lwt.return ()
   end ;
-  
-  
+
+
   (* ---- test pane --------------------------------------------------- *)
-
-
   let editor_test = find_component "learnocaml-exo-test-pane" in
   let editor_t = Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div editor_test) in
   let ace_t = Ocaml_mode.get_editor editor_t in
@@ -334,7 +332,7 @@ let () =
         warnings in
     Ocaml_mode.report_error ~set_class editor_t error warnings  >>= fun () ->
     Ace.focus ace_t ;
-    Lwt.return () in*)
+    Lwt.return () in *)
   begin test_button
       ~group: toplevel_buttons_group
       ~icon: "typecheck" "Check" @@ fun () ->
@@ -377,21 +375,52 @@ let () =
       ~icon: "typecheck" "Check" @@ fun () ->
     typecheck true
   end ;
-  (*-------question pane  -------------------------------------------------*)
 
+  (*-------question pane  -------------------------------------------------*)
   let editor_question = find_component "learnocaml-exo-tab-question" in
-  
   let ace_quest = Ace.create_editor (Tyxml_js.To_dom.of_div editor_question ) in
   Ace.set_contents ace_quest (get_question id) ;
   Ace.set_font_size ace_quest 18;
 
+  (* ---- prelude pane --------------------------------------------------- *)
+  let editor_prelude = find_component "learnocaml-exo-prelude-pane" in
+  let editor_prel = Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div editor_prelude) in
+  let ace_prel = Ocaml_mode.get_editor editor_prel in
+  Ace.set_contents ace_prel
+    ( get_prelude id ) ;
+  Ace.set_font_size ace_prel 18;
+ 
 
-  
+    (* ---- prepare pane --------------------------------------------------- *)
+  let editor_prepare = find_component "learnocaml-exo-prepare-pane" in
+  let editor_prep = Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div editor_prepare) in
+  let ace_prep = Ocaml_mode.get_editor editor_prep in
+  Ace.set_contents ace_prep
+    ( get_prepare id ) ;
+  Ace.set_font_size ace_prep 18;
+
   (* ---- editor pane --------------------------------------------------- *)
   let editor_pane = find_component "learnocaml-exo-editor-pane" in
   let editor = Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div editor_pane) in
   let ace = Ocaml_mode.get_editor editor in
-  Ace.set_contents ace (get_solution id) ;
+
+  let recovering () =
+    let solution = Ace.get_contents ace in
+    let titre = get_titre id  in
+    let question = Ace.get_contents ace_quest in
+    let template = Ace.get_contents ace_temp in
+    let test = Ace.get_contents ace_t in
+    let prepare= Ace.get_contents ace_prep in
+    let prelude =Ace.get_contents ace_prel in 
+    let  diff =
+      match Learnocaml_local_storage.(retrieve (editor_state id)) with
+      | { Learnocaml_exercise_state.diff } -> diff
+      | exception Not_found -> None in
+    Learnocaml_local_storage.(store (editor_state id))
+      { Learnocaml_exercise_state.id ; solution ; titre ; question ; template ; diff ; test ;prepare;prelude;
+        mtime = gettimeofday () } in
+
+  Ace.set_contents ace (get_solution id);
   Ace.set_font_size ace 18;
   let messages = Tyxml_js.Html5.ul [] in
   begin editor_button
@@ -428,35 +457,13 @@ let () =
 
   begin editor_button
       ~icon: "save" "Save" @@ fun () ->
-    let solution = Ace.get_contents ace in
-    let titre =  get_titre id  in
-    let question=Ace.get_contents ace_quest in
-    let template= Ace.get_contents ace_temp in
-    let test= Ace.get_contents ace_t in
-    let report, diff, description  =
-      match Learnocaml_local_storage.(retrieve (editor_state id)) with
-      | { Learnocaml_exercise_state.report ; diff ; description} -> report, diff, description
-      | exception Not_found -> None, None, None in
-    Learnocaml_local_storage.(store (editor_state id))
-      { Learnocaml_exercise_state.report ; id ; solution ; titre ; question ; template ; diff ; test ; description ;
-        mtime = gettimeofday () } ;
+    recovering () ;
     Lwt.return ()
   end ;
   
   begin editor_button
       ~icon: "download" "Download" @@ fun () ->
-    let solution = Ace.get_contents ace in
-    let titre = get_titre id  in
-    let question=Ace.get_contents ace_quest in
-    let template= Ace.get_contents ace_temp in
-    let test= Ace.get_contents ace_t in
-    let report, diff, description  =
-      match Learnocaml_local_storage.(retrieve (editor_state id)) with
-      | { Learnocaml_exercise_state.report ; diff ; description} -> report, diff, description
-      | exception Not_found -> None, None, None in
-    Learnocaml_local_storage.(store (editor_state id))
-      { Learnocaml_exercise_state.report ; id ; solution ; titre ; question ; template ; diff ; test ; description ;
-        mtime = gettimeofday () } ;
+    recovering () ;
     let name = id ^ ".json" in
     let content =Learnocaml_local_storage.(retrieve (editor_state id)) in  
   let json =
@@ -465,16 +472,15 @@ let () =
       content in
   let contents =
       (Js._JSON##stringify (json)) in
-    
-    
     Learnocaml_common.fake_download ~name ~contents ;
     Lwt.return ()
   end ;
+
  (* let lib = " module Test_lib = Test_lib.Make(struct\n\
         \  let results = results\n\
         \  let set_progress = set_progress\n\
         \  module Introspection = Introspection\n\
-              end)" in*)
+              end)" in *)
   let typecheck set_class =
     Learnocaml_toplevel.check top (Ace.get_contents ace) >>= fun res ->
     let error, warnings =
@@ -512,24 +518,21 @@ let () =
   let exo_toolbar = find_component "learnocaml-exo-toolbar" in
   let toolbar_button = button ~container: exo_toolbar ~theme: "light" in
   begin toolbar_button
-          ~icon: "left" "Metadata" @@ fun () ->
-    let solution = Ace.get_contents ace in
-    let titre =get_titre id in
-    let question= Ace.get_contents ace_quest in
-    let template= Ace.get_contents ace_temp in
-    let test= Ace.get_contents ace_t in
-    let report, diff, description  =
-      match Learnocaml_local_storage.(retrieve (editor_state id)) with
-      | { Learnocaml_exercise_state.report ; diff ; description } -> report, diff, description
-      | exception Not_found -> None, None, None in
-    Learnocaml_local_storage.(store (editor_state id))
-      { Learnocaml_exercise_state.report ; id ; solution ; titre ; question ; template ; diff ; test ; description ;
-        mtime = gettimeofday () } ;
-      Dom_html.window##location##assign
+      ~icon: "left" "Metadata" @@ fun () ->
+      recovering () ;
+      Dom_html.window##.location##assign
         (Js.string ("new_exercise.html#id=" ^ id ^ "&action=open"));
     Lwt.return ()
   end;
   
+  begin toolbar_button
+      ~icon: "upload" "Experiment" @@ fun ()->
+    recovering () ;
+     Dom_html.window##.location##assign
+        (Js.string ("exercise.html#id=." ^ id ^ "&action=open"));
+    Lwt.return_unit
+  end; 
+    
   let messages = Tyxml_js.Html5.ul [] in
   begin toolbar_button
       ~icon: "list" "Exercises" @@ fun () ->
@@ -539,24 +542,13 @@ let () =
       Manip.Ev.onclick btn_cancel ( fun _ ->
         hide_loading ~id:"learnocaml-exo-loading" () ; true) ;
       let btn_yes = Tyxml_js.Html5.(button [ pcdata "Yes" ]) in
-      Manip.Ev.onclick btn_yes (fun _ -> let solution = Ace.get_contents ace in
-
-    let titre =  get_titre id in
-    let question=Ace.get_contents ace_quest in
-    let template= Ace.get_contents ace_temp in
-    let test= Ace.get_contents ace_t in
-    let report, diff, description  =
-      match Learnocaml_local_storage.(retrieve (editor_state id)) with
-      | { Learnocaml_exercise_state.report ; diff ; description } -> report, diff, description
-      | exception Not_found -> None, None, None in
-    Learnocaml_local_storage.(store (editor_state id))
-      { Learnocaml_exercise_state.report ; id ; solution ; titre ; question ; template ; diff ; test ; description ;
-        mtime = gettimeofday () } ;
-      Dom_html.window##location##assign
+      Manip.Ev.onclick btn_yes (fun _ ->
+      recovering () ;
+      Dom_html.window##.location##assign
         (Js.string "index.html#activity=editor") ; true) ;
       let btn_no = Tyxml_js.Html5.(button [ pcdata "No" ]) in
       Manip.Ev.onclick btn_no (fun _ -> 
-      Dom_html.window##location##assign
+      Dom_html.window##.location##assign
         (Js.string "index.html#activity=editor") ; true);
       let div =
         Tyxml_js.Html5.(div ~a: [ a_class [ "dialog" ] ]
@@ -574,24 +566,19 @@ let () =
     Manip.SetCss.opacity abort_message (Some "1") ;
     Lwt.return ()
   end ;
-
   
   let messages = Tyxml_js.Html5.ul [] in
   let callback text =
     Manip.appendChild messages Tyxml_js.Html5.(li [ pcdata text ]) in
   let exo ()=
   let titre =  get_titre id in
-  let description=
-    match get_description id with
-      None->""
-    |Some s->s
-  in
+  let description="" in
   
   let exo1= Learnocaml_exercise.set  Learnocaml_exercise.id id Learnocaml_exercise.empty in
   let exo2= Learnocaml_exercise.set Learnocaml_exercise.title titre exo1 in
-  let exo3 =Learnocaml_exercise.set Learnocaml_exercise.max_score 0 exo2 in
-  let exo4 =Learnocaml_exercise.set Learnocaml_exercise.prepare "" exo3 in
-  let exo5 =Learnocaml_exercise.set Learnocaml_exercise.prelude "" exo4 in
+  let exo3 =Learnocaml_exercise.set Learnocaml_exercise.max_score 1 exo2 in
+  let exo4 =Learnocaml_exercise.set Learnocaml_exercise.prepare (get_prepare id) exo3 in
+  let exo5 =Learnocaml_exercise.set Learnocaml_exercise.prelude (get_prelude id) exo4 in
   let exo6 =Learnocaml_exercise.set Learnocaml_exercise.solution (get_solution id) exo5 in
   let exo7 =Learnocaml_exercise.set Learnocaml_exercise.test (get_test id) exo6 in
   let exo8 =Learnocaml_exercise.set Learnocaml_exercise.template (get_template id) exo7 in
@@ -631,8 +618,8 @@ let () =
           aborted >>= fun () ->
           Lwt.return Learnocaml_report.[ Message ([ Text "Grading aborted by user." ], Failure) ] in
         Lwt.pick [ grading ; abortion ] >>= fun report ->
-        let grade = display_report (*exo*) report in
-        (worker() ) := Grading_jsoo.get_grade2 ~callback (*exo*) ;
+        let grade = display_report (exo () ) report in
+        (worker() ) := Grading_jsoo.get_grade ~callback ( exo () ) ;
         Learnocaml_local_storage.(store (exercise_state id))
           { Learnocaml_exercise_state.grade = Some grade ; solution ; report = Some report ;
             mtime = gettimeofday () } ;
@@ -645,20 +632,19 @@ let () =
           Learnocaml_report.[ Text "Error in your code." ; Break ;
                    Text "Cannot start the grader if your code does not typecheck." ] in
         let report = Learnocaml_report.[ Message (msg, Failure) ] in
-        let grade = display_report (*exo*) report in
-        Learnocaml_local_storage.(store (exercise_state id))
+        let grade = display_report (exo () ) report in
+        (*Learnocaml_local_storage.(store (exercise_state id))
           { Learnocaml_exercise_state.grade = Some grade ; solution ; report = Some report ;
-            mtime = gettimeofday () } ;
+            mtime = gettimeofday () } ;*)
         select_tab "report" ;
         Lwt_js.yield () >>= fun () ->
         hide_loading ~id:"learnocaml-exo-loading" () ;
         typecheck true
   end ;
+
   (* ---- return -------------------------------------------------------- *)
   toplevel_launch >>= fun _ ->
   typecheck false >>= fun () ->
   hide_loading ~id:"learnocaml-exo-loading" () ;
 
-  Lwt.return ()
-;;
-
+  Lwt.return () ;;

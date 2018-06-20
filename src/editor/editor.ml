@@ -588,7 +588,7 @@ let () =
   let worker () = ref (Grading_jsoo.get_grade ~callback (exo () )  ) in
   begin toolbar_button
       ~icon: "reload" "Grade!" @@ fun () ->
-
+    recovering () ;
 
     let aborted, abort_message =
       let t, u = Lwt.task () in

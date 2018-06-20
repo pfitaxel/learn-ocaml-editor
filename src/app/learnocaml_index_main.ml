@@ -167,13 +167,13 @@ let editor_tab _ _ () =
                   let button =button ~a:[a_id exercise_id]  [img ~src:("icons/icon_cleanup_dark.svg") ~alt:"" () ; pcdata "" ]in 
                    Manip.Ev.onclick button
                    (fun _ ->
-                    (* begin
+                     begin
                        let messages = Tyxml_js.Html5.ul [] in
                        let aborted, abort_message =
                          let t, u = Lwt.task () in
                          let btn_no = Tyxml_js.Html5.(button [ pcdata "No" ]) in
                          Manip.Ev.onclick btn_no ( fun _ ->
-                                                       hide_loading ~id:"learnocaml-exo-loading" () ; true) ;
+                                                       hide_loading ~id:"learnocaml-main-loading" () ; true) ;
                          let btn_yes = Tyxml_js.Html5.(button [ pcdata "Yes" ]) in
                          Manip.Ev.onclick btn_yes (fun _ ->
                              let rmv=
@@ -195,20 +195,9 @@ let editor_tab _ _ () =
                          t, div in 
                        Manip.replaceChildren messages
                          Tyxml_js.Html5.[ li [ pcdata "" ] ] ;
-                       show_loading ~id:"learnocaml-exo-loading" [ abort_message ] ;
+                       show_loading ~id:"learnocaml-main-loading" [ abort_message ] ;
                        Manip.SetCss.opacity abort_message (Some "1") ;
-                     *) 
-                       let rmv=
-                         match Learnocaml_local_storage.(retrieve (index_state "index")) with
-                         |{Learnocaml_exercise_state.exos ;mtime}-> exos
-                       in
-                       let exos = StringMap.remove exercise_id rmv in
-                       let index = {Learnocaml_exercise_state.exos; mtime = gettimeofday ()} in
-                       Learnocaml_local_storage.(store (index_state "index")) index;
-                       Learnocaml_local_storage.(delete (editor_state exercise_id));
-                       Dom_html.window##.location##reload ;
-(*
-                     end ;*)
+                        end ;
                       true) ;button
                 ] ) ::
               a ~a:[ a_href ("editor.html#id="^exercise_id^"&action=open") ; 

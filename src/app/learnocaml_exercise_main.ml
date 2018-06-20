@@ -31,7 +31,7 @@ let get_prepare id = Learnocaml_local_storage.(retrieve (editor_state id)).prepa
 
 
 let init_tabs, select_tab =
-  let names = [ "text" ; "toplevel" ; "report" ; "editor" ] in
+  let names = [ "text" ; "toplevel" ; "report" ; "editor" ;"template";"test.ml"] in
   let current = ref "text" in
   let select_tab name =
     set_arg "tab" name ;
@@ -158,8 +158,7 @@ let () =
   in
    Lwt.return (exo0 () )
 in
- let id =if idEditor id then String.sub id 1 ((String.length id)-1) else id in
-   
+    
   let after_init top =
     exercise_fetch >>= fun exo ->
     begin match Learnocaml_exercise.(get prelude) exo with
@@ -230,6 +229,9 @@ in
     Learnocaml_toplevel.execute top ;
     Lwt.return ()
   end ;
+  (*----- test.ml pane -------------------------------------------------- *)
+  (*let text_container =
+    Tyxml_js.Html5.[ pcdata ("je suis la ")] ;*)
   (* ---- text pane ----------------------------------------------------- *)
   let text_container = find_component "learnocaml-exo-tab-text" in
   let text_iframe = Dom_html.createIframe Dom_html.document in
@@ -366,7 +368,7 @@ in
     Dom_html.window##.location##assign
       (Js.string "index.html#activity=exercises") ;
     Lwt.return ()
-  end ;
+  end; (*   marque fin de la barre au dessus de celle a creer   ééé   *)
   let messages = Tyxml_js.Html5.ul [] in
   let callback text =
     Manip.appendChild messages Tyxml_js.Html5.(li [ pcdata text ]) in

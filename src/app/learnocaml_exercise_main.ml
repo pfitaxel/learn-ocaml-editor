@@ -151,7 +151,7 @@ let () =
   let exo3 =Learnocaml_exercise.set Learnocaml_exercise.max_score 1 exo2 in
   let exo4 =Learnocaml_exercise.set Learnocaml_exercise.prepare (get_prepare id) exo3 in
   let exo5 =Learnocaml_exercise.set Learnocaml_exercise.prelude (get_prelude id) exo4 in
-  let exo6 =Learnocaml_exercise.set Learnocaml_exercise.solution (get_solution id) exo5 in
+  let exo6 =Learnocaml_exercise.set Learnocaml_exercise.solution ("") exo5 in
   let exo7 =Learnocaml_exercise.set Learnocaml_exercise.test (get_test id) exo6 in
   let exo8 =Learnocaml_exercise.set Learnocaml_exercise.template (get_template id) exo7 in
   Learnocaml_exercise.set Learnocaml_exercise.descr (question) exo8

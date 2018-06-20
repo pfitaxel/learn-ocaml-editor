@@ -196,8 +196,8 @@ let editor_tab _ _ () =
                        Manip.replaceChildren messages
                          Tyxml_js.Html5.[ li [ pcdata "" ] ] ;
                        show_loading ~id:"learnocaml-main-loading" [ abort_message ] ;
-                       Manip.SetCss.opacity abort_message (Some "1")
-                     end ;
+                       Manip.SetCss.opacity abort_message (Some "1") ;
+                        end ;
                       true) ;button
                 ] ) ::
               a ~a:[ a_href ("editor.html#id="^exercise_id^"&action=open") ; 

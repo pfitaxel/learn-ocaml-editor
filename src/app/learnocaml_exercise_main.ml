@@ -31,7 +31,7 @@ let get_prepare id = Learnocaml_local_storage.(retrieve (editor_state id)).prepa
 
 
 let init_tabs, select_tab =
-  let names = [ "text" ; "toplevel" ; "report" ; "editor" ;"template";"test.ml"] in
+  let names = [ "text" ; "toplevel" ; "report" ; "editor"] in
   let current = ref "text" in
   let select_tab name =
     set_arg "tab" name ;

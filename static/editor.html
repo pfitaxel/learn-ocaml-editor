@@ -52,26 +52,42 @@
       -->
     </div>
     <div id="learnocaml-exo-tab-buttons">
-      <button id="learnocaml-exo-button-editor">Solution</button>
+
+      <button id="learnocaml-exo-button-editor"
+      title="Type here the solution of the exercise">Solution</button>
       <!-- To select a tab, make it the only one whose
            button and tab have the class .front-tab.
            Don't set the editor to .front-tab initially. -->
-      <button id="learnocaml-exo-button-template">Template</button>
-      <button id="learnocaml-exo-button-prelude">Prelude</button>
-      <button id="learnocaml-exo-button-prepare">Prepare</button>
+
+      <button id="learnocaml-exo-button-template"
+      title="Type here or generate the template the student will complete or correct">
+      Template</button>
+
+      <button id="learnocaml-exo-button-prelude"
+      title="Type here the definitions of types and functions given to the student">
+      Prelude</button>
+
+      <button id="learnocaml-exo-button-prepare"
+      title="Type here hidden definitions given to the student">Prepare</button>
+
       <button id="learnocaml-exo-button-toplevel" class="front-tab">Toplevel</button>
-      
+
       <!-- When graded, apply one of .partial, .success or .failure.
            The score must be put in a span.score. -->
-      <button id="learnocaml-exo-button-question">Question</button>
-      <button id="learnocaml-exo-button-test" class="front-tab">Test.ml</button>
+
+      <button id="learnocaml-exo-button-question"
+      title="Type here the wording of the exercise in Markdown">Question</button>
+
+      <button id="learnocaml-exo-button-test" class="front-tab"
+      title="Type here the tests set code">Test.ml</button>
+
       <button id="learnocaml-exo-button-report">Report</button>
-          
+
       <!-- Any other button can be added. -->
     </div>
     <div id="learnocaml-exo-tabs">
       <!-- Same comment as above for the first two tabs. -->
-      <div id="learnocaml-exo-tab-editor">
+      <div id="learnocaml-exo-tab-editor" title="Type here the solution of the exercise">
         <div id="learnocaml-exo-editor-pane" class="pane">Editor</div>
         <div id="learnocaml-exo-editor-toolbar" class="buttons">
           <!-- Any button can be added.
@@ -151,9 +167,10 @@
         <div id="learnocaml-exo-prepare-pane" class="prepare-pane"></div>
         <div id="learnocaml-exo-prepare-toolbar" class="buttons"></div>
       </div>
-      <div id="learnocaml-exo-tab-question" title="Type here the wording of the exercise">
-	<div id="learnocaml-exo-question-mark" class="questions-mark" ></div>
-	<div id="learnocaml-exo-question-html" class="questions-html"></div>
+
+      <div id="learnocaml-exo-tab-question" title="Type here the wording of the exercise in Markdown">
+        <div id="learnocaml-exo-question-mark" class="questions-mark" ></div>
+        <div id="learnocaml-exo-question-html" class="questions-html"></div>
       </div>
 
       <div id="learnocaml-exo-tab-test" title="Type here the tests set code">

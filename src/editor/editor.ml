@@ -66,7 +66,7 @@ let get_template id = Learnocaml_local_storage.(retrieve (editor_state id)).temp
 let get_test id = Learnocaml_local_storage.(retrieve (editor_state id)).test
 let get_prelude id = Learnocaml_local_storage.(retrieve (editor_state id)).prelude
 let get_prepare id = Learnocaml_local_storage.(retrieve (editor_state id)).prepare
-
+let astuce= ref (fun ()->())
 
 let string_of_char ch = String.make 1 ch ;;
 
@@ -389,7 +389,7 @@ let () =
   Ace.set_contents ace_prel
     ( get_prelude id ) ;
   Ace.set_font_size ace_prel 18;
-
+ 
     let typecheck set_class =
     Learnocaml_toplevel.check top (Ace.get_contents ace_prel) >>= fun res ->
     let error, warnings =
@@ -422,6 +422,7 @@ let () =
   let editor_prepare = find_component "learnocaml-exo-prepare-pane" in
   let editor_prep = Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div editor_prepare) in
   let ace_prep = Ocaml_mode.get_editor editor_prep in
+  
   Ace.set_contents ace_prep
     ( get_prepare id ) ;
   Ace.set_font_size ace_prep 18;
@@ -458,7 +459,7 @@ let () =
   let editor_pane = find_component "learnocaml-exo-editor-pane" in
   let editor = Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div editor_pane) in
   let ace = Ocaml_mode.get_editor editor in
-
+  
   let recovering () =
     let solution = Ace.get_contents ace in
     let titre = get_titre id  in
@@ -474,7 +475,7 @@ let () =
     Learnocaml_local_storage.(store (editor_state id))
       { Learnocaml_exercise_state.id ; solution ; titre ; question ; template ; diff ; test ;prepare;prelude;
         mtime = gettimeofday () } in
-
+  astuce:=recovering ;
   Ace.set_contents ace (get_solution id);
   Ace.set_font_size ace 18;
   let messages = Tyxml_js.Html5.ul [] in
@@ -515,6 +516,10 @@ let () =
     recovering () ;
     Lwt.return ()
   end ;
+
+
+ 
+
   
   begin editor_button
       ~icon: "download" "Download" @@ fun () ->
@@ -703,3 +708,6 @@ let () =
   hide_loading ~id:"learnocaml-exo-loading" () ;
 
   Lwt.return () ;;
+let () =Lwt.async @@ fun ()->
+  let _= Dom_html.window##setInterval (Js.wrap_callback (fun () -> !astuce () ) ) 120000.0; in 
+                                   Lwt.return_unit ;;

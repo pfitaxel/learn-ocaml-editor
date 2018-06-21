@@ -19,6 +19,8 @@ open Js_utils
 open Lwt.Infix
 open Learnocaml_common
 open Learnocaml_exercise_state
+
+open Js_of_ocaml
        
 (*
 module Report = Learnocaml_report
@@ -377,10 +379,69 @@ let () =
   end ;
 
   (*-------question pane  -------------------------------------------------*)
-  let editor_question = find_component "learnocaml-exo-tab-question" in
+  let editor_question = find_component "learnocaml-exo-question-mark" in
   let ace_quest = Ace.create_editor (Tyxml_js.To_dom.of_div editor_question ) in
   Ace.set_contents ace_quest (get_question id) ;
   Ace.set_font_size ace_quest 18;
+
+  let question =get_question id in
+  let question =Omd.to_html (Omd.of_string question) in
+ 
+  let text_container = find_component "learnocaml-exo-question-html" in
+  let text_iframe = Dom_html.createIframe Dom_html.document in
+  Manip.replaceChildren text_container
+    Tyxml_js.Html5.[ Tyxml_js.Of_dom.of_iFrame text_iframe ] ;
+  Js.Opt.case
+    (text_iframe##.contentDocument)
+    (fun () -> failwith "cannot edit iframe document")
+    (fun d ->
+       let html = Format.asprintf
+           "<!DOCTYPE html>\
+            <html><head>\
+            <title>%s - exercise text</title>\
+            <meta charset='UTF-8'>\
+            <link rel='stylesheet' href='css/learnocaml_standalone_description.css'>\
+            </head>\
+            <body>\
+            %s\
+            </body>\
+            </html>"
+           (get_titre id)
+           question in
+       d##open_;
+       d##write (Js.string html);
+       d##close);
+
+let old_text = ref "" in
+  
+let onload () =
+   let rec dyn_preview =
+    let text = Ace.get_contents ace_quest in
+      if text <> !old_text then begin
+       Js.Opt.case
+    (text_iframe##.contentDocument)
+    (fun () -> failwith "cannot edit iframe document")
+    (fun d ->
+       let html = Format.asprintf
+           "<!DOCTYPE html>\
+            <html><head>\
+            <title>%s - exercise text</title>\
+            <meta charset='UTF-8'>\
+            <link rel='stylesheet' href='css/learnocaml_standalone_description.css'>\
+            </head>\
+            <body>\
+            %s\
+            </body>\
+            </html>"
+           (get_titre id)
+           (Omd.to_html (Omd.of_string text)) in
+       d##open_;
+       d##write (Js.string html);
+       d##close);
+       old_text := text
+        end
+   in
+   dyn_preview; () in
 
   (* ---- prelude pane --------------------------------------------------- *)
   let editor_prelude = find_component "learnocaml-exo-prelude-pane" in
@@ -701,5 +762,8 @@ let () =
   toplevel_launch >>= fun _ ->
   typecheck false >>= fun () ->
   hide_loading ~id:"learnocaml-exo-loading" () ;
+  let () = Lwt.async @@ fun () ->
+     let _ = Dom_html.window##setInterval (Js.wrap_callback (fun () -> onload ())) 200.0; in
+     Lwt.return () in
+  Lwt.return ();;
 
-  Lwt.return () ;;

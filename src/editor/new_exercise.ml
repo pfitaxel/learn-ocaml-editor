@@ -1,3 +1,4 @@
+open Js_utils
 open Js_of_ocaml
 open Str
 open Js_of_ocaml
@@ -7,7 +8,29 @@ open Learnocaml_common
 module StringMap = Map.Make (String)
 
 let setInnerHtml elt s =    
-  elt##.innerHTML:= Js.string s
+  elt##.innerHTML := Js.string s
+
+let set_string_translations () =
+  let translations = [
+  "txt_new_exo", [%i"New exercise"];
+  "txt_id", [%i"Unique identifier:<br>"];
+  "txt_title", [%i"Title (unique too):<br>"];
+  "txt_descr", [%i"Description of the exercise:<br>"];
+  "txt_diff", [%i"Difficulty level:<br>"];
+  "cancel", [%i"Cancel"];
+  "save", [%i"Save"];
+  ] in
+  List.iter
+  (fun (id, text) -> Manip.setInnerHtml (find_component id) text)
+  translations
+
+let set_lang () =
+  match Js.Optdef.to_option (Dom_html.window##.navigator##.language) with
+  | Some l -> Ocplib_i18n.set_lang (Js.to_string l)
+  | None ->
+    match Js.Optdef.to_option (Dom_html.window##.navigator##.userLanguage) with
+    | Some l -> Ocplib_i18n.set_lang (Js.to_string l)
+    | None -> ()
 
 let transResultOption = function
   |None -> false
@@ -28,6 +51,7 @@ let toFloatOpt = function
 let previousId = match (arg "id") with
   |exception Not_found -> ""
   |s -> s
+
 let save = getElementById "save"
 let identifier = getElementById_coerce "identifier" CoerceTo.input
 let title = getElementById_coerce "title" CoerceTo.input
@@ -118,52 +142,52 @@ let _ = save##.onclick:= handler (fun _ ->
   let title_unique = titleUnique () in
   if not id_correct && not title_correct then
     begin
-      setInnerHtml id_error "Incorrect identifier: an identifier can't be empty, \
+      setInnerHtml id_error [%i"Incorrect identifier: an identifier can't be empty, \
                              and only lower case letters, numerals, dashes \
-                             and underscores are allowed";
-      setInnerHtml title_error "Incorrect title: a title can't be empty, \
-                             or begin or end with a space or a tab"
+                             and underscores are allowed"];
+      setInnerHtml title_error [%i"Incorrect title: a title can't be empty, \
+                             or begin or end with a space or a tab"]
     end
   else if not id_correct && title_correct && not title_unique then
     begin
-      setInnerHtml id_error "Incorrect identifier: an identifier can't be empty, \
+      setInnerHtml id_error [%i"Incorrect identifier: an identifier can't be empty, \
                              and only lower case letters, numerals, dashes \
-                             and underscores are allowed";
-      setInnerHtml title_error "This title is already used, please choose another one"
+                             and underscores are allowed"];
+      setInnerHtml title_error [%i"This title is already used, please choose another one"]
     end
   else if not id_correct && title_correct && title_unique then
     begin
-      setInnerHtml id_error "Incorrect identifier: an identifier can't be empty, \
+      setInnerHtml id_error [%i"Incorrect identifier: an identifier can't be empty, \
                              and only lower case letters, numerals, dashes \
-                             and underscores are allowed";
+                             and underscores are allowed"];
       setInnerHtml title_error ""
     end
   else if id_correct && not id_unique && not title_correct then
     begin
-      setInnerHtml id_error "This identifier is already used, please choose another one";
-      setInnerHtml title_error "Incorrect title: a title can't be empty, \
-                                or begin or end with a space or a tab"
+      setInnerHtml id_error [%i"This identifier is already used, please choose another one"];
+      setInnerHtml title_error [%i"Incorrect title: a title can't be empty, \
+                                or begin or end with a space or a tab"]
     end
   else if id_correct && not id_unique && title_correct && not title_unique then
     begin
-      setInnerHtml id_error "This identifier is already used, please choose another one";
-      setInnerHtml title_error "This title is already used, please choose another one"
+      setInnerHtml id_error [%i"This identifier is already used, please choose another one"];
+      setInnerHtml title_error [%i"This title is already used, please choose another one"]
     end
   else if id_correct && not id_unique && title_correct && title_unique then
     begin
-      setInnerHtml id_error "This identifier is already used, please choose another one";
+      setInnerHtml id_error [%i"This identifier is already used, please choose another one"];
       setInnerHtml title_error ""
     end
   else if id_correct && id_unique && not title_correct then
     begin
       setInnerHtml id_error "";
-      setInnerHtml title_error "Incorrect title: a title can't be empty, \
-                                or begin or end with a space or a tab"
+      setInnerHtml title_error [%i"Incorrect title: a title can't be empty, \
+                                or begin or end with a space or a tab"]
     end
   else if id_correct && id_unique && title_correct && not title_unique then
     begin
       setInnerHtml id_error "";
-      setInnerHtml title_error "This title is already used, please choose another one"
+      setInnerHtml title_error [%i"This title is already used, please choose another one"]
     end
   else
     begin
@@ -176,3 +200,6 @@ let _ = save##.onclick:= handler (fun _ ->
     end
   ; Js._true
 )
+
+let () = set_lang ()
+let () = set_string_translations ()

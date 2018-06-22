@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1">
     <title>Learn OCaml by OCamlPro - Exercise</title>
+        <link rel="icon" type="image/x-icon" href="icons/favicon.ico" />
+    <!--[if IE]><link rel="shortcut icon" type="image/x-icon" href="icons/favicon.ico"     /><![endif]-->﻿
     <link rel="stylesheet" href="css/learnocaml_common.css">
     <link rel="stylesheet" href="css/learnocaml_exercise.css">
     <link rel="stylesheet" href="css/learnocaml_report.css">
@@ -42,27 +44,27 @@
       </div>
     </div>
     <div style="margin: 0 5%;">
-      <h1>New Exercise</h1>
+      <h1 id="txt_new_exo">New Exercise</h1>
       <!--form-->
         <p>
-          <label for="identifier">Unique identifier:<br></label>
+          <label id="txt_id" for="identifier">Unique identifier:<br></label>
           <input type="text" id="identifier" name="identifier" value=""
           maxlength="250" size="40" required pattern="[a-z0-9_-]+" autofocus />
           <span id="id_error" class="error" aria-live="polite"></span>
         </p>
         <p>
-          <label for="title">Title (unique too):<br></label>
+          <label id="txt_title" for="title">Title (unique too):<br></label>
           <input type="text" id="title" name="title" value=""
           size="40" required pattern="[^ \t]|([^ \t].*[^ \t])" />
           <span id="title_error" class="error" aria-live="polite"></span>
         </p>
         <p>
-          <label for="description">Description of the exercise:<br></label>
+          <label id="txt_descr" for="description">Description of the exercise:<br></label>
           <textarea id="description" name="description" cols="80" rows="12">
           </textarea>
         </p>
         <p>
-          <label for="difficulty">Difficulty level:<br></label>
+          <label id="txt_diff" for="difficulty">Difficulty level:<br></label>
           <select name="difficulty" id="difficulty" size="1" required />
             <option value="0.">0</option>
             <option value="0.5">0.5</option>

@@ -19,6 +19,8 @@ open Js_utils
 open Lwt.Infix
 open Learnocaml_common
 open Learnocaml_exercise_state
+
+open Js_of_ocaml
        
 (*
 module Report = Learnocaml_report
@@ -53,7 +55,7 @@ module Dummy_Functor (Introspection :
   module Test_lib = Test_lib.Make(Dummy_Params)
   module Report = Learnocaml_report
 *)
-
+let auto_save_interval=120.0 ;; (* in seconds*)
 
 module StringMap = Map.Make (String)
 
@@ -66,7 +68,7 @@ let get_template id = Learnocaml_local_storage.(retrieve (editor_state id)).temp
 let get_test id = Learnocaml_local_storage.(retrieve (editor_state id)).test
 let get_prelude id = Learnocaml_local_storage.(retrieve (editor_state id)).prelude
 let get_prepare id = Learnocaml_local_storage.(retrieve (editor_state id)).prepare
-
+let recovering_callback= ref (fun ()->())
 
 let string_of_char ch = String.make 1 ch ;;
 
@@ -377,10 +379,69 @@ let () =
   end ;
 
   (*-------question pane  -------------------------------------------------*)
-  let editor_question = find_component "learnocaml-exo-tab-question" in
+  let editor_question = find_component "learnocaml-exo-question-mark" in
   let ace_quest = Ace.create_editor (Tyxml_js.To_dom.of_div editor_question ) in
   Ace.set_contents ace_quest (get_question id) ;
   Ace.set_font_size ace_quest 18;
+
+  let question =get_question id in
+  let question =Omd.to_html (Omd.of_string question) in
+ 
+  let text_container = find_component "learnocaml-exo-question-html" in
+  let text_iframe = Dom_html.createIframe Dom_html.document in
+  Manip.replaceChildren text_container
+    Tyxml_js.Html5.[ Tyxml_js.Of_dom.of_iFrame text_iframe ] ;
+  Js.Opt.case
+    (text_iframe##.contentDocument)
+    (fun () -> failwith "cannot edit iframe document")
+    (fun d ->
+       let html = Format.asprintf
+           "<!DOCTYPE html>\
+            <html><head>\
+            <title>%s - exercise text</title>\
+            <meta charset='UTF-8'>\
+            <link rel='stylesheet' href='css/learnocaml_standalone_description.css'>\
+            </head>\
+            <body>\
+            %s\
+            </body>\
+            </html>"
+           (get_titre id)
+           question in
+       d##open_;
+       d##write (Js.string html);
+       d##close);
+
+let old_text = ref "" in
+  
+let onload () =
+   let rec dyn_preview =
+    let text = Ace.get_contents ace_quest in
+      if text <> !old_text then begin
+       Js.Opt.case
+    (text_iframe##.contentDocument)
+    (fun () -> failwith "cannot edit iframe document")
+    (fun d ->
+       let html = Format.asprintf
+           "<!DOCTYPE html>\
+            <html><head>\
+            <title>%s - exercise text</title>\
+            <meta charset='UTF-8'>\
+            <link rel='stylesheet' href='css/learnocaml_standalone_description.css'>\
+            </head>\
+            <body>\
+            %s\
+            </body>\
+            </html>"
+           (get_titre id)
+           (Omd.to_html (Omd.of_string text)) in
+       d##open_;
+       d##write (Js.string html);
+       d##close);
+       old_text := text
+        end
+   in
+   dyn_preview; () in
 
   (* ---- prelude pane --------------------------------------------------- *)
   let editor_prelude = find_component "learnocaml-exo-prelude-pane" in
@@ -389,7 +450,7 @@ let () =
   Ace.set_contents ace_prel
     ( get_prelude id ) ;
   Ace.set_font_size ace_prel 18;
-
+ 
     let typecheck set_class =
     Learnocaml_toplevel.check top (Ace.get_contents ace_prel) >>= fun res ->
     let error, warnings =
@@ -422,6 +483,7 @@ let () =
   let editor_prepare = find_component "learnocaml-exo-prepare-pane" in
   let editor_prep = Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div editor_prepare) in
   let ace_prep = Ocaml_mode.get_editor editor_prep in
+  
   Ace.set_contents ace_prep
     ( get_prepare id ) ;
   Ace.set_font_size ace_prep 18;
@@ -458,7 +520,7 @@ let () =
   let editor_pane = find_component "learnocaml-exo-editor-pane" in
   let editor = Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div editor_pane) in
   let ace = Ocaml_mode.get_editor editor in
-
+  
   let recovering () =
     let solution = Ace.get_contents ace in
     let titre = get_titre id  in
@@ -474,7 +536,7 @@ let () =
     Learnocaml_local_storage.(store (editor_state id))
       { Learnocaml_exercise_state.id ; solution ; titre ; question ; template ; diff ; test ;prepare;prelude;
         mtime = gettimeofday () } in
-
+  recovering_callback:=recovering ;
   Ace.set_contents ace (get_solution id);
   Ace.set_font_size ace 18;
   let messages = Tyxml_js.Html5.ul [] in
@@ -515,7 +577,7 @@ let () =
     recovering () ;
     Lwt.return ()
   end ;
-  
+
   begin editor_button
       ~icon: "download" "Download" @@ fun () ->
     recovering () ;
@@ -701,5 +763,13 @@ let () =
   toplevel_launch >>= fun _ ->
   typecheck false >>= fun () ->
   hide_loading ~id:"learnocaml-exo-loading" () ;
+  let () = Lwt.async @@ fun () ->
+     let _ = Dom_html.window##setInterval (Js.wrap_callback (fun () -> onload ())) 200.0; in
+     Lwt.return () in
+  Lwt.return ();;
 
-  Lwt.return () ;;
+let () =Lwt.async @@ fun ()->
+    let _= Dom_html.window##setInterval (Js.wrap_callback (fun () -> !recovering_callback () ) ) (auto_save_interval *. 1000.0);
+    in 
+    Lwt.return_unit ;;
+

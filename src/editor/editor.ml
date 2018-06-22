@@ -55,7 +55,7 @@ module Dummy_Functor (Introspection :
   module Test_lib = Test_lib.Make(Dummy_Params)
   module Report = Learnocaml_report
 *)
-
+let auto_save_interval=120.0 ;; (* in seconds*)
 
 module StringMap = Map.Make (String)
 
@@ -68,7 +68,7 @@ let get_template id = Learnocaml_local_storage.(retrieve (editor_state id)).temp
 let get_test id = Learnocaml_local_storage.(retrieve (editor_state id)).test
 let get_prelude id = Learnocaml_local_storage.(retrieve (editor_state id)).prelude
 let get_prepare id = Learnocaml_local_storage.(retrieve (editor_state id)).prepare
-let astuce= ref (fun ()->())
+let recovering_callback= ref (fun ()->())
 
 let string_of_char ch = String.make 1 ch ;;
 
@@ -536,7 +536,7 @@ let onload () =
     Learnocaml_local_storage.(store (editor_state id))
       { Learnocaml_exercise_state.id ; solution ; titre ; question ; template ; diff ; test ;prepare;prelude;
         mtime = gettimeofday () } in
-  astuce:=recovering ;
+  recovering_callback:=recovering ;
   Ace.set_contents ace (get_solution id);
   Ace.set_font_size ace 18;
   let messages = Tyxml_js.Html5.ul [] in
@@ -769,7 +769,7 @@ let onload () =
   Lwt.return ();;
 
 let () =Lwt.async @@ fun ()->
-    let _= Dom_html.window##setInterval (Js.wrap_callback (fun () -> !astuce () ) ) 120000.0;
+    let _= Dom_html.window##setInterval (Js.wrap_callback (fun () -> !recovering_callback () ) ) (auto_save_interval *. 1000.0);
     in 
     Lwt.return_unit ;;
 

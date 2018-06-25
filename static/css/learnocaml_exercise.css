@@ -163,8 +163,22 @@ body {
     z-index: 998;
     opacity: 1;
   }
+  
+  #learnocaml-exo-button-editor.front-tab ~ #learnocaml-exo-button-testhaut {
+    border-bottom: none;
+    background: #bbb;
+  }
+  #learnocaml-exo-button-editor.front-tab ~ #learnocaml-exo-button-testhaut::after {
+    display: none;
+  }
+  #learnocaml-exo-tab-editor.front-tab ~ #learnocaml-exo-tab-testhaut {
+    z-index: 998;
+    opacity: 1;
+  }
 
-/* fin changement  */
+  
+  /* fin changement  */
+  
 
 
   #learnocaml-exo-tabs > * {
@@ -512,6 +526,58 @@ body {
   }
 }
 
+/* testhaut */
+
+#learnocaml-exo-tab-buttons > #learnocaml-exo-button-testhaut {
+  background: #444;
+  color: white;
+}
+#learnocaml-exo-tab-testhaut > .testhaut-pane {
+  position: absolute;
+  left: 0; top: 0; bottom: 40px; width: 100%;
+  background: #666;
+  color: #fff;
+  z-index: 1002;
+}
+
+
+#learnocaml-exo-tab-testhaut > .buttons {
+  position: absolute;
+  left: 0; bottom: 0px; width: 100%; height: 40px;
+  background: linear-gradient(to bottom, #666 0px, #444 10px, #222 60px);
+  color: #fff;
+  line-height: 40px;
+  display: flex;
+  flex-direction: row;
+  z-index: 1003;
+}
+#learnocaml-exo-tab-testhaut > .buttons::after {
+  position: absolute;
+  bottom: 40px; left: 0px; height: 5px; width: 100%;
+  background: linear-gradient(to top, rgba(0,0,0,0.4) 0px, rgba(0,0,0,0) 5px);
+  content:"";
+}
+#learnocaml-exo-tab-testhaut > .buttons > button {
+  flex: 1;
+  background: none;
+  border: none;
+  color: #eee;
+  text-shadow: 2px 2px 5px rgba(0,0,0,0.4);
+  border-top: 1px #eee solid;
+  position: relative;
+  padding: 0;
+}
+#learnocaml-exo-tab-testhaut > .buttons > button:not(:first-child) {
+  border-left: 1px #eee solid;
+}
+@media (max-width: 550px) {
+  #learnocaml-exo-tab-testhaut > .buttons > button > .label {
+    display: none;
+  }
+}
+
+/* fin testhaut */
+
 /* fin du changement  */
 
 /* question tab */
@@ -828,6 +894,89 @@ body {
   color: #b00;
   text-shadow: 0px 0px 40px #F66;
 }
+
+/*testhaut */
+
+#learnocaml-exo-testhaut-pane {
+  font-size: 18px;
+  font-family: 'Inconsolata', monospace;
+}
+#learnocaml-exo-testhaut-pane .ace_gutter {
+  background: linear-gradient(to left, transparent 0, #444 8px, #ccc 8px, #ccc 9px, #444 9px) ;
+  color: #ccc;
+}
+#learnocaml-exo-testhaut-pane .ace_gutter-active-line {
+  background: linear-gradient(to left, #777 0, #456 8px, #ccc 8px, #ccc 9px, #678 9px) ;
+  color: #888;
+}
+#learnocaml-exo-testhaut-pane .ace_gutter-cell {
+  padding: 0 14px 0 0;
+}
+#learnocaml-exo-testhaut-pane .ace_gutter-cell.ace_warning {
+  background: linear-gradient(to right, #980 0, #980 4px, transparent 80%) ;
+}
+#learnocaml-exo-testhaut-pane .ace_gutter-cell.ace_error {
+  background: linear-gradient(to right, #900 0, #900 4px, transparent 80%) ;
+}
+#learnocaml-exo-testhaut-pane .ace_comment { color: #aaa; font-style: italic; }
+#learnocaml-exo-testhaut-pane .ace_keyword { color: #e80; font-weight:bold; }
+#learnocaml-exo-testhaut-pane .ace_constant { color: #acf; }
+#learnocaml-exo-testhaut-pane .ace_string { color: #acf; }
+#learnocaml-exo-testhaut-pane .ace_function { color: #fff; }
+#learnocaml-exo-testhaut-pane .ace_type { color: #fff; }
+#learnocaml-exo-testhaut-pane .ace_operator { color: #fff; }
+#learnocaml-exo-testhaut-pane .ace_meta { color: #fff; }
+#learnocaml-exo-testhaut-pane .ace_variable { color: #fff; }
+#learnocaml-exo-testhaut-pane .ace_text { color: #fff; }
+#learnocaml-exo-testhaut-pane .error {
+  border-bottom: 2px #b00 solid;
+  position: absolute;
+}
+
+#learnocaml-exo-testhaut-pane .warning {
+  border-bottom: 2px #ca0 solid;
+  position: absolute;
+}
+
+#learnocaml-exo-testhaut-pane .ace_selection { background: #e80; opacity: 0.4; }
+#learnocaml-exo-testhaut-pane .ace_active-line { background: #acf; opacity: 0.2; }
+#learnocaml-exo-testhaut-pane .ace_selected-word { background: #e80; opacity: 0.2; }
+
+#learnocaml-exo-testhaut-pane.ocaml-check-success::after,
+#learnocaml-exo-testhaut-pane.ocaml-check-warn::after,
+#learnocaml-exo-testhaut-pane.ocaml-check-error::after {
+  animation: 1s check_status_animation;
+  animation-fill-mode: forwards;
+  position: absolute;
+  margin: -100px 0 0 0;
+  top: 50%;
+  text-align: center;
+  font-size: 200px;
+  line-height: 200px;
+  width: 100%;
+}
+
+#learnocaml-exo-testhaut-pane.ocaml-check-success::after {
+  content: "✌";
+  color: #0a0;
+  text-shadow: 0px 0px 40px #6F6;
+}
+
+#learnocaml-exo-testhaut-pane.ocaml-check-warn::after {
+  content: "✋";
+  color: #ec0;
+  text-shadow: 0px 0px 40px #Fe6;
+}
+
+#learnocaml-exo-testhaut-pane.ocaml-check-error::after {
+  content: "☠";
+  color: #b00;
+  text-shadow: 0px 0px 40px #F66;
+}
+
+/* fin testhaut */
+
+
 
 /* question mark */
 

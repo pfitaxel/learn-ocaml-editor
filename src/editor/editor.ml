@@ -148,7 +148,7 @@ let rec genTemplate chaine = if chaine="" then "" else
 	concatenation (genLet (decompositionSol chaine 0));;
 
 let init_tabs, select_tab =
-  let names = [ "toplevel" ; "report" ; "editor" ; "template" ; "test" ; "question" ; "prelude" ; "prepare" ] in
+  let names = [ "toplevel" ; "report" ; "editor" ; "template" ; (*"test" ;*) "question" ; "prelude" ; "prepare";"testhaut" ] in
   let current = ref "question" in
   let select_tab name =
     set_arg "tab" name ;
@@ -278,9 +278,11 @@ let () =
   let prelude_toolbar = find_component "learnocaml-exo-prelude-toolbar" in
   let prepare_toolbar = find_component "learnocaml-exo-prepare-toolbar" in
   let test_toolbar = find_component "learnocaml-exo-test-toolbar" in
+  let testhaut_toolbar = find_component "learnocaml-exo-testhaut-toolbar" in
   let toplevel_button = button ~container: toplevel_toolbar ~theme: "dark" in
   let editor_button = button ~container: editor_toolbar ~theme: "light" in
   let test_button = button ~container: test_toolbar ~theme: "light" in
+  let testhaut_button = button ~container: testhaut_toolbar ~theme: "light" in
   let template_button = button ~container: template_toolbar ~theme: "light" in
   let prelude_button = button ~container: prelude_toolbar ~theme: "light" in
   let prepare_button = button ~container: prepare_toolbar ~theme: "light" in
@@ -389,6 +391,51 @@ let () =
     typecheck true
   end ;
 
+
+  (* ---- testhaut pane --------------------------------------------------- *)
+(*let editor_testhaut = find_component "learnocaml-exo-test-pane" in
+  let editor_thaut = Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div editor_test) in
+  let ace_thaut = Ocaml_mode.get_editor editor_thaut in
+  Ace.set_contents ace_thaut  (get_test id); 
+  Ace.set_font_size ace_t 18;
+*)
+   (* let typecheck set_class =
+    Learnocaml_toplevel.check top (Ace.get_contents ace_t) >>= fun res ->
+    let error, warnings =
+      match res with
+      | Toploop_results.Ok ((), warnings) -> None, warnings
+      | Toploop_results.Error (err, warnings) -> Some err, warnings in
+    let transl_loc { Toploop_results.loc_start ; loc_end } =
+      { Ocaml_mode.loc_start ; loc_end } in
+    let error = match error with
+      | None -> None
+      | Some { Toploop_results.locs ; msg ; if_highlight } ->
+          Some { Ocaml_mode.locs = List.map transl_loc locs ;
+                 msg = (if if_highlight <> "" then if_highlight else msg) } in
+    let warnings =
+      List.map
+        (fun { Toploop_results.locs ; msg ; if_highlight } ->
+           { Ocaml_mode.loc = transl_loc (List.hd locs) ;
+             msg = (if if_highlight <> "" then if_highlight else msg) })
+        warnings in
+    Ocaml_mode.report_error ~set_class editor_t error warnings  >>= fun () ->
+    Ace.focus ace_t ;
+    Lwt.return () in *)
+  begin testhaut_button
+      ~group: toplevel_buttons_group
+      ~icon: "typecheck" "Check" @@ fun () ->
+    Lwt.return ()
+  end ;
+  begin testhaut_button
+      ~group: toplevel_buttons_group
+      ~icon: "sync" "Generate" @@ fun () ->
+    Lwt.return ()
+  end ;
+  begin testhaut_button
+      ~group: toplevel_buttons_group
+      ~icon: "run" "Compile" @@ fun () ->
+    Lwt.return ()
+  end ;  
   (* ---- template pane --------------------------------------------------- *)
   let editor_template = find_component "learnocaml-exo-template-pane" in
   let editor_temp = Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div editor_template) in

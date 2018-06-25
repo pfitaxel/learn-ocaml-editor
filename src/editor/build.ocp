@@ -78,15 +78,13 @@ begin program "editor"
       commands = [ {
         "js_of_ocaml"
            "+cstruct/cstruct.js"
-	   "+dynlink.js"
-	   "+toplevel.js"
-	   "--toplevel"
-	   "--nocmis"
-	   "%{ace_FULL_SRC_DIR}%/ace_bindings.js"
+           "+dynlink.js"
+	       "+toplevel.js"
+	       "--toplevel"
+	       "--nocmis"
+	       "%{ace_FULL_SRC_DIR}%/ace_bindings.js"
            %byte_exe( p = "editor" )
       } ]
     )
   ]
 end
-
-

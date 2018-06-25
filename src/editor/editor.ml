@@ -19,7 +19,6 @@ open Js_utils
 open Lwt.Infix
 open Learnocaml_common
 open Learnocaml_exercise_state
-
 open Js_of_ocaml
        
 (*
@@ -55,7 +54,7 @@ module Dummy_Functor (Introspection :
   module Test_lib = Test_lib.Make(Dummy_Params)
   module Report = Learnocaml_report
 *)
-let auto_save_interval=120.0 ;; (* in seconds*)
+let auto_save_interval = 120.0 ;; (* in seconds*)
 
 module StringMap = Map.Make (String)
 
@@ -293,7 +292,7 @@ let () =
     end >>= fun r1 ->
     Learnocaml_toplevel.load ~print_outcome:false top
      "" >>= fun r2 ->
-    if not r1 || not r2 then failwith "error in prelude" ;
+    if not r1 || not r2 then failwith [%i "error in prelude"] ;
     Learnocaml_toplevel.set_checking_environment top >>= fun () ->
     Lwt.return () in
   let timeout_prompt =
@@ -355,8 +354,14 @@ let () =
   let ace_t = Ocaml_mode.get_editor editor_t in
   Ace.set_contents ace_t  (get_test id); 
   Ace.set_font_size ace_t 18;
+
+ (*let lib = " module Test_lib = Test_lib.Make(struct\n\
+        \  let results = results\n\
+        \  let set_progress = set_progress\n\
+        \  module Introspection = Introspection\n\
+              end)" in *)
   
-   (* let typecheck set_class =
+   let typecheck set_class =
     Learnocaml_toplevel.check top (Ace.get_contents ace_t) >>= fun res ->
     let error, warnings =
       match res with
@@ -377,11 +382,11 @@ let () =
         warnings in
     Ocaml_mode.report_error ~set_class editor_t error warnings  >>= fun () ->
     Ace.focus ace_t ;
-    Lwt.return () in *)
+    Lwt.return () in
   begin test_button
       ~group: toplevel_buttons_group
       ~icon: "typecheck" [%i"Check"] @@ fun () ->
-    Lwt.return ()
+    typecheck true
   end ;
 
   (* ---- template pane --------------------------------------------------- *)
@@ -583,7 +588,7 @@ let onload () =
   Ace.set_contents ace (get_solution id);
   Ace.set_font_size ace 18;
   let messages = Tyxml_js.Html5.ul [] in
-  begin editor_button
+  begin editor_butto
       ~icon: "sync" [%i"Gen. template"] @@ fun () ->
     select_tab "template";
     if (Ace.get_contents ace_temp) = "" then        
@@ -636,11 +641,7 @@ let onload () =
     Lwt.return ()
   end ;
 
- (* let lib = " module Test_lib = Test_lib.Make(struct\n\
-        \  let results = results\n\
-        \  let set_progress = set_progress\n\
-        \  module Introspection = Introspection\n\
-              end)" in *)
+
   let typecheck set_class =
     Learnocaml_toplevel.check top (Ace.get_contents ace) >>= fun res ->
     let error, warnings =
@@ -752,7 +753,7 @@ let onload () =
 
     let aborted, abort_message =
       let t, u = Lwt.task () in
-      let btn = Tyxml_js.Html5.(button [ pcdata "abort" ]) in
+      let btn = Tyxml_js.Html5.(button [ pcdata [%i "abort" ]]) in
       Manip.Ev.onclick btn (fun _ -> Lwt.wakeup u () ; true) ;
       let div =
         Tyxml_js.Html5.(div ~a: [ a_class [ "dialog" ] ]

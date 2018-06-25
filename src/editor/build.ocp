@@ -47,6 +47,7 @@ begin program "editor"
     "js_of_ocaml.ppx"
     "ocplib-json-typed.browser"
     "omd"
+    "grading"
  ]
   files = [
     "editor.ml" ( comp = [ ppx_js ppx_ocplib_i18n]  )
@@ -58,6 +59,10 @@ begin program "editor"
       commands = [ {
         "js_of_ocaml"
            "+cstruct/cstruct.js"
+	   "+dynlink.js"
+	   "+toplevel.js"
+	   "--toplevel"
+	   "--nocmis"
 	   "%{ace_FULL_SRC_DIR}%/ace_bindings.js"
            %byte_exe( p = "editor" )
       } ]

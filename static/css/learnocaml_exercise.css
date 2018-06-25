@@ -90,6 +90,13 @@ body {
   z-index: 1009;
   background: linear-gradient(to top, rgba(0,0,0,0.4) 0, transparent 5px);
 }
+#learnocaml-exo-tab-buttons > button[disabled]::after {
+	position: absolute;
+  left:0; right:0; bottom:0; top:0;
+  content:"";
+  z-index: 1009;
+  background: linear-gradient(to top, rgba(333,0,0,0.4) 0, transparent 5px);
+}
 #learnocaml-exo-tabs > * {
   position: absolute;
   z-index: 997;

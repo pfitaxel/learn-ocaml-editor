@@ -49,7 +49,6 @@ install: static
 	@cp _obuild/*/learnocaml-main.js ${DEST_DIR}/js/
 	@cp _obuild/*/editor.js ${DEST_DIR}/js/
 	@cp _obuild/*/new_exercise.js ${DEST_DIR}/js/
-	@cp _obuild/*/test.js ${DEST_DIR}/js/
 	@cp _obuild/*/learnocaml-exercise.js ${DEST_DIR}/js/
 	@cp _obuild/*/learnocaml-toplevel-worker.js ${DEST_DIR}/js/
 	@cp _obuild/*/learnocaml-grader-worker.js ${DEST_DIR}/js/

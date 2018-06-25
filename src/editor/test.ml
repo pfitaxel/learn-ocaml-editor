@@ -84,4 +84,5 @@ spec##.onclick := handler (fun _ ->
 suite##.onclick := handler (fun _ ->
      select_tab "suite";
      Js._true);
+Lwt.return ();;
              

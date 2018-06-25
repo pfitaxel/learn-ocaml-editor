@@ -1,0 +1,103 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1">
+    <title>Learn OCaml by OCamlPro - Exercise</title>
+        <link rel="icon" type="image/x-icon" href="icons/favicon.ico" />
+    <!--[if IE]><link rel="shortcut icon" type="image/x-icon" href="icons/favicon.ico"     /><![endif]-->﻿
+    <link rel="stylesheet" href="css/learnocaml_common.css">
+    <link rel="stylesheet" href="css/learnocaml_exercise.css">
+    <link rel="stylesheet" href="css/learnocaml_report.css">
+    <link rel="stylesheet" href="css/learnocaml_tryocaml.css">
+    <script src="js/ace/ace.js" type="text/javascript" charset="utf-8" defer></script>
+    <script language="JavaScript" src="js/test.js" defer></script>
+  </head>
+  <body>
+    <style type="text/css"> 
+      a:link
+      {
+      	text-decoration:none; 
+      }
+      input:invalid
+      {
+      	border: 1px red;
+      	box-shadow: 0 0 2px 1px red;
+  	  }
+  	  .error
+  	  {
+  	  	color: darkred;
+  	  }
+    </style>
+    <div style="display:none">
+      <!-- preload -->
+      <img src="icons/tryocaml_loading_1.gif"><img src="icons/tryocaml_loading_2.gif">
+      <img src="icons/tryocaml_loading_3.gif"><img src="icons/tryocaml_loading_4.gif">
+      <img src="icons/tryocaml_loading_5.gif"><img src="icons/tryocaml_loading_6.gif">
+      <img src="icons/tryocaml_loading_7.gif"><img src="icons/tryocaml_loading_8.gif">
+    </div>
+    <div id="learnocaml-main-toolbar">
+      <div class="logo">
+        <img src="icons/logo_ocaml.svg">
+        <span>Learn OCaml</span>
+        <img src="icons/logo_ocp.svg">
+      </div>
+    </div>
+    <div style="margin: 0 5%;">
+      <h1 id="txt_test">Test</h1>
+      <!--form-->
+      <p>
+          <label id="txt_name" for="name">Name :<br></label>
+          <input type="text" id="name" name="name" value=""
+          maxlength="250" size="40" required  />
+      </p>
+      <p>
+          <label id="txt_ty" for="ty">Type :<br></label>
+          <input type="text" id="ty" name="ty" value=""
+          size="40" required />
+      </p>
+      <p>
+	<input id="solution" type="radio" name="choix" value="solution">
+	<label for="solution">Solution</label>
+	<input id="spec" type="radio" name="choix" value="spec">
+	<label for="spec">Specification</label>
+	<input id="suite" type="radio" name="choix" value="suite">
+	<label for="suite">Suite</label>
+      </p>
+      
+      <div id="learnocaml-tab-solution">
+	<div id="learnocaml-tab-solution-input">
+	  <label for="tests">Input tests</label>
+	  <input type="text" id="tests" name="tests" value=""/>
+	</div>
+	<div id="learnocaml-tab-solution-extra">
+	  <label id="txt_gen" for="gen">Extra alea:<br></label>
+	  <input type="number" name="gen" id="gen" value="0" step="1" min="0" max="10">
+	</div>
+      </div>
+      
+      <div id="learnocaml-tab-spec">
+	<div id="learnocaml-tab-spec-input">
+	  <label for="tests">Input tests</label>
+	  <input type="text" id="tests" name="tests" value=""/>
+	</div>
+	<div id="learnocaml-tab-spec-extra">
+	  <label id="txt_gen" for="gen">Extra alea:<brr></label>
+	  <input type="number" name="gen" id="gen" value="0" step="1" min="0" max="10">
+	  </input>
+	</div>
+	<div id="learnocaml-tab-spec-spec">
+	  <label for="spec">Specification</label>
+	  <input type="text" id="spec" name="spec" value=""/>
+	</div>
+      </div>
+      
+      <div id="learnocaml-tab-suite">
+	<label for="tests">Input tests</label>
+	<input type="text" id="tests" name="tests" value=""/>
+      </div>
+      <div id="learnocaml-test-toolbar" class="buttons"></div>
+      <!--/form-->
+    </div>
+  </body>
+</html>

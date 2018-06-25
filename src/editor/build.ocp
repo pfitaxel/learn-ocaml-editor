@@ -33,6 +33,59 @@ begin program "new_exercise"
   ]
 end
 
+begin program "test"
+  comp_requires = "ppx_ocplib_i18n:asm"
+ requires = [
+    "ezjsonm"
+    "grading-jsoo"
+    "ace"
+    "learnocaml-state"
+    "learnocaml-repository"
+    "learnocaml-app-common"
+    "learnocaml-toplevel"
+    "jsutils"
+    "jsutils"
+    "ppx_metaquot_lib"
+    "js_of_ocaml.ppx"
+    "ocplib_i18n"
+    "ocplib-json-typed.browser"
+
+  ]
+  files = [
+    "test.ml" ( comp = [ ppx_js ppx_ocplib_i18n]  )
+  ]
+    build_rules = [
+    "%{test_FULL_DST_DIR}%/test.js" (
+      build_target = true
+      sources = %byte_exe( p = "test" )
+      commands = [ {
+        "js_of_ocaml"
+           "+cstruct/cstruct.js"
+           "%{ace_FULL_SRC_DIR}%/ace_bindings.js"            
+           %byte_exe( p = "test" )
+      } ]
+    )
+  ]
+end
+
+begin library "test-spec"
+  comp_requires = "ppx_metaquot:asm"
+  link += [ "-linkall" ]
+  requires = [
+    "ty"
+    "toploop"
+    "ppx_metaquot"
+    "ppx_metaquot_lib"
+    "ocplib-json-typed"
+    "learnocaml-state"
+    "learnocaml-repository"
+    "testing"
+  ]
+  files = [
+    "test_spec.ml" ( comp += [ "-ppx" %asm_exe( p = "ppx_metaquot") ] )
+  ]
+end
+
 begin program "editor"
   comp_requires = "ppx_ocplib_i18n:asm"
 
@@ -47,7 +100,7 @@ begin program "editor"
     "js_of_ocaml.ppx"
     "ocplib-json-typed.browser"
     "omd"
-    "grading"
+    "test-spec"
  ]
   files = [
     "editor.ml" ( comp = [ ppx_js ppx_ocplib_i18n]  )

@@ -214,7 +214,7 @@ let display_report exo report =
   end ;
   let report_container = find_component "learnocaml-exo-tab-report" in
   Manip.setInnerHtml report_container
-    (Format.asprintf "%a" Learnocaml_report.(output_html_of_report ~bare: true) report) ;
+    (Format.asprintf "%a" Learnocaml_report.(output_html_of_report ~bare: true) report) ;solution
   grade
 
 let () =

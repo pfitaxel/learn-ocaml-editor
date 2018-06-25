@@ -2,13 +2,11 @@
 # Copyright (C) 2018 OCamlPro
 # Louis Gesbert <louis.gesbert@ocamlpro.com>, 2018.
 #
-#: src/editor/new_exercise.ml:163,34--36 src/editor/new_exercise.ml:179,34--36
-#: src/editor/new_exercise.ml:183,31--33 src/editor/new_exercise.ml:189,31--33
 #: src/editor/new_exercise.ml:194,31--33 src/editor/new_exercise.ml:195,34--36
 msgid ""
 msgstr ""
 "Project-Id-Version: learn-ocaml ~dev\n"
-"PO-Revision-Date: 2018-06-25 15:21+0200\n"
+"PO-Revision-Date: 2018-06-25 17:30+0200\n"
 "Last-Translator: Louis Gesbert <Louis.gesbert@ocamlpro.com>\n"
 "Language-Team: OCamlPro\n"
 "Language: french\n"

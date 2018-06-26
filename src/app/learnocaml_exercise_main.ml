@@ -25,7 +25,7 @@ let get_diff id = Learnocaml_local_storage.(retrieve (editor_state id)).diff
 let get_solution id = Learnocaml_local_storage.(retrieve (editor_state id)).solution
 let get_question id = Learnocaml_local_storage.(retrieve (editor_state id)).question
 let get_template id = Learnocaml_local_storage.(retrieve (editor_state id)).template
-let get_test id = Learnocaml_local_storage.(retrieve (editor_state id)).test
+let get_testml id = Learnocaml_local_storage.(retrieve (editor_state id)).test.testml
 let get_prelude id = Learnocaml_local_storage.(retrieve (editor_state id)).prelude
 let get_prepare id = Learnocaml_local_storage.(retrieve (editor_state id)).prepare
                                       
@@ -208,7 +208,7 @@ let () =
   let exo4 =Learnocaml_exercise.set Learnocaml_exercise.prepare (get_prepare id) exo3 in
   let exo5 =Learnocaml_exercise.set Learnocaml_exercise.prelude (get_prelude id) exo4 in
   let exo6 =Learnocaml_exercise.set Learnocaml_exercise.solution (get_solution id) exo5 in
-  let exo7 =Learnocaml_exercise.set Learnocaml_exercise.test (get_test id) exo6 in
+  let exo7 =Learnocaml_exercise.set Learnocaml_exercise.test (get_testml id) exo6 in
   let exo8 =Learnocaml_exercise.set Learnocaml_exercise.template (get_template id) exo7 in
   Learnocaml_exercise.set Learnocaml_exercise.descr (question) exo8
   in

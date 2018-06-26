@@ -45,6 +45,65 @@ let exercise_state_enc =
 ;;
 
 
+
+open Learnocaml_index;;
+type index_state=
+  {
+    exos: exercise Map.Make (String).t ;
+        mtime :float
+        
+  }
+let index_state_enc = conv (fun {exos;mtime}->(exos,mtime) ) (fun (exos,mtime)->{exos;mtime}) (obj2 (req "exercises" (map_enc exercise_enc)) (dft "mtime" float 0.))
+;;
+
+
+type type_question= Suite | Solution | Spec ;;
+
+type question_state =
+  {id :int;
+   ty :string;
+   type_question : type_question;
+   input :string;
+   output:string;
+   extra_alea:int;
+   
+  }
+open Json_encoding
+
+let question_state_enc =
+  conv
+    (fun {id; ty; type_question; input; output; extra_alea}->
+       (id, ty, type_question, input, output, extra_alea)
+    )
+    (fun (id, ty, type_question, input, output, extra_alea)->
+       {id; ty; type_question; input; output; extra_alea}
+    )
+    (obj6
+       (req "id" int)
+       (req "ty" string)
+       (req "type_question" ( string_enum ["suite",Suite;"spec",Spec;"solution",Solution] ) )
+       (req "input" string)
+       (req "output" string)
+       (req "extra_alea" int)
+    )
+;;
+
+
+type test_state = {testml : string;
+                   testhaut : question_state Map.Make (String).t}
+
+
+
+                 
+let test_state_enc =conv
+    (fun {testml;testhaut}->(testml,testhaut))
+    ( fun (testml,testhaut)->{testml;testhaut})
+    (obj2
+       (req "testml" string)
+       (req "testhaut" (map_enc question_state_enc) )
+    )
+;;
+
 type editor_state =
   { id : string ;
     titre : string;
@@ -53,7 +112,7 @@ type editor_state =
     solution : string ;
     question : string ;
     template : string ;
-    test : string ;
+    test : test_state ;
     prelude : string;    
     mtime : float }
 
@@ -74,15 +133,6 @@ let editor_state_enc =
        (req "solution" string)
        (req "question" string)
        (req "template" string)
-       (req "test" string)
+       (req "test" test_state_enc )
        (req "prelude" string)
        (dft "mtime" float 0.))
-
-open Learnocaml_index;;
-type index_state=
-  {
-    exos: exercise Map.Make (String).t ;
-        mtime :float
-        
-  }
-let index_state_enc = conv (fun {exos;mtime}->(exos,mtime) ) (fun (exos,mtime)->{exos;mtime}) (obj2 (req "exercises" (map_enc exercise_enc)) (dft "mtime" float 0.))

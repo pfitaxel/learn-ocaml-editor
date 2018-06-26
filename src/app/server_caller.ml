@@ -62,9 +62,9 @@ let fetch_exercise_index () =
     Learnocaml_index.exercise_index_enc
     Learnocaml_index.exercise_index_path
 
-let fetch_editor_index ()=
+let fetch_index id=
   let index=
-    match Learnocaml_local_storage.(retrieve (index_state "index"))
+    match Learnocaml_local_storage.(retrieve (index_state id))
     with
       {Learnocaml_exercise_state.exos;mtime}->exos
    
@@ -82,6 +82,10 @@ let fetch_editor_index ()=
     Lwt.fail (Cannot_fetch msg)
 ;;
 
+let fetch_editor_index () =fetch_index "index";;
+
+let fetch_test_index ()= fetch_index "index2";;
+    
 let fetch_exercise id =
   fetch_and_decode_json
     Learnocaml_exercise.enc

@@ -572,7 +572,7 @@ let onload () =
       ~group: toplevel_buttons_group
       ~icon: "typecheck" [%i"Check"] @@ fun () ->
     typecheck true
-  end ;
+  end ; 
 
     (* ---- prepare pane --------------------------------------------------- *)
   let editor_prepare = find_component "learnocaml-exo-prepare-pane" in

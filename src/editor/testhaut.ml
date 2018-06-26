@@ -55,7 +55,23 @@ let save = getElementById "save";;
 
 let setInnerHtml elt s =    
   elt##.innerHTML:=Js.string s ;;
+
 let _ = solution##.onclick:= handler (fun _ -> select_tab "solution"; Js._true);;
+
+let compute_question_id test_haut =
+  let key_list =List.map (fun (a,b)->int_of_string a) (StringMap.bindings test_haut) in
+  let mi coulvois =
+    let rec aux c n=match c with
+        []->n
+      |x::l->if x<>n then aux l n else aux coulvois (n+1)
+    in aux coulvois 1
+  in string_of_int (mi key_list)
+;;
+
+  
+  
+                      
+    
 
 let _ = spec##.onclick:= handler (fun _ -> select_tab "spec"; Js._true);;
 let _ = suite##.onclick:= handler (fun _ -> select_tab "suite"; Js._true);;
@@ -72,7 +88,8 @@ let _ = save##.onclick:= handler (fun _ ->
         let question = {name; ty; type_question; input; output; extra_alea} in
         let open Editor_lib in
         let testhaut = get_testhaut id in
-        let testhaut = StringMap.add "1" question testhaut in
+        let question_id =compute_question_id testhaut in
+        let testhaut = StringMap.add question_id question testhaut in
         save_testhaut testhaut id;
         Dom_html.window##.location##assign
         (Js.string ("editor.html#id=" ^ id ^ "&action=open"))

@@ -57,7 +57,7 @@ install: static
 
 	@cp _obuild/*/editor.js ${DEST_DIR}/js/
 	@cp _obuild/*/new_exercise.js ${DEST_DIR}/js/
-	#@cp _obuild/*/test.js ${DEST_DIR}/js/
+	@cp _obuild/*/testhaut.js ${DEST_DIR}/js/
 
 
 .PHONY: learn-ocaml.install travis

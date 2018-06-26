@@ -26,7 +26,7 @@ val exercise_state_enc : exercise_state Json_encoding.encoding
 type type_question= Suite | Solution | Spec ;;
 
 type question_state =
-  {id :int;
+  {name :string;
    ty :string;
    type_question : type_question;
    input :string;
@@ -37,6 +37,8 @@ type question_state =
 type test_state = {testml : string;
                    testhaut : question_state Map.Make (String).t}
 
+val testhaut_enc : question_state Map.Make (String).t Json_encoding.encoding
+    
 type editor_state =
   { id : string ;
     titre : string;

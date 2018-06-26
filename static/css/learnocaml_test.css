@@ -2,6 +2,11 @@ body{
   background: #eee;
   margin: 0 5%;
 }
+#txt_test{
+  text-align: center;
+  font-size: 50px;
+  line-height: 3px; 
+}
 #learnocaml-main-toolbar {
   position: absolute;
   left: 0; top: 0;

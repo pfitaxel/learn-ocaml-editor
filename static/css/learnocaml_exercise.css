@@ -77,7 +77,7 @@ body {
 #learnocaml-exo-tab-buttons > button:not(:first-child) {
   border-left: 1px #333 solid;
 }
-#learnocaml-exo-tab-buttons > button:not([disabled]) {
+#learnocaml-exo-tab-buttons > button {
   border-bottom: 1px #333 solid;
 }
 #learnocaml-exo-tab-buttons > button[disabled]::before {
@@ -95,7 +95,7 @@ body {
   left:0; right:0; bottom:0; top:0;
   content:"";
   z-index: 1009;
-  background: linear-gradient(to top, rgba(333,0,0,0.4) 0, transparent 5px);
+  background: rgba(0,0,0,0.4);
 }
 #learnocaml-exo-tabs > * {
   position: absolute;
@@ -232,8 +232,8 @@ body {
 }
 /* -------------------- editor tab -------------------------------- */
 #learnocaml-exo-tab-buttons > #learnocaml-exo-button-editor {
-  background: #444;
-  color: white;
+  background: #eee;
+  color: black;
 }
 #learnocaml-exo-tab-editor > .pane {
   position: absolute;
@@ -278,8 +278,8 @@ body {
 }
 /*--------------------- template ---------------------------------- */
 #learnocaml-exo-tab-buttons > #learnocaml-exo-button-template {
-  background: #444;
-  color: white;
+  background: #eee;
+  color: black;
 }
 #learnocaml-exo-tab-template > .template-pane {
   position: absolute;
@@ -325,8 +325,8 @@ body {
 
 /*--------------------- prepare ---------------------------------- */
 #learnocaml-exo-tab-buttons > #learnocaml-exo-button-prepare {
-  background: #444;
-  color: white;
+  background: #eee;
+  color: black;
 }
 #learnocaml-exo-tab-prepare > .prepare-pane {
   position: absolute;
@@ -372,8 +372,8 @@ body {
 
 /*--------------------- prelude ---------------------------------- */
 #learnocaml-exo-tab-buttons > #learnocaml-exo-button-prelude {
-  background: #444;
-  color: white;
+  background: #eee;
+  color: black;
 }
 #learnocaml-exo-tab-prelude > .prelude-pane {
   position: absolute;
@@ -426,7 +426,7 @@ body {
   margin: 5px 0 0 0;
 }
 #learnocaml-exo-tab-buttons > #learnocaml-exo-button-toplevel {
-  background: #bbb;
+  background: #eee;
 }
 #learnocaml-exo-tab-toplevel {
   background: #bbb;
@@ -479,8 +479,8 @@ body {
 /* attention changement  */
 
 #learnocaml-exo-tab-buttons > #learnocaml-exo-button-test {
-  background: #444;
-  color: white;
+  background: #eee;
+  color: black;
 }
 #learnocaml-exo-tab-test > .test-pane {
   position: absolute;
@@ -529,8 +529,8 @@ body {
 /* testhaut */
 
 #learnocaml-exo-tab-buttons > #learnocaml-exo-button-testhaut {
-  background: #444;
-  color: white;
+  background: #eee;
+  color: black;
 }
 #learnocaml-exo-tab-testhaut > .testhaut-pane {
   position: absolute;

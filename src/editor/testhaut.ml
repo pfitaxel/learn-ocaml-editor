@@ -126,12 +126,9 @@ let compiler = getElementById "BoutonCompiler";;
 ;;
 (*il faut recuperer la liste des questions dans le local storage et pour chaque questions : *)
 
-let get_questions id  = Learnocaml_local_storage.(retrieve (editor_state id)).test;;
+let get_test_string id  = Learnocaml_local_storage.(retrieve (editor_state id)).test.testml;;
 
-let getListeQuestions quest
-match quest with
-|String a -> failwith ""
-|Index -> 
+let get_test_liste id = Learnocaml_local_storage.(retrieve (editor_state id)).test.testhaut;;
 
 
 (*
@@ -140,6 +137,16 @@ let get_nbAlea nomQuestion = Learnocaml_local_storage.(retrieve (editor_state no
 let get_jdtEntree nomQuestion = Learnocaml_local_storage.(retrieve (editor_state nomQuestion)).jdtEntree;;
 let get_jdtSortie nomQuestion = Learnocaml_local_storage.(retrieve (editor_state nomQuestion)).jdtSortie;;
 *)
+
+question_state :
+id
+ty
+type_question (Suite|Solution|Spec)
+extra_alea
+input
+output
+
+
 
 let rec constructJdt listeQuestion = match listeQuestion with
   |[]->[]

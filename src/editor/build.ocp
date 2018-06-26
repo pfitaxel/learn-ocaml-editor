@@ -52,6 +52,24 @@ begin library "test-spec"
   ]
 end
 
+begin library "editor_lib"
+  comp_requires = [ "ppx_ocplib_i18n:asm" "ppx_metaquot:asm" ]
+
+  files = [
+    "editor_lib.ml" ( comp = ppx_ocplib_i18n )   
+  ]
+  requires = [
+    "ace"
+    "learnocaml-repository"
+    "learnocaml-app-common"
+    "ocplib_i18n"
+    "js_of_ocaml.ppx"
+    
+    ]
+
+end
+
+
 begin program "editor"
   comp_requires = "ppx_ocplib_i18n:asm"
 
@@ -66,6 +84,7 @@ begin program "editor"
     "js_of_ocaml.ppx"
     "ocplib-json-typed.browser"
     "omd"
+    "editor_lib"
     "test-spec"
  ]
   files = [

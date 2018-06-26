@@ -60,10 +60,10 @@ begin library "editor_lib"
   ]
   requires = [
     "ace"
-    "learnocaml-repository"
-    "learnocaml-app-common"
+    "learnocaml-repository" 
     "ocplib_i18n"
     "js_of_ocaml.ppx"
+    "learnocaml-app-common"
     
     ]
 

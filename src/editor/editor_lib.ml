@@ -10,3 +10,31 @@ let get_testml id = Learnocaml_local_storage.(retrieve (editor_state id)).test.t
 let get_testhaut id = Learnocaml_local_storage.(retrieve (editor_state id)).test.testhaut                      
 let get_prelude id = Learnocaml_local_storage.(retrieve (editor_state id)).prelude
 let get_prepare id = Learnocaml_local_storage.(retrieve (editor_state id)).prepare
+                       
+module StringMap=Map.Make(String)
+    
+let ajout_question testhaut question id =StringMap.add id question testhaut;; 
+
+open Learnocaml_common
+
+let save_testhaut testhaut id =
+  match Learnocaml_local_storage.(retrieve (editor_state id) ) with
+    {id;titre;prepare;diff;solution;question;template;test;prelude;mtime}->
+      let mtime=gettimeofday () in
+      let test ={testml=test.testml;testhaut} in
+      let nvexo= {id;titre;prepare;diff;solution;question;template;test;prelude;mtime} in
+      
+  Learnocaml_local_storage.(store (editor_state id)) nvexo ;;
+
+
+let fetch_test_index id=
+    let index= get_testhaut id   
+  in
+  let open Learnocaml_exercise_state in
+  let open Learnocaml_index in
+  let json =
+    Json_repr_browser.Json_encoding.construct
+     testhaut_enc index
+    in
+  try Lwt.return (Json_repr_browser.Json_encoding.destruct testhaut_enc json) with exn ->
+    Lwt.fail (failwith "" )

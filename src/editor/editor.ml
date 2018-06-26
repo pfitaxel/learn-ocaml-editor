@@ -267,7 +267,7 @@ let () =
   Lwt.async @@ fun () ->
   set_lang ();
   set_string_translations ();
-  set_string_translations_titles (); 
+  set_string_translations_titles ();
   Learnocaml_local_storage.init () ;
                
   (* ---- launch everything --------------------------------------------- *)

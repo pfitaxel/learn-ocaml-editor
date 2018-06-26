@@ -2,6 +2,7 @@
 # Copyright (C) 2018 OCamlPro
 # Louis Gesbert <louis.gesbert@ocamlpro.com>, 2018.
 #
+#: src/editor/new_exercise.ml:194,31--33 src/editor/new_exercise.ml:195,34--36
 msgid ""
 msgstr ""
 "Project-Id-Version: learn-ocaml ~dev\n"
@@ -551,5 +552,3 @@ msgstr "Tester"
 #: src/editor/editor.ml:715,38--77
 msgid "Do you want to save before closing?\n"
 msgstr "Voulez-vous sauvegarder avant de fermer?\n"
-
-

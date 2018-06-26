@@ -20,7 +20,7 @@ open Lwt.Infix
 open Learnocaml_common
 open Learnocaml_exercise_state
 open Js_of_ocaml
-       
+open Editor_lib       
 (*
 module Report = Learnocaml_report
 
@@ -57,17 +57,6 @@ module Dummy_Functor (Introspection :
 let auto_save_interval = 120.0 ;; (* in seconds*)
 
 module StringMap = Map.Make (String)
-
-let get_titre id = Learnocaml_local_storage.(retrieve (editor_state id)).titre
-
-let get_diff id = Learnocaml_local_storage.(retrieve (editor_state id)).diff
-let get_solution id = Learnocaml_local_storage.(retrieve (editor_state id)).solution
-let get_question id = Learnocaml_local_storage.(retrieve (editor_state id)).question
-let get_template id = Learnocaml_local_storage.(retrieve (editor_state id)).template
-let get_testml id = Learnocaml_local_storage.(retrieve (editor_state id)).test.testml
-let get_prelude id = Learnocaml_local_storage.(retrieve (editor_state id)).prelude
-let get_prepare id = Learnocaml_local_storage.(retrieve (editor_state id)).prepare
-let get_testhaut id =  Learnocaml_local_storage.(retrieve (editor_state id)).test.testhaut
                          
 let recovering_callback= ref (fun ()->())
 

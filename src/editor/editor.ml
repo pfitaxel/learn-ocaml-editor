@@ -237,6 +237,19 @@ let set_string_translations () =
   (fun (id, text) -> Manip.setInnerHtml (find_component id) text)
   translations
 
+let set_string_translations_titles () =
+  let translations = [
+  "learnocaml-exo-button-editor", [%i"Type here the solution of the exercise"];
+  "learnocaml-exo-button-template", [%i"Type here or generate the template the student will complete or correct"];
+  "learnocaml-exo-button-prelude", [%i"Type here the definitions of types and functions given to the student"];
+  "learnocaml-exo-button-prepare", [%i"Type here hidden definitions given to the student"];
+  "learnocaml-exo-button-question", [%i"Type here the wording of the exercise in Markdown"];
+  "learnocaml-exo-button-test", [%i"Type here the tests sets code"];
+  ] in
+  List.iter
+  (fun (id, text) -> Manip.setTitle (find_component id) text)
+  translations
+
 let set_lang () =
 	match Js.Optdef.to_option (Dom_html.window##.navigator##.language) with
 	| Some l -> Ocplib_i18n.set_lang (Js.to_string l)
@@ -254,6 +267,7 @@ let () =
   Lwt.async @@ fun () ->
   set_lang ();
   set_string_translations ();
+  set_string_translations_titles ();
   Learnocaml_local_storage.init () ;
                
   (* ---- launch everything --------------------------------------------- *)

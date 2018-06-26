@@ -117,6 +117,10 @@ module Manip = struct
     let elt = get_elt "setInnerHtml" elt in
     elt##.innerHTML := Js.string s
 
+  let setTitle elt s =
+    let elt = get_elt "setTitle" elt in
+    elt##.title := Js.string s
+
   let addClass elt s =
     let elt = get_elt "addClass" elt in
     elt##.classList##(add (Js.string s))

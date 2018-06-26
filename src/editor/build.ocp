@@ -49,7 +49,7 @@ begin program "testhaut"
     "js_of_ocaml.ppx"
     "ocplib_i18n"
     "ocplib-json-typed.browser"
-
+	"editor_lib"
   ]
   files = [
     "testhaut.ml" ( comp = [ ppx_js ppx_ocplib_i18n]  )

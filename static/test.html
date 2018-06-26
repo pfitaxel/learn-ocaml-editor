@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="css/learnocaml_report.css">
     <link rel="stylesheet" href="css/learnocaml_tryocaml.css">
     <script src="js/ace/ace.js" type="text/javascript" charset="utf-8" defer></script>
-    <script language="JavaScript" src="js/test.js" defer></script>
+    <script language="JavaScript" src="js/testhaut.js" defer></script>
   </head>
   <body>
     <style type="text/css"> 
@@ -68,40 +68,41 @@
     <div id="learnocaml-tabs">
       <div id="learnocaml-tab-solution">
 	<div id="learnocaml-tab-solution-input">
-	  <label for="tests">Input tests</label>
-	  <input type="text" id="tests" name="tests" value=""/>
+	  <label for="sol-tests">Input tests : <brr></label>
+	  <textarea id="sol-tests" name="tests" value="" cols="25" rows="10"></textarea>
 	</div>
 	<div id="learnocaml-tab-solution-extra">
-	  <label id="txt_gen" for="gen">Extra alea:<br></label>
-	  <input type="number" name="gen" id="gen" value="0" step="1" min="0" max="10">
+	  <label id="txt_gen" for="sol-gen">Extra alea:<brr></label>
+	  <input type="number" name="gen" id="sol-gen" value="0" step="1" min="0" max="10">
+	  </input>
 	</div>
       </div>
       
       <div id="learnocaml-tab-spec">
 	<div id="learnocaml-tab-spec-input">
-	  <label for="tests">Input tests</label>
-	  <input type="text" id="tests" name="tests" value=""/>
+	  <label for="spec-tests">Input tests : <brr></label>
+	  <textarea id="spec-tests" name="tests" value="" cols="25" rows="10"></textarea>
 	</div>
 	<div id="learnocaml-tab-spec-extra">
-	  <label id="txt_gen" for="gen">Extra alea:<brr></label>
-	  <input type="number" name="gen" id="gen" value="0" step="1" min="0" max="10">
+	  <label id="txt_gen" for="spec-gen">Extra alea:<brr></label>
+	  <input type="number" name="gen" id="spec-gen" value="0" step="1" min="0" max="10">
 	  </input>
 	</div>
 	<div id="learnocaml-tab-spec-spec">
 	  <label for="spec">Specification</label>
-	  <input type="text" id="spec" name="spec" value=""/>
+	  <textarea id="spec" name="tests" value="" cols="25" rows="3"></textarea>
 	</div>
       </div>
       
       <div id="learnocaml-tab-suite">
 	<div id="learnocaml-tab-suite-input">
-	  <label for="tests">Input</label>
-	  <input type="text" id="tests" name="tests" value=""/>
+	  <label for="input">Input</label>
+	  <textarea id="input" name="tests" value="" cols="25" rows="10"></textarea>
 	</div>
 	
 	<div id="learnocaml-tab-suite-output">
-	  <label for="tests">Output</label>
-	  <input type="text" id="result" name="result" value=""/>
+	  <label for="output">Output</label>
+	  <textarea id="output" name="tests" value="" cols="25" rows="10"></textarea>
 	</div>
       </div>
     </div>

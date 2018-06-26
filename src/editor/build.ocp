@@ -33,6 +33,7 @@ begin program "new_exercise"
   ]
 end
 
+
 begin library "test-spec"
   comp_requires = "ppx_metaquot:asm"
   link += [ "-linkall" ]
@@ -77,7 +78,7 @@ begin program "editor"
       commands = [ {
         "js_of_ocaml"
            "+cstruct/cstruct.js"
-           "+dynlink.js"	   
+	   "+dynlink.js"
 	   "+toplevel.js"
 	   "--toplevel"
 	   "--nocmis"

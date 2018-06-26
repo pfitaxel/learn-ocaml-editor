@@ -128,23 +128,8 @@ let compiler = getElementById "BoutonCompiler";;
 
 let get_test_string id  = Learnocaml_local_storage.(retrieve (editor_state id)).test.testml;;
 
-let get_test_liste id = Learnocaml_local_storage.(retrieve (editor_state id)).test.testhaut;;
 
 
-(*
-let get_tyFct nomQuestion = Learnocaml_local_storage.(retrieve (editor_state nomQuestion)).tyFct;;
-let get_nbAlea nomQuestion = Learnocaml_local_storage.(retrieve (editor_state nomQuestion)).aleatoire;;
-let get_jdtEntree nomQuestion = Learnocaml_local_storage.(retrieve (editor_state nomQuestion)).jdtEntree;;
-let get_jdtSortie nomQuestion = Learnocaml_local_storage.(retrieve (editor_state nomQuestion)).jdtSortie;;
-*)
-
-question_state :
-id
-ty
-type_question (Suite|Solution|Spec)
-extra_alea
-input
-output
 
 
 

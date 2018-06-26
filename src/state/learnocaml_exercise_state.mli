@@ -23,6 +23,20 @@ type exercise_state =
 
 val exercise_state_enc : exercise_state Json_encoding.encoding
 
+type type_question= Suite | Solution | Spec ;;
+
+type question_state =
+  {id :int;
+   ty :string;
+   type_question : type_question;
+   input :string;
+   output:string;
+   extra_alea:int;   
+  }
+
+type test_state = {testml : string;
+                   testhaut : question_state Map.Make (String).t}
+
 type editor_state =
   { id : string ;
     titre : string;
@@ -31,7 +45,7 @@ type editor_state =
     solution : string ;
     question : string ;
     template : string ;
-    test : string ;
+    test : test_state ;
     prelude : string ;    
     mtime : float }
 

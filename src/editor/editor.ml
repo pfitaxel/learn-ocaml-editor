@@ -65,9 +65,11 @@ let get_diff id = Learnocaml_local_storage.(retrieve (editor_state id)).diff
 let get_solution id = Learnocaml_local_storage.(retrieve (editor_state id)).solution
 let get_question id = Learnocaml_local_storage.(retrieve (editor_state id)).question
 let get_template id = Learnocaml_local_storage.(retrieve (editor_state id)).template
-let get_test id = Learnocaml_local_storage.(retrieve (editor_state id)).test
+let get_testml id = Learnocaml_local_storage.(retrieve (editor_state id)).test.testml
 let get_prelude id = Learnocaml_local_storage.(retrieve (editor_state id)).prelude
 let get_prepare id = Learnocaml_local_storage.(retrieve (editor_state id)).prepare
+let get_testhaut id =  Learnocaml_local_storage.(retrieve (editor_state id)).test.testhaut
+                         
 let recovering_callback= ref (fun ()->())
 
 let string_of_char ch = String.make 1 ch ;;
@@ -148,6 +150,114 @@ let rec genLet listech =
 let rec genTemplate chaine = if chaine="" then "" else
 	concatenation (genLet (decompositionSol chaine 0));;
 
+
+let manuquestion =let open Learnocaml_index in
+  {exercise_title ="manu's question";
+   exercise_kind=Problem;
+   exercise_stars=0.0;
+   exercise_short_description= Some "Voici un exemple de question"}
+;;
+
+let init ()= Learnocaml_local_storage.(store (index_state "index2"))
+    {Learnocaml_exercise_state.exos=StringMap.add "manu" manuquestion StringMap.empty;
+     mtime=gettimeofday ()};; 
+
+let testhaut_init () =
+  let open Learnocaml_index in
+  Learnocaml_local_storage.init ();
+  let pct_init=None in
+    let pct_signal, pct_signal_set = React.S.create pct_init in
+              Learnocaml_local_storage.(listener (index_state "index2")) :=
+                Some (fun _-> pct_signal_set None) ;
+       
+  let ()=
+  match Learnocaml_local_storage.(retrieve (index_state "index2")) with
+  |exception Not_found -> init ()
+  |_->() 
+  in  
+    Server_caller.fetch_test_index () >>= fun index ->  
+  let content_div = find_component "learnocaml-exo-testhaut-pane" in
+  let format_exercise_list all_exercise_states =
+    let rec format_contents lvl acc contents =
+      let open Tyxml_js.Html5 in
+      match contents with
+      | Learnocaml_exercises exercises ->
+          StringMap.fold
+            (fun exercise_id { exercise_kind ;
+                               exercise_title ;
+                               exercise_short_description ;
+                               exercise_stars } acc ->  
+              
+              (div ~a:[a_id ("button_delete")] [
+                  let button =button ~a:[a_id exercise_id]  [img ~src:("icons/icon_cleanup_dark.svg") ~alt:"" () ; pcdata "" ]in 
+                   Manip.Ev.onclick button
+                   (fun _ ->
+                     begin
+                       let messages = Tyxml_js.Html5.ul [] in
+                       let aborted, abort_message =
+                         let t, u = Lwt.task () in
+                         let btn_no = Tyxml_js.Html5.(button [ pcdata "No" ]) in
+                         Manip.Ev.onclick btn_no ( fun _ ->
+                                                       hide_loading ~id:"learnocaml-main-loading" () ; true) ;
+                         let btn_yes = Tyxml_js.Html5.(button [ pcdata "Yes" ]) in
+                         Manip.Ev.onclick btn_yes (fun _ ->
+                             let rmv=
+                               match Learnocaml_local_storage.(retrieve (index_state "index")) with
+                               |{Learnocaml_exercise_state.exos ;mtime}-> exos
+                             in
+                             let exos = StringMap.remove exercise_id rmv in
+                             let index = {Learnocaml_exercise_state.exos; mtime = gettimeofday ()} in
+                             Learnocaml_local_storage.(store (index_state "index")) index;
+                             Learnocaml_local_storage.(delete (editor_state exercise_id));
+                             Dom_html.window##.location##reload ; true) ;
+                         let div =
+                           Tyxml_js.Html5.(div ~a: [ a_class [ "dialog" ] ]
+                                             [ pcdata "Are you sure you want to delete this question ?\n" ;
+                                               btn_yes ;
+                                               pcdata " " ;
+                                               btn_no ]) in
+                         Manip.SetCss.opacity div (Some "0") ;
+                         t, div in 
+                       Manip.replaceChildren messages
+                         Tyxml_js.Html5.[ li [ pcdata "" ] ] ;
+                       show_loading ~id:"learnocaml-main-loading" [ abort_message ] ;
+                       Manip.SetCss.opacity abort_message (Some "1") ;
+                        end ;
+                      true) ;button
+                ] ) ::
+              a ~a:[ a_href ("editor.html#id="^exercise_id^"&action=open") ; 
+                     a_class [ "exercise" ] ] [
+                  div ~a:[ a_class [ "descr" ] ] [
+                  h1 [ pcdata exercise_title ] ;
+                  p [ match exercise_short_description with
+                      | None -> pcdata "No description available."
+                      | Some text -> pcdata text ] ;
+                    ]          
+              ] ::
+              acc)
+            exercises acc
+      | Groups groups ->
+          let h = match lvl with 1 -> h1 | 2 -> h2 | _ -> h3 in
+          StringMap.fold
+            (fun _ { group_title ; group_contents } acc ->
+               format_contents (succ lvl)
+                 (h ~a:[ a_class [ "pack" ] ] [ pcdata group_title ] :: acc)
+                 group_contents)
+            groups acc in
+     let open Tyxml_js.Html5 in
+    List.rev (format_contents 1 [a ~a:[ a_href ("new_exercise.html#&action=open") ; 
+        a_class [ "exercise" ] ] [
+      div ~a:[ a_class [ "descr" ] ] [
+        h1 [ pcdata "New question" ];
+        p [pcdata "Create a new question"];];
+      ]] index) in
+  let list_div =
+   Tyxml_js.Html5.(div ~a: [Tyxml_js.Html5.a_id "learnocaml-main-exercise-list" ])
+      (format_exercise_list Learnocaml_local_storage.(retrieve all_exercise_states)) in
+  Dom.appendChild (Tyxml_js.To_dom.of_div content_div) (Tyxml_js.To_dom.of_div list_div ) ;
+  Lwt.return_unit;;
+   
+
 let init_tabs, select_tab =
   let names = [ "toplevel" ; "report" ; "editor" ; "template" ; (*"test" ;*) "question" ; "prelude" ; "prepare";"testhaut" ] in
   let current = ref "question" in
@@ -190,6 +300,7 @@ let init_tabs, select_tab =
       names ;
     select_tab !current in
   init_tabs, select_tab
+
 
 let display_report exo report =
   let score, failed = Learnocaml_report.result_of_report report in
@@ -312,7 +423,7 @@ let () =
   let editor_test = find_component "learnocaml-exo-test-pane" in
   let editor_t = Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div editor_test) in
   let ace_t = Ocaml_mode.get_editor editor_t in
-  Ace.set_contents ace_t  (get_test id); 
+  Ace.set_contents ace_t  (get_testml id); 
   Ace.set_font_size ace_t 18;
   
    (* let typecheck set_class =
@@ -348,7 +459,7 @@ let () =
 (*let editor_testhaut = find_component "learnocaml-exo-test-pane" in
   let editor_thaut = Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div editor_test) in
   let ace_thaut = Ocaml_mode.get_editor editor_thaut in
-  Ace.set_contents ace_thaut  (get_test id); 
+  Ace.set_contents ace_thaut  (get_testml id); 
   Ace.set_font_size ace_t 18;
 *)
    (* let typecheck set_class =
@@ -373,6 +484,7 @@ let () =
     Ocaml_mode.report_error ~set_class editor_t error warnings  >>= fun () ->
     Ace.focus ace_t ;
     Lwt.return () in *)
+   let _ =testhaut_init () in ();
   begin testhaut_button
       ~group: toplevel_buttons_group
       ~icon: "typecheck" "Check" @@ fun () ->
@@ -381,7 +493,7 @@ let () =
   begin testhaut_button
       ~group: toplevel_buttons_group
       ~icon: "sync" "Generate" @@ fun () ->
-    Lwt.return ()
+    Lwt.return () 
   end ;
   begin testhaut_button
       ~group: toplevel_buttons_group
@@ -573,9 +685,11 @@ let onload () =
     let titre = get_titre id  in
     let question = Ace.get_contents ace_quest in
     let template = Ace.get_contents ace_temp in
-    let test = Ace.get_contents ace_t in
+    let testml = Ace.get_contents ace_t in
+    let testhaut= get_testhaut id in
     let prepare= Ace.get_contents ace_prep in
     let prelude =Ace.get_contents ace_prel in 
+    let test ={testml;testhaut} in
     let  diff =
       match Learnocaml_local_storage.(retrieve (editor_state id)) with
       | { Learnocaml_exercise_state.diff } -> diff
@@ -744,7 +858,7 @@ let onload () =
   let exo4 =Learnocaml_exercise.set Learnocaml_exercise.prepare (get_prepare id) exo3 in
   let exo5 =Learnocaml_exercise.set Learnocaml_exercise.prelude (get_prelude id) exo4 in
   let exo6 =Learnocaml_exercise.set Learnocaml_exercise.solution (get_solution id) exo5 in
-  let exo7 =Learnocaml_exercise.set Learnocaml_exercise.test (get_test id) exo6 in
+  let exo7 =Learnocaml_exercise.set Learnocaml_exercise.test (get_testml id) exo6 in
   let exo8 =Learnocaml_exercise.set Learnocaml_exercise.template (get_template id) exo7 in
   Learnocaml_exercise.set Learnocaml_exercise.descr description exo8
   in
@@ -817,6 +931,5 @@ let onload () =
 
 let () =Lwt.async @@ fun ()->
     let _= Dom_html.window##setInterval (Js.wrap_callback (fun () -> !recovering_callback () ) ) (auto_save_interval *. 1000.0);
-    in 
-    Lwt.return_unit ;;
-
+    in
+      Lwt.return_unit ;;

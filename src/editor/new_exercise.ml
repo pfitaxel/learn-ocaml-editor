@@ -3,7 +3,7 @@ open Str
 open Js_of_ocaml
 open Dom_html
 open Learnocaml_common
-
+open Learnocaml_exercise_state
 module StringMap = Map.Make (String)
 
 let setInnerHtml elt s =    
@@ -35,7 +35,7 @@ let descr = getElementById_coerce "description" CoerceTo.textarea
 let difficulty = getElementById_coerce "difficulty" CoerceTo.select
 let  solution, question, template, test, previousTitre, previousDiff, prelude, prepare =
   match Learnocaml_local_storage.(retrieve (editor_state previousId)) with
-  | exception Not_found ->  "", "", "", "", "",None,"",""
+  | exception Not_found ->  "", "", "", {testml="";testhaut=StringMap.empty}, "",None,"",""
   | {Learnocaml_exercise_state.id ; solution ; titre ; question ; template ; diff ; test ; 
      mtime;prelude;prepare } ->  solution, question, template, test, titre, diff, prelude, prepare
                                  

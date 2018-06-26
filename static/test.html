@@ -7,7 +7,7 @@
         <link rel="icon" type="image/x-icon" href="icons/favicon.ico" />
     <!--[if IE]><link rel="shortcut icon" type="image/x-icon" href="icons/favicon.ico"     /><![endif]-->﻿
     <link rel="stylesheet" href="css/learnocaml_common.css">
-    <link rel="stylesheet" href="css/learnocaml_exercise.css">
+    <link rel="stylesheet" href="css/learnocaml_test.css">
     <link rel="stylesheet" href="css/learnocaml_report.css">
     <link rel="stylesheet" href="css/learnocaml_tryocaml.css">
     <script src="js/ace/ace.js" type="text/javascript" charset="utf-8" defer></script>
@@ -39,32 +39,33 @@
     <div id="learnocaml-main-toolbar">
       <div class="logo">
         <img src="icons/logo_ocaml.svg">
-        <span>Learn OCaml</span>
+        <span>Learn OCaml : Test</span>
         <img src="icons/logo_ocp.svg">
       </div>
+      <!--	<div id="learnocaml-test-toolbar" class="buttons"></div>-->
     </div>
-    <div style="margin: 0 5%;">
-      <h1 id="txt_test">Test</h1>
+    <div id="learnocaml-test">
       <!--form-->
-      <p>
-          <label id="txt_name" for="name">Name :<br></label>
-          <input type="text" id="name" name="name" value=""
-          maxlength="250" size="40" required  />
-      </p>
-      <p>
-          <label id="txt_ty" for="ty">Type :<br></label>
-          <input type="text" id="ty" name="ty" value=""
-          size="40" required />
-      </p>
-      <p>
+      <div id="learnocaml-tab-name">
+        <label id="txt_name" for="name">Name : </label>
+        <input type="text" id="name" name="name" value=""
+               maxlength="250" size="40" required  />
+      </div>
+      <div id="learnocaml-tab-type">
+        <label id="txt_ty" for="ty">Type : </label>
+        <input type="text" id="ty" name="ty" value=""
+               size="40" required />
+      </div>
+      <div id="learnocaml-tab-choix">
 	<input id="solution" type="radio" name="choix" value="solution">
 	<label for="solution">Solution</label>
 	<input id="spec" type="radio" name="choix" value="spec">
 	<label for="spec">Specification</label>
 	<input id="suite" type="radio" name="choix" value="suite">
 	<label for="suite">Suite</label>
-      </p>
-      
+      </div>
+    </div>
+    <div id="learnocaml-tabs">
       <div id="learnocaml-tab-solution">
 	<div id="learnocaml-tab-solution-input">
 	  <label for="tests">Input tests</label>
@@ -93,11 +94,17 @@
       </div>
       
       <div id="learnocaml-tab-suite">
-	<label for="tests">Input tests</label>
-	<input type="text" id="tests" name="tests" value=""/>
+	<div id="learnocaml-tab-suite-input">
+	  <label for="tests">Input</label>
+	  <input type="text" id="tests" name="tests" value=""/>
+	</div>
+	
+	<div id="learnocaml-tab-suite-output">
+	  <label for="tests">Output</label>
+	  <input type="text" id="result" name="result" value=""/>
+	</div>
       </div>
-      <div id="learnocaml-test-toolbar" class="buttons"></div>
-      <!--/form-->
     </div>
+    <!--/form-->
   </body>
 </html>

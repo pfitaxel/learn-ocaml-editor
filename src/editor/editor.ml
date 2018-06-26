@@ -214,7 +214,7 @@ let display_report exo report =
   end ;
   let report_container = find_component "learnocaml-exo-tab-report" in
   Manip.setInnerHtml report_container
-    (Format.asprintf "%a" Learnocaml_report.(output_html_of_report ~bare: true) report) ;solution
+    (Format.asprintf "%a" Learnocaml_report.(output_html_of_report ~bare: true) report) ;
   grade
 
 let () =
@@ -529,7 +529,7 @@ let onload () =
       ~group: toplevel_buttons_group
       ~icon: "typecheck" [%i "Check"] @@ fun () ->
     typecheck true
-  end ;
+  end ; 
 
     (* ---- prepare pane --------------------------------------------------- *)
   let editor_prepare = find_component "learnocaml-exo-prepare-pane" in

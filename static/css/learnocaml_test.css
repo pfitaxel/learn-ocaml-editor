@@ -1,0 +1,142 @@
+body{
+  background: #eee;
+}
+#learnocaml-main-toolbar {
+  position: absolute;
+  left: 0; top: 0;
+  color: #fff;
+  z-index: 1004;
+  border-bottom: 1px #eee solid;
+  display: flex;
+  background: #222;
+}
+#learnocaml-main-toolbar a {
+  text-decoration: none;
+  color: #fff;
+}
+#learnocaml-main-toolbar > button {
+  border-left: 1px #eee solid !important;
+  padding: 0 10px 0 10px;
+  margin: 0;
+  background: none;
+  border: none;
+  flex: 0;
+  position: relative;
+  display: block;
+}
+#learnocaml-main-toolbar > button > * {
+  padding: 5px;
+  color: #eee;
+  text-align: center;
+}
+#learnocaml-main-toolbar::before {
+  z-index: 1004;
+  position: absolute;
+  left: 0px; height: 5px; width: 100%;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.4) 0px, rgba(0,0,0,0) 5px);
+  content:"";
+}
+@media (max-width: 549px) {
+  #learnocaml-main-toolbar {
+    height: 40px;
+  }
+  #learnocaml-main-toolbar::before {
+    top: 41px;
+  }
+  #learnocaml-main-toolbar > button > .label {
+    display: none;
+  }
+}
+@media (min-width: 550px) {
+  #learnocaml-main-toolbar {
+    height: 60px;
+  }
+  #learnocaml-main-toolbar::before {
+    top: 61px;
+  }
+}
+
+
+#learnocaml-test {
+position: absolute;
+  z-index: 998;
+  background: #eee;
+  padding: 0;
+  opacity: 1;
+	text-align: center;
+}
+#learnocaml-test {
+  left: 0px; top:80px; right: 0px; bottom: 65%;
+}
+#learnocaml-tab-name{
+  padding: 5px;text-align:center;
+}
+#learnocaml-tab-type{
+  padding: 5px;text-align:center;
+}
+#learnocaml-tab-choix{
+  padding: 5px;text-align:center;
+}
+#learnocaml-tabs {
+position: absolute;
+  z-index: 998;
+  background: #eee;
+  padding: 0;
+  opacity: 1;
+}
+#learnocaml-tabs {
+  left: 0px; top:35%; right: 0px; bottom: 0px;
+}
+
+#learnocaml-tabs > * {
+  position: absolute;
+  z-index: 997;
+  background: #eee;
+  padding: 0;
+  opacity: 0;
+}
+#learnocaml-tabs > *.front-tab {
+  z-index: 998;
+  opacity: 1;
+}
+#learnocaml-tabs > * {
+  left: 0px; top: 15px; right: 0px; bottom: 40px;
+}
+
+#learnocaml-tab-solution-input {
+	left: 0px; top: 0px; right: 50%; bottom: 0px; position:absolute; 		text-align:center;
+}
+
+#learnocaml-tab-solution-extra {
+	left: 50%; top: 0px; right: 0px; bottom: 0px; position :absolute;
+	text-align:center;
+}
+
+#learnocaml-tab-spec-input {
+	left: 0px; top: 0%; right: 50%; bottom: 15%;
+	position: absolute;
+	text-align:center;
+}
+
+#learnocaml-tab-spec-extra {
+	left: 50%; top: 0px; right: 0px; bottom: 15%;
+	position: absolute;
+	text-align:center;
+}
+
+#learnocaml-tab-spec-spec {
+	left: 0px; top: 85%; right: 0px; bottom: 0px;
+	position: absolute;
+	text-align:center;
+}
+
+#learnocaml-tab-suite-input{
+  left: 0px; top: 0%; right: 50%; bottom: 0%;
+	position: absolute;
+	text-align:center;
+}
+
+#learnocaml-tab-suite-output{
+  left: 50%; top: 0px; right: 0px; bottom: 0px;
+	position: absolute;text-align:center;
+}

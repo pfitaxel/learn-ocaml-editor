@@ -64,6 +64,7 @@ let specif = match getElementById_coerce "specif" CoerceTo.textarea with
     None -> failwith "element spec inconnu"
   | Some s -> s;;
 
+
 let input_suite = match getElementById_coerce "input" CoerceTo.textarea with
     None -> failwith "element input_suite inconnu"
   | Some s -> s;;
@@ -87,17 +88,15 @@ let compute_question_id test_haut =
   in string_of_int (mi key_list)
 ;;
 
-  
-  
-                      
-    
+open Learnocaml_exercise_state  
+open Editor_lib
+
 let _ = solution##.onclick:= handler (fun _ -> select_tab "solution"; Js._true);;
 let _ = spec##.onclick:= handler (fun _ -> select_tab "spec"; Js._true);;
 let _ = suite##.onclick:= handler (fun _ -> select_tab "suite"; Js._true);;
 let _ = save##.onclick:= handler (fun _ ->
    if arg "tab" = "suite" then
       begin
-        let open Learnocaml_exercise_state in
         let name = Js.to_string name##.value in
         let ty = Js.to_string ty##.value in
         let type_question = Suite in
@@ -105,7 +104,6 @@ let _ = save##.onclick:= handler (fun _ ->
         let output = Js.to_string  output_suite##.value in
         let extra_alea = 0 in
         let question = {name; ty; type_question; input; output; extra_alea} in
-        let open Editor_lib in
         let testhaut = get_testhaut id in
         let question_id =compute_question_id testhaut in
         let testhaut = StringMap.add question_id question testhaut in
@@ -116,7 +114,6 @@ let _ = save##.onclick:= handler (fun _ ->
       end;
    if arg "tab" = "solution" then
      begin
-        let open Learnocaml_exercise_state in
         let name = Js.to_string name##.value in
         let ty = Js.to_string ty##.value in
         let type_question = Solution in
@@ -124,7 +121,6 @@ let _ = save##.onclick:= handler (fun _ ->
         let output = "" in
         let extra_alea = int_of_string (Js.to_string extraAleaSol##.value) in
         let question = {name; ty; type_question; input; output; extra_alea} in
-        let open Editor_lib in
         let testhaut = get_testhaut id in
         let question_id = compute_question_id testhaut in
         let testhaut = StringMap.add question_id question testhaut in

@@ -299,7 +299,7 @@ let testhaut_init () =
                         end ;
                       true) ;button
                 ] ) ::
-              a ~a:[ a_href ("test.html#id="^id^"&ïd_question="^question_id^"&action=open") ; 
+              a ~a:[ a_href ("test.html#id="^id^"&id_question="^question_id^"&action=open") ; 
                      a_class [ "exercise" ] ] [
                   div ~a:[ a_class [ "descr" ] ] [
                   h1 [ pcdata name ] ;

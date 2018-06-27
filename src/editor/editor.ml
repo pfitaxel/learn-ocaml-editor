@@ -264,56 +264,57 @@ let testhaut_init () =
              (* match question_id with
                 "0" -> []
               | _ ->*)
-                  (div ~a:[a_id ("button_delete")] [
-                       let button = button ~a:[a_id question_id]
-                                      [img ~src:("icons/icon_cleanup_dark.svg") ~alt:"" () ; pcdata ""] in
-                       Manip.Ev.onclick button
-                         (fun _ ->
-                           begin
-                             let messages = Tyxml_js.Html5.ul [] in
-                             let aborted, abort_message =
-                               let t, u = Lwt.task () in
-                               let btn_no = Tyxml_js.Html5.(button [ pcdata "No" ]) in
-                               Manip.Ev.onclick btn_no (fun _ ->
-                                   hide_loading ~id:"learnocaml-main-loading" () ; true) ;
-                               let btn_yes = Tyxml_js.Html5.(button [ pcdata "Yes" ]) in
-                               Manip.Ev.onclick btn_yes (fun _ ->
-                                   let rmv= get_testhaut id in                            
-                                   let testhaut = StringMap.remove question_id rmv in
-                                   save_testhaut testhaut id ; 
-                                   Dom_html.window##.location##reload ; true) ;
-                               let div =
-                                 Tyxml_js.Html5.(div ~a: [ a_class [ "dialog" ] ]
-                                                   [ pcdata "Are you sure you want to delete this question ?\n" ;
-                                                     btn_yes ;
-                                                     pcdata " " ;
-                                                     btn_no ]) in
-                               Manip.SetCss.opacity div (Some "0") ;
-                               t, div in 
-                             Manip.replaceChildren messages
-                               Tyxml_js.Html5.[ li [ pcdata "" ] ] ;
-                             show_loading ~id:"learnocaml-main-loading" [ abort_message ] ;
-                             Manip.SetCss.opacity abort_message (Some "1") ;
-                           end ;
-                           true) ;button
-                  ] ) ::
-                    a ~a:[ a_href ("test.html#id="^id^"&questionid="^question_id^"&action=open") ; 
-                           a_class [ "exercise" ] ] [
-                        div ~a:[ a_class [ "descr" ] ] [
-                            h1 [ pcdata name ] ;
-                            p [   pcdata ty ] ;
-                          ]          
-                      ] ::
-                      acc)
-            contents acc
+              
+              (div ~a:[a_id ("button_delete")] [
+                  let button = button ~a:[a_id question_id]
+                  [img ~src:("icons/icon_cleanup_dark.svg") ~alt:"" () ; pcdata ""] in
+                   Manip.Ev.onclick button
+                   (fun _ ->
+                     begin
+                       let messages = Tyxml_js.Html5.ul [] in
+                       let aborted, abort_message =
+                         let t, u = Lwt.task () in
+                         let btn_no = Tyxml_js.Html5.(button [ pcdata "No" ]) in
+                         Manip.Ev.onclick btn_no (fun _ ->
+                                                  hide_loading ~id:"learnocaml-main-loading" () ; true) ;
+                         let btn_yes = Tyxml_js.Html5.(button [ pcdata "Yes" ]) in
+                         Manip.Ev.onclick btn_yes (fun _ ->
+                             let rmv= get_testhaut id in                            
+                             let testhaut = StringMap.remove question_id rmv in
+                             save_testhaut testhaut id ; 
+                             Dom_html.window##.location##reload ; true) ;
+                         let div =
+                           Tyxml_js.Html5.(div ~a: [ a_class [ "dialog" ] ]
+                                             [ pcdata "Are you sure you want to delete this question ?\n" ;
+                                               btn_yes ;
+                                               pcdata " " ;
+                                               btn_no ]) in
+                         Manip.SetCss.opacity div (Some "0") ;
+                         t, div in 
+                       Manip.replaceChildren messages
+                         Tyxml_js.Html5.[ li [ pcdata "" ] ] ;
+                       show_loading ~id:"learnocaml-main-loading" [ abort_message ] ;
+                       Manip.SetCss.opacity abort_message (Some "1") ;
+                        end ;
+                      true) ;button
+                ] ) ::
+              a ~a:[ a_href ("test.html#id="^id^"&questionid="^question_id^"&action=open") ; 
+                     a_class [ "exercise" ] ] [
+                  div ~a:[ a_class [ "descr" ] ] [
+                  h1 [ pcdata name ] ;
+                  p [   pcdata ty ] ;
+                    ]          
+              ] ::
+              acc)
+             contents acc
     in
-    let open Tyxml_js.Html5 in
-    List.rev (format_contents  [a ~a:[ a_href ("test.html#id="^id^"&action=open") ; 
-                                       a_class [ "exercise" ] ] [
-                                    div ~a:[ a_class [ "descr" ] ] [
-                                        h1 [ pcdata "New question" ];
-                                        p [pcdata "Create a new question"];];
-                ]] index) in
+     let open Tyxml_js.Html5 in
+     List.rev (format_contents  [a ~a:[ a_href ("test.html#id="^id^"&action=open") ; 
+        a_class [ "exercise" ] ] [
+      div ~a:[ a_class [ "descr" ] ] [
+        h1 [ pcdata "New question" ];
+        p [pcdata "Create a new question"];];
+      ]] index) in 
   let list_div =
    Tyxml_js.Html5.(div ~a: [Tyxml_js.Html5.a_id "learnocaml-main-exercise-list" ])
       (format_question_list index) in
@@ -622,7 +623,7 @@ let () =
    let _ =testhaut_init () in ();
   begin testhaut_button
       ~group: toplevel_buttons_group
-      ~icon: "typecheck" [%i"Check"] @@ fun () ->
+      ~icon: "typecheck" "Check" @@ fun () ->
     Lwt.return ()
   end ;
   begin testhaut_button

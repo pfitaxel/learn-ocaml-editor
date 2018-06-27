@@ -312,7 +312,7 @@ let testhaut_init () =
   
   
      let open Tyxml_js.Html5 in
-     List.rev (format_contents  [a ~a:[ a_href ("test.html#id="^id^"&action=open") ; 
+     List.rev (format_contents  [a ~a:[ a_id "new_question" ; 
         a_class [ "exercise" ] ] [
       div ~a:[ a_class [ "descr" ] ] [
         h1 [ pcdata "New question" ];

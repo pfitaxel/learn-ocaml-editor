@@ -121,7 +121,6 @@ begin program "editor"
     "omd"
     "editor_lib"
     "test-spec"
-    "grading"
  ]
   files = [
     "editor.ml" ( comp = [ ppx_js ppx_ocplib_i18n]  )

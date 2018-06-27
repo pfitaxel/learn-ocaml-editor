@@ -58,8 +58,108 @@ let auto_save_interval = 120.0 ;; (* in seconds*)
 
 module StringMap = Map.Make (String)
                          
-let recovering_callback= ref (fun ()->())
+let recovering_callback = ref (fun ()->())
 
+
+(*_________________________Fonctions pour generer le test_____________________________________*)
+
+let rec listFst liste= match liste with
+  |[]->[]
+  |a::b -> (fst a)::(listFst b)
+
+                      
+let rec redondanceAux liste elem= match liste with
+  |[]->[]
+  |e::s -> if (e=elem) then (redondanceAux s elem) else (e::(redondanceAux s elem)) 
+
+
+let rec redondance liste = match liste with
+  |[]->[]
+  |e::s -> e :: (redondance (redondanceAux s e))
+
+
+let rec decomposition str n = 
+if (n+1= String.length str) then [(str.[n])]
+else ( (str.[n])::(decomposition str (n+1)) );;
+
+let rec rechercheParenthese listeChar n =
+	if n=0 
+	then listeChar 
+	else 
+		match listeChar with
+		|[]-> failwith "error type"
+		|'('::l ->(rechercheParenthese l (n+1))
+		|')'::l->(rechercheParenthese l (n-1))
+		|ch::l->rechercheParenthese l n ;;
+
+
+let rec nbArgs listeChar = match listeChar with
+|[] -> 0
+|'-'::'>'::suite -> 1+(nbArgs suite)
+|ch::s -> if (ch = '(') then (nbArgs (rechercheParenthese listeChar 1)) else (nbArgs s) ;;
+
+let test_fun ty = "test_function_"^(string_of_int (nbArgs (decomposition ty 0)))^"_against_solution" ;;
+
+let testAlea nombreTestAlea = " ~gen:"^(string_of_int nombreTestAlea) ;;
+
+let typeFct ty name = "[%ty : "^ty^" ] \""^name^"\"" ;;
+
+let librairie = "open Test_lib ;;\n open Report ;;\n" ;;
+
+let init = "let () =
+  set_result @@
+  ast_sanity_check code_ast @@ fun () ->\n" ;;
+
+                  
+(* il faut recuperer la liste des questions dans le local storage et pour chaque question recuperer ses informations *)
+
+let get_test_liste id = Learnocaml_local_storage.(retrieve (editor_state id)).test.testhaut
+let get_test_string id  = Learnocaml_local_storage.(retrieve (editor_state id)).test.testml                             
+
+                                                  
+                                                  
+let get_id_question id = let test_list = get_test_liste id  in let all_id = StringMap.bindings test_list in redondance (listFst all_id)
+let get_ty id idQuestion= let test_list = get_test_liste id in StringMap.(find idQuestion test_list).ty
+let get_name_question id idQuestion= let test_list = get_test_liste id in StringMap.(find idQuestion test_list).name                                                                       
+let get_type_question id idQuestion= let test_list = get_test_liste id in StringMap.(find idQuestion test_list).type_question
+let get_extra_alea id idQuestion= let test_list = get_test_liste id in StringMap.(find idQuestion test_list).extra_alea
+let get_input id idQuestion= let test_list = get_test_liste id in StringMap.(find idQuestion test_list).input
+let get_output id idQuestion= let test_list = get_test_liste id in StringMap.(find idQuestion test_list).output                                                 
+
+let rec constructListeQuest listKey id = match listKey with
+  |[]->[]
+  |key::suite -> ((get_name_question id key),(get_ty id key),(get_extra_alea id key),(get_input id key),false)::(constructListeQuest suite id)
+
+
+
+(*Pour testAgainstSol :*)                                                                                           
+(*le variable b est un booléen qui pourra peut être servir pour les tests polymorphe*)
+
+let sectionSol fct= match fct with
+|(name,typeF,nbAlea,jdt,b)->"Section
+      		        	([ Text \"Function:\" ; Code \""^name^"\" ],\n"
+      				^(test_fun typeF)^(testAlea nbAlea)^"\n"
+      				^(typeFct typeF name)^"\n["
+      				^jdt^"] )"
+|_->failwith "error" ;;
+
+let rec constructSectionSol listeFonction = match listeFonction with
+|[]->"]"
+|fct::suite->if ((constructSectionSol suite)<>"]") 
+			then ((sectionSol fct)^" ;\n"^(constructSectionSol suite)) 
+			else ((sectionSol fct)^(constructSectionSol suite)) ;;
+
+let constructFinalSol listeFonction = 
+  librairie^init^"["^(constructSectionSol listeFonction)^";;"
+
+
+
+
+
+
+
+                                                                                           
+(*_________________________Fonctions pour generer le template_____________________________________*)                             
 let string_of_char ch = String.make 1 ch ;;
 
 let failchar = [' ';'f';'a';'i';'l';'w';'i';'t';'h';' ';'"';'T';'O';'D';'O';'"';'\n'] ;;
@@ -223,7 +323,7 @@ let testhaut_init () =
    
 
 let init_tabs, select_tab =
-  let names = [ "toplevel" ; "report" ; "editor" ; "template" ; (*"test" ;*) "question" ; "prelude" ; "prepare";"testhaut" ] in
+  let names = [ "toplevel" ; "report" ; "editor" ; "template" ; "test" ; "question" ; "prelude" ; "prepare" ; "testhaut" ] in
   let current = ref "question" in
   let select_tab name =
     set_arg "tab" name ;
@@ -511,7 +611,19 @@ let () =
   begin testhaut_button
       ~group: toplevel_buttons_group
       ~icon: "run" "Compile" @@ fun () ->
-    Lwt.return ()
+    let listeFonction = constructListeQuest (get_id_question id) id in
+    let tests = constructFinalSol listeFonction in 
+    match Learnocaml_local_storage.(retrieve (editor_state id) ) with
+    |{id;titre;prepare;diff;solution;question;template;test;prelude;mtime}->
+      let mtime=gettimeofday () in
+      let test ={testml=tests;testhaut=test.testhaut} in
+      let nvexo= {id;titre;prepare;diff;solution;question;template;test;prelude;mtime} in    
+      Learnocaml_local_storage.(store (editor_state id)) nvexo;
+      Manip.disable
+        (find_component ("learnocaml-exo-button-testhaut")) ;
+      Ace.set_contents ace_t  (get_testml id);
+      select_tab "test";
+      Lwt.return ()
   end ;  
   (* ---- template pane --------------------------------------------------- *)
   let editor_template = find_component "learnocaml-exo-template-pane" in

@@ -61,7 +61,7 @@ module StringMap = Map.Make (String)
 let recovering_callback = ref (fun ()->())
 
 
-(*_________________________Fonctions pour generer le test_____________________________________*)
+(* ---------- Fonctions pour generer le test ---------- *)
 
 let rec listFst liste= match liste with
   |[]->[]
@@ -111,24 +111,32 @@ let init = "let () =
   ast_sanity_check code_ast @@ fun () ->\n" ;;
 
                   
-(* il faut recuperer la liste des questions dans le local storage et pour chaque question recuperer ses informations *)
+(* il faut recuperer la liste des questions dans le local storage
+   et pour chaque question recuperer ses informations *)
 
 let get_test_liste id = Learnocaml_local_storage.(retrieve (editor_state id)).test.testhaut
-let get_test_string id  = Learnocaml_local_storage.(retrieve (editor_state id)).test.testml                             
+let get_test_string id = Learnocaml_local_storage.(retrieve (editor_state id)).test.testml
 
-                                                  
-                                                  
-let get_id_question id = let test_list = get_test_liste id  in let all_id = StringMap.bindings test_list in redondance (listFst all_id)
-let get_ty id idQuestion= let test_list = get_test_liste id in StringMap.(find idQuestion test_list).ty
-let get_name_question id idQuestion= let test_list = get_test_liste id in StringMap.(find idQuestion test_list).name                                                                       
-let get_type_question id idQuestion= let test_list = get_test_liste id in StringMap.(find idQuestion test_list).type_question
-let get_extra_alea id idQuestion= let test_list = get_test_liste id in StringMap.(find idQuestion test_list).extra_alea
-let get_input id idQuestion= let test_list = get_test_liste id in StringMap.(find idQuestion test_list).input
-let get_output id idQuestion= let test_list = get_test_liste id in StringMap.(find idQuestion test_list).output                                                 
+
+let get_id_question id = let test_list = get_test_liste id in
+  let all_id = StringMap.bindings test_list in redondance (listFst all_id)
+let get_ty id idQuestion = let test_list = get_test_liste id in
+  StringMap.(find idQuestion test_list).ty
+let get_name_question id idQuestion = let test_list = get_test_liste id in
+  StringMap.(find idQuestion test_list).name                                                                       
+let get_type_question id idQuestion = let test_list = get_test_liste id in
+  StringMap.(find idQuestion test_list).type_question
+let get_extra_alea id idQuestion= let test_list = get_test_liste id in
+  StringMap.(find idQuestion test_list).extra_alea
+let get_input id idQuestion= let test_list = get_test_liste id in
+  StringMap.(find idQuestion test_list).input
+let get_output id idQuestion= let test_list = get_test_liste id in
+  StringMap.(find idQuestion test_list).output                                                 
 
 let rec constructListeQuest listKey id = match listKey with
   |[]->[]
-  |key::suite -> ((get_name_question id key),(get_ty id key),(get_extra_alea id key),(get_input id key),false)::(constructListeQuest suite id)
+  |key::suite -> ((get_name_question id key),(get_ty id key),(get_extra_alea id key),
+                  (get_input id key),false)::(constructListeQuest suite id)
 
 
 
@@ -153,13 +161,7 @@ let constructFinalSol listeFonction =
   librairie^init^"["^(constructSectionSol listeFonction)^";;"
 
 
-
-
-
-
-
-                                                                                           
-(*_________________________Fonctions pour generer le template_____________________________________*)                             
+(* ---------- Fonctions pour generer le template ---------- *)
 let string_of_char ch = String.make 1 ch ;;
 
 let failchar = [' ';'f';'a';'i';'l';'w';'i';'t';'h';' ';'"';'T';'O';'D';'O';'"';'\n'] ;;
@@ -216,7 +218,9 @@ let rec rechercheLet listech b = match listech with
 |_::'e'::'l'::'s'::'e'::_::l -> rechercheLet l (validationLet l)
 |_::'i'::'n'::_::l -> rechercheLet l (validationLet l)
 |'-'::'>'::l->rechercheLet l (validationLet l)
-|'l'::'e'::'t'::' '::l ->if b && ((rechercheEgal l)=1) then 'l'::'e'::'t'::' '::l else (if ((rechercheEgal l)=0) then rechercheLet l false else rechercheLet l true)
+|'l'::'e'::'t'::' '::l ->
+    if b && ((rechercheEgal l)=1) then 'l'::'e'::'t'::' '::l
+    else (if ((rechercheEgal l)=0) then rechercheLet l false else rechercheLet l true)
 |c::suite -> rechercheLet suite b
 ;;
 
@@ -239,16 +243,10 @@ let rec genTemplate chaine = if chaine="" then "" else
 	concatenation (genLet (decompositionSol chaine 0));;
 
 
-
-
-let id =arg "id";;
+let id = arg "id";;
 
 
 let testhaut_init () =
-  
-
-       
-   
     fetch_test_index id >>= fun index ->  
   let content_div = find_component "learnocaml-exo-testhaut-pane" in
   let format_question_list all_question_states =
@@ -265,7 +263,8 @@ let testhaut_init () =
                                 } acc ->  
               
               (div ~a:[a_id ("button_delete")] [
-                  let button =button ~a:[a_id question_id]  [img ~src:("icons/icon_cleanup_dark.svg") ~alt:"" () ; pcdata "" ]in 
+                  let button = button ~a:[a_id question_id]
+                  [img ~src:("icons/icon_cleanup_dark.svg") ~alt:"" () ; pcdata ""] in
                    Manip.Ev.onclick button
                    (fun _ ->
                      begin
@@ -273,8 +272,8 @@ let testhaut_init () =
                        let aborted, abort_message =
                          let t, u = Lwt.task () in
                          let btn_no = Tyxml_js.Html5.(button [ pcdata "No" ]) in
-                         Manip.Ev.onclick btn_no ( fun _ ->
-                                                       hide_loading ~id:"learnocaml-main-loading" () ; true) ;
+                         Manip.Ev.onclick btn_no (fun _ ->
+                                                  hide_loading ~id:"learnocaml-main-loading" () ; true) ;
                          let btn_yes = Tyxml_js.Html5.(button [ pcdata "Yes" ]) in
                          Manip.Ev.onclick btn_yes (fun _ ->
                              let rmv= get_testhaut id in                            
@@ -306,8 +305,6 @@ let testhaut_init () =
               acc)
              contents acc
     in
-  
-  
      let open Tyxml_js.Html5 in
      List.rev (format_contents  [a ~a:[ a_href ("test.html#id="^id^"&action=open") ; 
         a_class [ "exercise" ] ] [
@@ -323,7 +320,8 @@ let testhaut_init () =
    
 
 let init_tabs, select_tab =
-  let names = [ "toplevel" ; "report" ; "editor" ; "template" ; "test" ; "question" ; "prelude" ; "prepare" ; "testhaut" ] in
+  let names = [ "toplevel" ; "report" ; "editor" ; "template" ; "test" ;
+                "question" ; "prelude" ; "prepare" ; "testhaut" ] in
   let current = ref "question" in
   let select_tab name =
     set_arg "tab" name ;
@@ -820,7 +818,8 @@ let onload () =
       | { Learnocaml_exercise_state.diff } -> diff
       | exception Not_found -> None in
     Learnocaml_local_storage.(store (editor_state id))
-      { Learnocaml_exercise_state.id ; solution ; titre ; question ; template ; diff ; test ;prepare;prelude;
+      { Learnocaml_exercise_state.id ; solution ; titre ; question ; template ;
+        diff ; test ; prepare ; prelude;
         mtime = gettimeofday () } in
   recovering_callback:=recovering ;
   Ace.set_contents ace (get_solution id);
@@ -839,7 +838,7 @@ let onload () =
          Manip.Ev.onclick btn_cancel ( fun _ ->
                                        hide_loading ~id:"learnocaml-exo-loading" () ; true) ;
          let btn_yes = Tyxml_js.Html5.(button [ pcdata [%i"Yes"] ]) in
-         Manip.Ev.onclick btn_yes (fun _ -> Ace.set_contents ace_temp (genTemplate (Ace.get_contents ace) );
+         Manip.Ev.onclick btn_yes (fun _ -> Ace.set_contents ace_temp (genTemplate (Ace.get_contents ace));
                                             hide_loading ~id:"learnocaml-exo-loading" ();
                                             true) ;
          let div =
@@ -1051,6 +1050,7 @@ let onload () =
   Lwt.return ();;
 
 let () = Lwt.async @@ fun ()->
-    let _= Dom_html.window##setInterval (Js.wrap_callback (fun () -> !recovering_callback () ) ) (auto_save_interval *. 1000.0);
+    let _= Dom_html.window##setInterval (Js.wrap_callback (fun () -> !recovering_callback ()))
+    (auto_save_interval *. 1000.0);
     in 
     Lwt.return_unit ;;

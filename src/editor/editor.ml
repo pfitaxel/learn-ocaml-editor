@@ -58,8 +58,110 @@ let auto_save_interval = 120.0 ;; (* in seconds*)
 
 module StringMap = Map.Make (String)
                          
-let recovering_callback= ref (fun ()->())
+let recovering_callback = ref (fun ()->())
 
+
+(* ---------- Fonctions pour generer le test ---------- *)
+
+let rec listFst liste= match liste with
+  |[]->[]
+  |a::b -> (fst a)::(listFst b)
+
+                      
+let rec redondanceAux liste elem= match liste with
+  |[]->[]
+  |e::s -> if (e=elem) then (redondanceAux s elem) else (e::(redondanceAux s elem)) 
+
+
+let rec redondance liste = match liste with
+  |[]->[]
+  |e::s -> e :: (redondance (redondanceAux s e))
+
+
+let rec decomposition str n = 
+if (n+1= String.length str) then [(str.[n])]
+else ( (str.[n])::(decomposition str (n+1)) );;
+
+let rec rechercheParenthese listeChar n =
+	if n=0 
+	then listeChar 
+	else 
+		match listeChar with
+		|[]-> failwith "error type"
+		|'('::l ->(rechercheParenthese l (n+1))
+		|')'::l->(rechercheParenthese l (n-1))
+		|ch::l->rechercheParenthese l n ;;
+
+
+let rec nbArgs listeChar = match listeChar with
+|[] -> 0
+|'-'::'>'::suite -> 1+(nbArgs suite)
+|ch::s -> if (ch = '(') then (nbArgs (rechercheParenthese listeChar 1)) else (nbArgs s) ;;
+
+let test_fun ty = "test_function_"^(string_of_int (nbArgs (decomposition ty 0)))^"_against_solution" ;;
+
+let testAlea nombreTestAlea = " ~gen:"^(string_of_int nombreTestAlea) ;;
+
+let typeFct ty name = "[%ty : "^ty^" ] \""^name^"\"" ;;
+
+let librairie = "open Test_lib ;;\n open Report ;;\n" ;;
+
+let init = "let () =
+  set_result @@
+  ast_sanity_check code_ast @@ fun () ->\n" ;;
+
+                  
+(* il faut recuperer la liste des questions dans le local storage
+   et pour chaque question recuperer ses informations *)
+
+let get_test_liste id = Learnocaml_local_storage.(retrieve (editor_state id)).test.testhaut
+let get_test_string id = Learnocaml_local_storage.(retrieve (editor_state id)).test.testml
+
+
+let get_id_question id = let test_list = get_test_liste id in
+  let all_id = StringMap.bindings test_list in redondance (listFst all_id)
+let get_ty id idQuestion = let test_list = get_test_liste id in
+  StringMap.(find idQuestion test_list).ty
+let get_name_question id idQuestion = let test_list = get_test_liste id in
+  StringMap.(find idQuestion test_list).name                                                                       
+let get_type_question id idQuestion = let test_list = get_test_liste id in
+  StringMap.(find idQuestion test_list).type_question
+let get_extra_alea id idQuestion= let test_list = get_test_liste id in
+  StringMap.(find idQuestion test_list).extra_alea
+let get_input id idQuestion= let test_list = get_test_liste id in
+  StringMap.(find idQuestion test_list).input
+let get_output id idQuestion= let test_list = get_test_liste id in
+  StringMap.(find idQuestion test_list).output                                                 
+
+let rec constructListeQuest listKey id = match listKey with
+  |[]->[]
+  |key::suite -> ((get_name_question id key),(get_ty id key),(get_extra_alea id key),
+                  (get_input id key),false)::(constructListeQuest suite id)
+
+
+
+(*Pour testAgainstSol :*)                                                                                           
+(*le variable b est un booléen qui pourra peut être servir pour les tests polymorphe*)
+
+let sectionSol fct= match fct with
+|(name,typeF,nbAlea,jdt,b)->"Section
+      		        	([ Text \"Function:\" ; Code \""^name^"\" ],\n"
+      				^(test_fun typeF)^(testAlea nbAlea)^"\n"
+      				^(typeFct typeF name)^"\n["
+      				^jdt^"] )"
+|_->failwith "error" ;;
+
+let rec constructSectionSol listeFonction = match listeFonction with
+|[]->"]"
+|fct::suite->if ((constructSectionSol suite)<>"]") 
+			then ((sectionSol fct)^" ;\n"^(constructSectionSol suite)) 
+			else ((sectionSol fct)^(constructSectionSol suite)) ;;
+
+let constructFinalSol listeFonction = 
+  librairie^init^"["^(constructSectionSol listeFonction)^";;"
+
+
+(* ---------- Fonctions pour generer le template ---------- *)
 let string_of_char ch = String.make 1 ch ;;
 
 let failchar = [' ';'f';'a';'i';'l';'w';'i';'t';'h';' ';'"';'T';'O';'D';'O';'"';'\n'] ;;
@@ -116,7 +218,9 @@ let rec rechercheLet listech b = match listech with
 |_::'e'::'l'::'s'::'e'::_::l -> rechercheLet l (validationLet l)
 |_::'i'::'n'::_::l -> rechercheLet l (validationLet l)
 |'-'::'>'::l->rechercheLet l (validationLet l)
-|'l'::'e'::'t'::' '::l ->if b && ((rechercheEgal l)=1) then 'l'::'e'::'t'::' '::l else (if ((rechercheEgal l)=0) then rechercheLet l false else rechercheLet l true)
+|'l'::'e'::'t'::' '::l ->
+    if b && ((rechercheEgal l)=1) then 'l'::'e'::'t'::' '::l
+    else (if ((rechercheEgal l)=0) then rechercheLet l false else rechercheLet l true)
 |c::suite -> rechercheLet suite b
 ;;
 
@@ -139,16 +243,10 @@ let rec genTemplate chaine = if chaine="" then "" else
 	concatenation (genLet (decompositionSol chaine 0));;
 
 
-
-
-let id =arg "id";;
+let id = arg "id";;
 
 
 let testhaut_init () =
-  
-
-       
-   
     fetch_test_index id >>= fun index ->  
   let content_div = find_component "learnocaml-exo-testhaut-pane" in
   let format_question_list all_question_states =
@@ -163,58 +261,59 @@ let testhaut_init () =
                                output;
                                extra_alea
                                 } acc ->  
-              
-              (div ~a:[a_id ("button_delete")] [
-                  let button =button ~a:[a_id question_id]  [img ~src:("icons/icon_cleanup_dark.svg") ~alt:"" () ; pcdata "" ]in 
-                   Manip.Ev.onclick button
-                   (fun _ ->
-                     begin
-                       let messages = Tyxml_js.Html5.ul [] in
-                       let aborted, abort_message =
-                         let t, u = Lwt.task () in
-                         let btn_no = Tyxml_js.Html5.(button [ pcdata "No" ]) in
-                         Manip.Ev.onclick btn_no ( fun _ ->
-                                                       hide_loading ~id:"learnocaml-main-loading" () ; true) ;
-                         let btn_yes = Tyxml_js.Html5.(button [ pcdata "Yes" ]) in
-                         Manip.Ev.onclick btn_yes (fun _ ->
-                             let rmv= get_testhaut id in                            
-                             let testhaut = StringMap.remove question_id rmv in
-                             save_testhaut testhaut id ; 
-                             Dom_html.window##.location##reload ; true) ;
-                         let div =
-                           Tyxml_js.Html5.(div ~a: [ a_class [ "dialog" ] ]
-                                             [ pcdata "Are you sure you want to delete this question ?\n" ;
-                                               btn_yes ;
-                                               pcdata " " ;
-                                               btn_no ]) in
-                         Manip.SetCss.opacity div (Some "0") ;
-                         t, div in 
-                       Manip.replaceChildren messages
-                         Tyxml_js.Html5.[ li [ pcdata "" ] ] ;
-                       show_loading ~id:"learnocaml-main-loading" [ abort_message ] ;
-                       Manip.SetCss.opacity abort_message (Some "1") ;
-                        end ;
-                      true) ;button
-                ] ) ::
-              a ~a:[ a_href ("test.html#id="^id^"&id_question="^question_id^"&action=open") ; 
-                     a_class [ "exercise" ] ] [
-                  div ~a:[ a_class [ "descr" ] ] [
-                  h1 [ pcdata name ] ;
-                  p [   pcdata ty ] ;
-                    ]          
-              ] ::
-              acc)
-             contents acc
+             (* match question_id with
+                "0" -> []
+              | _ ->*)
+                  (div ~a:[a_id ("button_delete")] [
+                       let button = button ~a:[a_id question_id]
+                                      [img ~src:("icons/icon_cleanup_dark.svg") ~alt:"" () ; pcdata ""] in
+                       Manip.Ev.onclick button
+                         (fun _ ->
+                           begin
+                             let messages = Tyxml_js.Html5.ul [] in
+                             let aborted, abort_message =
+                               let t, u = Lwt.task () in
+                               let btn_no = Tyxml_js.Html5.(button [ pcdata "No" ]) in
+                               Manip.Ev.onclick btn_no (fun _ ->
+                                   hide_loading ~id:"learnocaml-main-loading" () ; true) ;
+                               let btn_yes = Tyxml_js.Html5.(button [ pcdata "Yes" ]) in
+                               Manip.Ev.onclick btn_yes (fun _ ->
+                                   let rmv= get_testhaut id in                            
+                                   let testhaut = StringMap.remove question_id rmv in
+                                   save_testhaut testhaut id ; 
+                                   Dom_html.window##.location##reload ; true) ;
+                               let div =
+                                 Tyxml_js.Html5.(div ~a: [ a_class [ "dialog" ] ]
+                                                   [ pcdata "Are you sure you want to delete this question ?\n" ;
+                                                     btn_yes ;
+                                                     pcdata " " ;
+                                                     btn_no ]) in
+                               Manip.SetCss.opacity div (Some "0") ;
+                               t, div in 
+                             Manip.replaceChildren messages
+                               Tyxml_js.Html5.[ li [ pcdata "" ] ] ;
+                             show_loading ~id:"learnocaml-main-loading" [ abort_message ] ;
+                             Manip.SetCss.opacity abort_message (Some "1") ;
+                           end ;
+                           true) ;button
+                  ] ) ::
+                    a ~a:[ a_href ("test.html#id="^id^"&questionid="^question_id^"&action=open") ; 
+                           a_class [ "exercise" ] ] [
+                        div ~a:[ a_class [ "descr" ] ] [
+                            h1 [ pcdata name ] ;
+                            p [   pcdata ty ] ;
+                          ]          
+                      ] ::
+                      acc)
+            contents acc
     in
-  
-  
-     let open Tyxml_js.Html5 in
-     List.rev (format_contents  [a ~a:[ a_href ("test.html#id="^id^"&action=open") ; 
-        a_class [ "exercise" ] ] [
-      div ~a:[ a_class [ "descr" ] ] [
-        h1 [ pcdata "New question" ];
-        p [pcdata "Create a new question"];];
-      ]] index) in 
+    let open Tyxml_js.Html5 in
+    List.rev (format_contents  [a ~a:[ a_href ("test.html#id="^id^"&action=open") ; 
+                                       a_class [ "exercise" ] ] [
+                                    div ~a:[ a_class [ "descr" ] ] [
+                                        h1 [ pcdata "New question" ];
+                                        p [pcdata "Create a new question"];];
+                ]] index) in
   let list_div =
    Tyxml_js.Html5.(div ~a: [Tyxml_js.Html5.a_id "learnocaml-main-exercise-list" ])
       (format_question_list index) in
@@ -223,7 +322,8 @@ let testhaut_init () =
    
 
 let init_tabs, select_tab =
-  let names = [ "toplevel" ; "report" ; "editor" ; "template" ; (*"test" ;*) "question" ; "prelude" ; "prepare";"testhaut" ] in
+  let names = [ "toplevel" ; "report" ; "editor" ; "template" ; "test" ;
+                "question" ; "prelude" ; "prepare" ; "testhaut" ] in
   let current = ref "question" in
   let select_tab name =
     set_arg "tab" name ;
@@ -276,23 +376,63 @@ let display_report exo report =
   if grade >= 100 then begin
     Manip.addClass report_button "success" ;
     Manip.replaceChildren report_button
-      Tyxml_js.Html5.[ pcdata [%i "Report" ]]
+      Tyxml_js.Html5.[ pcdata [%i"Report"] ]
   end else if grade = 0 then begin
     Manip.addClass report_button "failure" ;
     Manip.replaceChildren report_button
-      Tyxml_js.Html5.[ pcdata [%i "Report" ]]
+      Tyxml_js.Html5.[ pcdata [%i"Report"] ]
   end else begin
     Manip.addClass report_button "partial" ;
     let pct = Format.asprintf "%2d%%" grade in
     Manip.replaceChildren report_button
-      Tyxml_js.Html5.[ pcdata [%i "Report" ];
+      Tyxml_js.Html5.[ pcdata [%i"Report"] ;
                        span ~a: [ a_class [ "score" ] ] [ pcdata pct ]]
   end ;
   let report_container = find_component "learnocaml-exo-tab-report" in
   Manip.setInnerHtml report_container
     (Format.asprintf "%a" Learnocaml_report.(output_html_of_report ~bare: true) report) ;
   grade
+(*
+let set_string_translations () =
+  let translations = [
+  "txt_preparing", [%i"Preparing the environment"];
+  "learnocaml-exo-button-editor", [%i"Solution"];
+  "learnocaml-exo-button-template", [%i"Template"];
+  "learnocaml-exo-button-prelude", [%i"Prelude"];
+  "learnocaml-exo-button-prepare", [%i"Prepare"];
+  "learnocaml-exo-button-toplevel", [%i"Toplevel"];
+  "learnocaml-exo-button-question", [%i"Question"];
+  "learnocaml-exo-button-test", [%i"Test.ml"];
+  "learnocaml-exo-button-report", [%i"Report"];
+  "learnocaml-exo-editor-pane", [%i"Editor"];
+  "learnocaml-exo-tab-report", [%i"Click the Grade! button to test your solution"];
+  "learnocaml-exo-test-pane", [%i"Editor"];
+  ] in
+  List.iter
+  (fun (id, text) -> Manip.setInnerHtml (find_component id) text)
+  translations
 
+let set_string_translations_titles () =
+  let translations = [
+  "learnocaml-exo-button-editor", [%i"Type here the solution of the exercise"];
+  "learnocaml-exo-button-template", [%i"Type here or generate the template the student will complete or correct"];
+  "learnocaml-exo-button-prelude", [%i"Type here the definitions of types and functions given to the student"];
+  "learnocaml-exo-button-prepare", [%i"Type here hidden definitions given to the student"];
+  "learnocaml-exo-button-question", [%i"Type here the wording of the exercise in Markdown"];
+  "learnocaml-exo-button-test", [%i"Type here the tests sets code"];
+  ] in
+  List.iter
+  (fun (id, text) -> Manip.setTitle (find_component id) text)
+  translations
+
+let set_lang () =
+	match Js.Optdef.to_option (Dom_html.window##.navigator##.language) with
+	| Some l -> Ocplib_i18n.set_lang (Js.to_string l)
+	| None ->
+		match Js.Optdef.to_option (Dom_html.window##.navigator##.userLanguage) with
+		| Some l -> Ocplib_i18n.set_lang (Js.to_string l)
+		| None -> ()
+                          *)
 let () =
   Lwt.async_exception_hook := begin function
     | Failure message -> fatal message
@@ -300,7 +440,10 @@ let () =
     | exn -> fatal (Printexc.to_string exn)
   end ;
   Lwt.async @@ fun () ->
-               Learnocaml_local_storage.init () ;
+ (* set_lang ();
+  set_string_translations ();
+  set_string_translations_titles ();*)
+  Learnocaml_local_storage.init () ;
                
   (* ---- launch everything --------------------------------------------- *)
   let toplevel_buttons_group = button_group () in
@@ -366,22 +509,45 @@ let () =
   (* ---- toplevel pane ------------------------------------------------- *)
   begin toplevel_button
       ~group: toplevel_buttons_group
-      ~icon: "cleanup" [%i "Clear"] @@ fun () ->
+      ~icon: "cleanup" [%i"Clear"] @@ fun () ->
     Learnocaml_toplevel.clear top ;
     Lwt.return ()
   end ;
   begin toplevel_button
-      ~icon: "reload" [%i "Reset"] @@ fun () ->
+      ~icon: "reload" [%i"Reset"] @@ fun () ->
     toplevel_launch >>= fun top ->
     disabling_button_group toplevel_buttons_group (fun () -> Learnocaml_toplevel.reset top)
   end ;
   begin toplevel_button
       ~group: toplevel_buttons_group
-      ~icon: "run" [%i "Eval phrase"] @@ fun () ->
+      ~icon: "run" [%i"Eval phrase"] @@ fun () ->
     Learnocaml_toplevel.execute top ;
     Lwt.return ()
   end ;
 
+  (* ---- testhaut edit ------------------------------------------------*)
+  
+  let name = "" in
+  let ty = "" in
+  let type_question = Suite in
+  let input = match get_buffer id with
+    exception Not_found -> ""
+  | buff -> buff.input in
+  let output = "" in
+  let extra_alea = 0 in
+  let question = {name; ty; type_question; input; output; extra_alea} in
+  let testhaut = get_testhaut id in
+  let question_id ="0" in
+  let testhaut = StringMap.add question_id question testhaut in
+  save_testhaut testhaut id;
+  let editor_testhaut = find_component "learnocaml-exo-testhaut-edit" in
+  let ace_testhaut = Ace.create_editor (Tyxml_js.To_dom.of_div editor_testhaut ) in
+  let buffer =
+  match get_buffer id with
+    exception Not_found -> ""
+  | buff -> buff.input in
+  Ace.set_contents ace_testhaut buffer ;
+  Ace.set_font_size ace_testhaut 18;
 
   (* ---- test pane --------------------------------------------------- *)
   let editor_test = find_component "learnocaml-exo-test-pane" in
@@ -420,7 +586,7 @@ let () =
     Lwt.return () in
   begin test_button
       ~group: toplevel_buttons_group
-      ~icon: "typecheck" [%i "Check"] @@ fun () ->
+      ~icon: "typecheck" [%i"Check"] @@ fun () ->
     typecheck true
   end ;
 
@@ -468,7 +634,19 @@ let () =
   begin testhaut_button
       ~group: toplevel_buttons_group
       ~icon: "run" "Compile" @@ fun () ->
-    Lwt.return ()
+    let listeFonction = constructListeQuest (get_id_question id) id in
+    let tests = constructFinalSol listeFonction in 
+    match Learnocaml_local_storage.(retrieve (editor_state id) ) with
+    |{id;titre;prepare;diff;solution;question;template;test;prelude;mtime}->
+      let mtime=gettimeofday () in
+      let test ={testml=tests;testhaut=test.testhaut} in
+      let nvexo= {id;titre;prepare;diff;solution;question;template;test;prelude;mtime} in    
+      Learnocaml_local_storage.(store (editor_state id)) nvexo;
+      Manip.disable
+        (find_component ("learnocaml-exo-button-testhaut")) ;
+      Ace.set_contents ace_t  (get_testml id);
+      select_tab "test";
+      Lwt.return ()
   end ;  
   (* ---- template pane --------------------------------------------------- *)
   let editor_template = find_component "learnocaml-exo-template-pane" in
@@ -503,7 +681,7 @@ let () =
     Lwt.return () in
   begin template_button
       ~group: toplevel_buttons_group
-      ~icon: "typecheck" [%i "Check"] @@ fun () ->
+      ~icon: "typecheck" [%i"Check"] @@ fun () ->
     typecheck true
   end ;
 
@@ -604,7 +782,7 @@ let onload () =
     Lwt.return () in
   begin prelude_button
       ~group: toplevel_buttons_group
-      ~icon: "typecheck" [%i "Check"] @@ fun () ->
+      ~icon: "typecheck" [%i"Check"] @@ fun () ->
     typecheck true
   end ; 
 
@@ -641,7 +819,7 @@ let onload () =
     Lwt.return () in
   begin prepare_button
       ~group: toplevel_buttons_group
-      ~icon: "typecheck" [%i "Check"] @@ fun () ->
+      ~icon: "typecheck" [%i"Check"] @@ fun () ->
     typecheck true
   end ;
   
@@ -649,6 +827,18 @@ let onload () =
   let editor_pane = find_component "learnocaml-exo-editor-pane" in
   let editor = Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div editor_pane) in
   let ace = Ocaml_mode.get_editor editor in
+
+  let save_buffer_test () =
+  let ty = "" in
+  let type_question = Suite in
+  let input = Ace.get_contents ace_testhaut in
+  let output = "" in
+  let extra_alea = 0 in
+  let question = {name; ty; type_question; input; output; extra_alea} in
+  let testhaut = get_testhaut id in
+  let question_id ="0" in
+  let testhaut = StringMap.add question_id question testhaut in
+  save_testhaut testhaut id in
   
   let recovering () =
     let solution = Ace.get_contents ace in
@@ -656,6 +846,16 @@ let onload () =
     let question = Ace.get_contents ace_quest in
     let template = Ace.get_contents ace_temp in
     let testml = Ace.get_contents ace_t in
+  (*  let ty = "" in
+  let type_question = Suite in
+  let input = Ace.get_contents ace_testhaut in
+  let output = "" in
+  let extra_alea = 0 in
+  let question = {name; ty; type_question; input; output; extra_alea} in
+  let testhaut = get_testhaut id in
+  let question_id ="0" in
+  let testhaut = StringMap.add question_id question testhaut in
+  save_testhaut testhaut id in*) save_buffer_test ();
     let testhaut= get_testhaut id in
     let prepare= Ace.get_contents ace_prep in
     let prelude =Ace.get_contents ace_prel in 
@@ -665,14 +865,15 @@ let onload () =
       | { Learnocaml_exercise_state.diff } -> diff
       | exception Not_found -> None in
     Learnocaml_local_storage.(store (editor_state id))
-      { Learnocaml_exercise_state.id ; solution ; titre ; question ; template ; diff ; test ;prepare;prelude;
+      { Learnocaml_exercise_state.id ; solution ; titre ; question ; template ;
+        diff ; test ; prepare ; prelude;
         mtime = gettimeofday () } in
   recovering_callback:=recovering ;
   Ace.set_contents ace (get_solution id);
   Ace.set_font_size ace 18;
   let messages = Tyxml_js.Html5.ul [] in
   begin editor_button
-      ~icon: "sync" [%i"Gen.  template"] @@ fun () ->
+      ~icon: "sync" [%i"Gen. template"] @@ fun () ->
     select_tab "template";
     if (Ace.get_contents ace_temp) = "" then        
         Ace.set_contents ace_temp (genTemplate (Ace.get_contents ace) )
@@ -683,13 +884,13 @@ let onload () =
          let btn_cancel = Tyxml_js.Html5.(button [ pcdata [%i"Cancel"] ]) in
          Manip.Ev.onclick btn_cancel ( fun _ ->
                                        hide_loading ~id:"learnocaml-exo-loading" () ; true) ;
-         let btn_yes = Tyxml_js.Html5.(button [ pcdata [%i "Yes" ]]) in
-         Manip.Ev.onclick btn_yes (fun _ -> Ace.set_contents ace_temp (genTemplate (Ace.get_contents ace) );
+         let btn_yes = Tyxml_js.Html5.(button [ pcdata [%i"Yes"] ]) in
+         Manip.Ev.onclick btn_yes (fun _ -> Ace.set_contents ace_temp (genTemplate (Ace.get_contents ace));
                                             hide_loading ~id:"learnocaml-exo-loading" ();
                                             true) ;
          let div =
            Tyxml_js.Html5.(div ~a: [ a_class [ "dialog" ] ]
-                             [ pcdata [%i "Do you want to crush template ?\n"] ;
+                             [ pcdata [%i"Do you want to crush the template?\n"] ;
                                btn_yes ;
                                pcdata " " ;
                                btn_cancel ]) in
@@ -704,13 +905,13 @@ let onload () =
   end ;
 
   begin editor_button
-      ~icon: "save" [%i "Save"] @@ fun () ->
+      ~icon: "save" [%i"Save"] @@ fun () ->
     recovering () ;
     Lwt.return ()
   end ;
 
   begin editor_button
-      ~icon: "download" [%i "Download"] @@ fun () ->
+      ~icon: "download" [%i"Download"] @@ fun () ->
     recovering () ;
     let name = id ^ ".json" in
     let content =Learnocaml_local_storage.(retrieve (editor_state id)) in  
@@ -749,12 +950,12 @@ let onload () =
     Lwt.return () in
   begin editor_button
       ~group: toplevel_buttons_group
-      ~icon: "typecheck" [%i "Check"] @@ fun () ->
+      ~icon: "typecheck" [%i"Check"] @@ fun () ->
     typecheck true
   end ;
   begin toplevel_button
       ~group: toplevel_buttons_group
-      ~icon: "run" [%i "Eval code"] @@ fun () ->
+      ~icon: "run" [%i"Eval code"] @@ fun () ->
     Learnocaml_toplevel.execute_phrase top (Ace.get_contents ace) >>= fun _ ->
     Lwt.return ()
   end ;
@@ -762,7 +963,7 @@ let onload () =
   let exo_toolbar = find_component "learnocaml-exo-toolbar" in
   let toolbar_button = button ~container: exo_toolbar ~theme: "light" in
   begin toolbar_button
-      ~icon: "left" [%i "Metadata"] @@ fun () ->
+      ~icon: "left" [%i"Metadata"] @@ fun () ->
       recovering () ;
       Dom_html.window##.location##assign
         (Js.string ("new_exercise.html#id=" ^ id ^ "&action=open"));
@@ -770,7 +971,7 @@ let onload () =
   end;
   
   begin toolbar_button
-      ~icon: "upload" [%i "Experiment"] @@ fun ()->
+      ~icon: "upload" [%i"Experiment"] @@ fun ()->
     recovering () ;
      Dom_html.window##.location##assign
         (Js.string ("exercise.html#id=." ^ id ^ "&action=open"));
@@ -779,24 +980,24 @@ let onload () =
     
   let messages = Tyxml_js.Html5.ul [] in
   begin toolbar_button
-      ~icon: "list" [%i "Exercises"] @@ fun () ->
+      ~icon: "list" [%i"Exercises"] @@ fun () ->
     let aborted, abort_message =
       let t, u = Lwt.task () in
-      let btn_cancel = Tyxml_js.Html5.(button [ pcdata [%i "Cancel"]]) in
+      let btn_cancel = Tyxml_js.Html5.(button [ pcdata [%i"Cancel"] ]) in
       Manip.Ev.onclick btn_cancel ( fun _ ->
         hide_loading ~id:"learnocaml-exo-loading" () ; true) ;
-      let btn_yes = Tyxml_js.Html5.(button [ pcdata [%i "Yes" ]]) in
+      let btn_yes = Tyxml_js.Html5.(button [ pcdata [%i"Yes"] ]) in
       Manip.Ev.onclick btn_yes (fun _ ->
       recovering () ;
       Dom_html.window##.location##assign
         (Js.string "index.html#activity=editor") ; true) ;
-      let btn_no = Tyxml_js.Html5.(button [ pcdata [%i "No"]]) in
+      let btn_no = Tyxml_js.Html5.(button [ pcdata [%i"No"] ]) in
       Manip.Ev.onclick btn_no (fun _ -> 
       Dom_html.window##.location##assign
         (Js.string "index.html#activity=editor") ; true);
       let div =
         Tyxml_js.Html5.(div ~a: [ a_class [ "dialog" ] ]
-                          [ pcdata [%i "Do you want to save before closing?\n"] ;
+                          [ pcdata [%i"Do you want to save before closing?\n"] ;
                             btn_yes ;
                             pcdata " " ;
                             btn_no ;
@@ -831,7 +1032,7 @@ let onload () =
   
   let worker () = ref (Grading_jsoo.get_grade ~callback (exo () )  ) in
   begin toolbar_button
-      ~icon: "reload" [%i "Grade!"] @@ fun () ->
+      ~icon: "reload" [%i"Grade!"] @@ fun () ->
     recovering () ;
 
     let aborted, abort_message =
@@ -842,11 +1043,11 @@ let onload () =
         Tyxml_js.Html5.(div ~a: [ a_class [ "dialog" ] ]
                           [ pcdata [%i"Grading is taking a lot of time, "] ;
                             btn ;
-                            pcdata " ?" ]) in
+                            pcdata "?" ]) in
       Manip.SetCss.opacity div (Some "0") ;
       t, div in
     Manip.replaceChildren messages
-      Tyxml_js.Html5.[ li [ pcdata [%i "Launching the grader"] ] ] ;
+      Tyxml_js.Html5.[ li [ pcdata [%i"Launching the grader"] ] ] ;
     show_loading ~id:"learnocaml-exo-loading" [ messages ; abort_message ] ;
     Lwt_js.sleep 1. >>= fun () ->
     let solution = Ace.get_contents ace in
@@ -860,7 +1061,7 @@ let onload () =
           Lwt_js.sleep 5. >>= fun () ->
           Manip.SetCss.opacity abort_message (Some "1") ;
           aborted >>= fun () ->
-          Lwt.return Learnocaml_report.[ Message ([ Text [%i "Grading aborted by user." ]], Failure) ] in
+          Lwt.return Learnocaml_report.[ Message ([ Text [%i"Grading aborted by user."] ], Failure) ] in
         Lwt.pick [ grading ; abortion ] >>= fun report ->
         let grade = display_report (exo () ) report in
         (worker() ) := Grading_jsoo.get_grade ~callback ( exo () ) ;
@@ -873,8 +1074,8 @@ let onload () =
         Lwt.return ()
     | Toploop_results.Error _ ->
         let msg =
-          Learnocaml_report.[ Text [%i "Error in your code."]; Break ;
-                   Text [%i "Cannot start the grader if your code does not typecheck."] ] in
+          Learnocaml_report.[ Text [%i"Error in your code."] ; Break ;
+                   Text [%i"Cannot start the grader if your code does not typecheck."] ] in
         let report = Learnocaml_report.[ Message (msg, Failure) ] in
         let grade = display_report (exo () ) report in
         (*Learnocaml_local_storage.(store (exercise_state id))
@@ -895,7 +1096,8 @@ let onload () =
      Lwt.return () in
   Lwt.return ();;
 
-let () =Lwt.async @@ fun ()->
-    let _= Dom_html.window##setInterval (Js.wrap_callback (fun () -> !recovering_callback () ) ) (auto_save_interval *. 1000.0);
-    in
-      Lwt.return_unit ;;
+let () = Lwt.async @@ fun ()->
+    let _= Dom_html.window##setInterval (Js.wrap_callback (fun () -> !recovering_callback ()))
+    (auto_save_interval *. 1000.0);
+    in 
+    Lwt.return_unit ;;

@@ -557,16 +557,16 @@ let () =
     Ocaml_mode.report_error ~set_class editor_t error warnings  >>= fun () ->
     Ace.focus ace_t ;
     Lwt.return () in *)
-   let _ =testhaut_init () in ();
-  begin testhaut_button
-      ~group: toplevel_buttons_group
-      ~icon: "typecheck" "Check" @@ fun () ->
-    Lwt.return ()
-  end ;
+  let _ =testhaut_init () in ();
   begin testhaut_button
       ~group: toplevel_buttons_group
       ~icon: "sync" "Generate" @@ fun () ->
     Lwt.return () 
+  end ;                             
+  begin testhaut_button
+      ~group: toplevel_buttons_group
+      ~icon: "typecheck" "Check" @@ fun () ->
+    Lwt.return ()
   end ;
   begin testhaut_button
       ~group: toplevel_buttons_group

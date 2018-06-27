@@ -137,7 +137,7 @@ let editor_tab _ _ () =
   in  
     Server_caller.fetch_editor_index () >>= fun index ->  
   show_loading ~id:"learnocaml-main-loading"
-    Tyxml_js.Html5.[ ul [ li [ pcdata "Loading editor" ] ] ] ;
+    Tyxml_js.Html5.[ ul [ li [ pcdata [%i"Loading editor"] ] ] ] ;
 
   Lwt_js.sleep 0.5 >>= fun () ->
   let content_div = find_component "learnocaml-main-content" in
@@ -171,10 +171,10 @@ let editor_tab _ _ () =
                        let messages = Tyxml_js.Html5.ul [] in
                        let aborted, abort_message =
                          let t, u = Lwt.task () in
-                         let btn_no = Tyxml_js.Html5.(button [ pcdata "No" ]) in
+                         let btn_no = Tyxml_js.Html5.(button [ pcdata [%i"No"] ]) in
                          Manip.Ev.onclick btn_no ( fun _ ->
                                                        hide_loading ~id:"learnocaml-main-loading" () ; true) ;
-                         let btn_yes = Tyxml_js.Html5.(button [ pcdata "Yes" ]) in
+                         let btn_yes = Tyxml_js.Html5.(button [ pcdata [%i"Yes"] ]) in
                          Manip.Ev.onclick btn_yes (fun _ ->
                              let rmv=
                                match Learnocaml_local_storage.(retrieve (index_state "index")) with
@@ -187,7 +187,7 @@ let editor_tab _ _ () =
                              Dom_html.window##.location##reload ; true) ;
                          let div =
                            Tyxml_js.Html5.(div ~a: [ a_class [ "dialog" ] ]
-                                             [ pcdata "Are you sure you want to delete the exercise ?\n" ;
+                                             [ pcdata [%i"Are you sure you want to delete the exercise?\n"] ;
                                                btn_yes ;
                                                pcdata " " ;
                                                btn_no ]) in
@@ -205,7 +205,7 @@ let editor_tab _ _ () =
                   div ~a:[ a_class [ "descr" ] ] [
                   h1 [ pcdata exercise_title ] ;
                   p [ match exercise_short_description with
-                      | None -> pcdata "No description available."
+                      | None -> pcdata [%i"No description available."]
                       | Some text -> pcdata text ] ;
 
                     ] ;       
@@ -241,8 +241,8 @@ let editor_tab _ _ () =
     List.rev (format_contents 1 [a ~a:[ a_href ("new_exercise.html#&action=open") ; 
         a_class [ "exercise" ] ] [
       div ~a:[ a_class [ "descr" ] ] [
-        h1 [ pcdata "New exercise" ];
-        p [pcdata "Create a new exercise"];];
+        h1 [ pcdata [%i"New exercise"] ];
+        p [pcdata [%i"Create a new exercise"]];];
       ]] index) in
   let list_div =
     Tyxml_js.Html5.(div ~a: [ Tyxml_js.Html5.a_id "learnocaml-main-exercise-list" ])

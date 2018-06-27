@@ -68,7 +68,6 @@ let specif = match getElementById_coerce "specif" CoerceTo.textarea with
     None -> failwith "element spec inconnu"
   | Some s -> s;;
 
-
 let input_suite = match getElementById_coerce "input" CoerceTo.textarea with
     None -> failwith "element input_suite inconnu"
   | Some s -> s;;
@@ -80,7 +79,6 @@ let save = getElementById "save";;
 
 let setInnerHtml elt s =    
   elt##.innerHTML:=Js.string s ;;
-
 
 let compute_question_id test_haut =
   let key_list =List.map (fun (a,b)->int_of_string a) (StringMap.bindings test_haut) in
@@ -174,4 +172,3 @@ let _ = save##.onclick:= handler (fun _ ->
         (Js.string ("editor.html#id=" ^ id ^ "&action=open"))
      end;
    Js._true)
-                       

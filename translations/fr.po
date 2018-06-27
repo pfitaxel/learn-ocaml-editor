@@ -370,3 +370,36 @@ msgstr "Cours"
 #: src/app/learnocaml_index_main.ml:763,41--62
 msgid "Choose an activity."
 msgstr "Sélectionnez une activité."
+
+#~ msgid "Test"
+#~ msgstr "Test"
+
+#~ msgid "Name: "
+#~ msgstr "Nom: "
+
+#~ msgid "Type: "
+#~ msgstr "Type: "
+
+#~ msgid "Solution"
+#~ msgstr "Solution"
+
+#~ msgid "Specification"
+#~ msgstr "Spécification"
+
+#~ msgid "Suite"
+#~ msgstr "Série de tests"
+
+#~ msgid "Input tests:<br>"
+#~ msgstr "Tests en entrée:<br>"
+
+#~ msgid "Extra alea:<br>"
+#~ msgstr "Aléa supplémentaire:<br>"
+
+#~ msgid "Specification:<br>"
+#~ msgstr "Spécification:<br>"
+
+#~ msgid "Input:<br>"
+#~ msgstr "Entrée:<br>"
+
+#~ msgid "Output:<br>"
+#~ msgstr "Sortie:<br>"

@@ -1,5 +1,6 @@
 body{
   background: #eee;
+  margin: 0 5%;
 }
 #learnocaml-main-toolbar {
   position: absolute;

@@ -157,7 +157,7 @@ let set_string_translations () =
     "learnocaml-exo-button-report", [%i"Report"];
     "learnocaml-exo-button-text", [%i"Exercise"];
     "learnocaml-exo-editor-pane", [%i"Editor"];
-    "txt_grade_report", [%i"Click the Grade button to get your report"];
+    "txt_grade_report", [%i"Click the Grade! button to get your report"];
   ] in
   List.iter
     (fun (id, text) ->
@@ -415,7 +415,7 @@ in
     begin
     let id = String.sub id 1 ((String.length id)-1) in
     begin toolbar_button
-       ~icon: "upload" "Editor" @@ fun ()->
+       ~icon: "upload" [%i"Edit"] @@ fun ()->
        Dom_html.window##.location##assign
        (Js.string ("editor.html#id=" ^ id ^ "&action=open"));                                    
        Lwt.return_unit 

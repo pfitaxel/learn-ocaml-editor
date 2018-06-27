@@ -392,7 +392,7 @@ let display_report exo report =
   Manip.setInnerHtml report_container
     (Format.asprintf "%a" Learnocaml_report.(output_html_of_report ~bare: true) report) ;
   grade
-(*
+    
 let set_string_translations () =
   let translations = [
   "txt_preparing", [%i"Preparing the environment"];
@@ -432,7 +432,6 @@ let set_lang () =
 		match Js.Optdef.to_option (Dom_html.window##.navigator##.userLanguage) with
 		| Some l -> Ocplib_i18n.set_lang (Js.to_string l)
 		| None -> ()
-                          *)
 let () =
   Lwt.async_exception_hook := begin function
     | Failure message -> fatal message
@@ -440,9 +439,9 @@ let () =
     | exn -> fatal (Printexc.to_string exn)
   end ;
   Lwt.async @@ fun () ->
- (* set_lang ();
+  set_lang ();
   set_string_translations ();
-  set_string_translations_titles ();*)
+  set_string_translations_titles ();
   Learnocaml_local_storage.init () ;
                
   (* ---- launch everything --------------------------------------------- *)
@@ -623,7 +622,7 @@ let () =
    let _ =testhaut_init () in ();
   begin testhaut_button
       ~group: toplevel_buttons_group
-      ~icon: "typecheck" "Check" @@ fun () ->
+      ~icon: "typecheck" [%i"Check"] @@ fun () ->
     Lwt.return ()
   end ;
   begin testhaut_button

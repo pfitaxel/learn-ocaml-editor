@@ -826,7 +826,7 @@ let onload () =
   Ace.set_contents ace (get_solution id);
   Ace.set_font_size ace 18;
   let messages = Tyxml_js.Html5.ul [] in
-  begin editor_butto
+  begin editor_button
       ~icon: "sync" [%i"Gen. template"] @@ fun () ->
     select_tab "template";
     if (Ace.get_contents ace_temp) = "" then        

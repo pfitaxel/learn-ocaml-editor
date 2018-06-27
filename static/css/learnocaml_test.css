@@ -1,6 +1,13 @@
 body{
   background: #eee;
-  margin: 0 5%;
+}
+#title{
+  text-align: center;
+  font-size: 25px;
+  line-height: 50px; 
+}
+#txt_txt{
+	text-align: center;
 }
 #learnocaml-main-toolbar {
   position: absolute;
@@ -40,6 +47,7 @@ body{
 @media (max-width: 549px) {
   #learnocaml-main-toolbar {
     height: 40px;
+    width: 100%
   }
   #learnocaml-main-toolbar::before {
     top: 41px;
@@ -51,6 +59,7 @@ body{
 @media (min-width: 550px) {
   #learnocaml-main-toolbar {
     height: 60px;
+    width: 100%;
   }
   #learnocaml-main-toolbar::before {
     top: 61px;
@@ -67,7 +76,7 @@ position: absolute;
 	text-align: center;
 }
 #learnocaml-test {
-  left: 0px; top:80px; right: 0px; bottom: 65%;
+  left: 0px; top:110px; right: 0px; bottom: 65%;
 }
 #learnocaml-tab-name{
   padding: 5px;text-align:center;
@@ -114,19 +123,19 @@ position: absolute;
 }
 
 #learnocaml-tab-spec-input {
-	left: 0px; top: 0%; right: 50%; bottom: 15%;
+	left: 0px; top: 0%; right: 50%; bottom: 20%;
 	position: absolute;
 	text-align:center;
 }
 
 #learnocaml-tab-spec-extra {
-	left: 50%; top: 0px; right: 0px; bottom: 15%;
+	left: 50%; top: 0px; right: 0px; bottom: 20%;
 	position: absolute;
 	text-align:center;
 }
 
 #learnocaml-tab-spec-spec {
-	left: 0px; top: 85%; right: 0px; bottom: 0px;
+	left: 0px; top: 80%; right: 0px; bottom: 0px;
 	position: absolute;
 	text-align:center;
 }

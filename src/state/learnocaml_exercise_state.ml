@@ -60,7 +60,7 @@ let index_state_enc = conv (fun {exos;mtime}->(exos,mtime) ) (fun (exos,mtime)->
 type type_question= Suite | Solution | Spec ;;
 
 type question_state =
-  {id :int;
+  {name:string;
    ty :string;
    type_question : type_question;
    input :string;
@@ -72,14 +72,14 @@ open Json_encoding
 
 let question_state_enc =
   conv
-    (fun {id; ty; type_question; input; output; extra_alea}->
-       (id, ty, type_question, input, output, extra_alea)
+    (fun {name; ty; type_question; input; output; extra_alea}->
+       (name, ty, type_question, input, output, extra_alea)
     )
-    (fun (id, ty, type_question, input, output, extra_alea)->
-       {id; ty; type_question; input; output; extra_alea}
+    (fun (name, ty, type_question, input, output, extra_alea)->
+       {name; ty; type_question; input; output; extra_alea}
     )
     (obj6
-       (req "id" int)
+       (req "name" string)
        (req "ty" string)
        (req "type_question" ( string_enum ["suite",Suite;"spec",Spec;"solution",Solution] ) )
        (req "input" string)
@@ -93,7 +93,7 @@ type test_state = {testml : string;
                    testhaut : question_state Map.Make (String).t}
 
 
-
+let testhaut_enc= map_enc question_state_enc
                  
 let test_state_enc =conv
     (fun {testml;testhaut}->(testml,testhaut))

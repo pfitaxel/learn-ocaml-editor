@@ -20,7 +20,7 @@ open Lwt.Infix
 open Learnocaml_common
 open Learnocaml_exercise_state
 open Js_of_ocaml
-       
+open Editor_lib       
 (*
 module Report = Learnocaml_report
 
@@ -57,17 +57,6 @@ module Dummy_Functor (Introspection :
 let auto_save_interval = 120.0 ;; (* in seconds*)
 
 module StringMap = Map.Make (String)
-
-let get_titre id = Learnocaml_local_storage.(retrieve (editor_state id)).titre
-
-let get_diff id = Learnocaml_local_storage.(retrieve (editor_state id)).diff
-let get_solution id = Learnocaml_local_storage.(retrieve (editor_state id)).solution
-let get_question id = Learnocaml_local_storage.(retrieve (editor_state id)).question
-let get_template id = Learnocaml_local_storage.(retrieve (editor_state id)).template
-let get_testml id = Learnocaml_local_storage.(retrieve (editor_state id)).test.testml
-let get_prelude id = Learnocaml_local_storage.(retrieve (editor_state id)).prelude
-let get_prepare id = Learnocaml_local_storage.(retrieve (editor_state id)).prepare
-let get_testhaut id =  Learnocaml_local_storage.(retrieve (editor_state id)).test.testhaut
                          
 let recovering_callback= ref (fun ()->())
 
@@ -134,6 +123,7 @@ let get_test_string id  = Learnocaml_local_storage.(retrieve (editor_state id)).
                                                   
 let get_id_question id = let test_list = get_test_liste id  in let all_id = StringMap.bindings test_list in redondance (listFst all_id)
 let get_ty id idQuestion= let test_list = get_test_liste id in StringMap.(find idQuestion test_list).ty
+let get_name_question id idQuestion= let test_list = get_test_liste id in StringMap.(find idQuestion test_list).name                                                                       
 let get_type_question id idQuestion= let test_list = get_test_liste id in StringMap.(find idQuestion test_list).type_question
 let get_extra_alea id idQuestion= let test_list = get_test_liste id in StringMap.(find idQuestion test_list).extra_alea
 let get_input id idQuestion= let test_list = get_test_liste id in StringMap.(find idQuestion test_list).input
@@ -141,7 +131,7 @@ let get_output id idQuestion= let test_list = get_test_liste id in StringMap.(fi
 
 let rec constructListeQuest listKey id = match listKey with
   |[]->[]
-  |key::suite -> (key,(get_ty id key),(get_extra_alea id key),(get_input id key),false)::(constructListeQuest suite id)
+  |key::suite -> ((get_name_question id key),(get_ty id key),(get_extra_alea id key),(get_input id key),false)::(constructListeQuest suite id)
 
 
 
@@ -152,8 +142,8 @@ let sectionSol fct= match fct with
 |(name,typeF,nbAlea,jdt,b)->"Section
       		        	([ Text \"Function:\" ; Code \""^name^"\" ],\n"
       				^(test_fun typeF)^(testAlea nbAlea)^"\n"
-      				^(typeFct typeF name)^"\n"
-      				^jdt^" )"
+      				^(typeFct typeF name)^"\n["
+      				^jdt^"] )"
 |_->failwith "error" ;;
 
 let rec constructSectionSol listeFonction = match listeFonction with
@@ -252,45 +242,33 @@ let rec genTemplate chaine = if chaine="" then "" else
 	concatenation (genLet (decompositionSol chaine 0));;
 
 
-let manuquestion =let open Learnocaml_index in
-  {exercise_title ="manu's question";
-   exercise_kind=Problem;
-   exercise_stars=0.0;
-   exercise_short_description= Some "Voici un exemple de question"}
-;;
 
-let init ()= Learnocaml_local_storage.(store (index_state "index2"))
-    {Learnocaml_exercise_state.exos=StringMap.add "manu" manuquestion StringMap.empty;
-     mtime=gettimeofday ()};; 
+
+let id =arg "id";;
+
 
 let testhaut_init () =
-  let open Learnocaml_index in
-  Learnocaml_local_storage.init ();
-  let pct_init=None in
-    let pct_signal, pct_signal_set = React.S.create pct_init in
-              Learnocaml_local_storage.(listener (index_state "index2")) :=
-                Some (fun _-> pct_signal_set None) ;
+  
+
        
-  let ()=
-  match Learnocaml_local_storage.(retrieve (index_state "index2")) with
-  |exception Not_found -> init ()
-  |_->() 
-  in  
-    Server_caller.fetch_test_index () >>= fun index ->  
+   
+    fetch_test_index id >>= fun index ->  
   let content_div = find_component "learnocaml-exo-testhaut-pane" in
-  let format_exercise_list all_exercise_states =
-    let rec format_contents lvl acc contents =
+  let format_question_list all_question_states =
+    let  format_contents acc contents =
       let open Tyxml_js.Html5 in
-      match contents with
-      | Learnocaml_exercises exercises ->
-          StringMap.fold
-            (fun exercise_id { exercise_kind ;
-                               exercise_title ;
-                               exercise_short_description ;
-                               exercise_stars } acc ->  
+            
+          StringMap.fold 
+            (fun question_id {name;
+                               ty ;
+                               type_question ;
+                               input;
+                               output;
+                               extra_alea
+                                } acc ->  
               
               (div ~a:[a_id ("button_delete")] [
-                  let button =button ~a:[a_id exercise_id]  [img ~src:("icons/icon_cleanup_dark.svg") ~alt:"" () ; pcdata "" ]in 
+                  let button =button ~a:[a_id question_id]  [img ~src:("icons/icon_cleanup_dark.svg") ~alt:"" () ; pcdata "" ]in 
                    Manip.Ev.onclick button
                    (fun _ ->
                      begin
@@ -302,14 +280,9 @@ let testhaut_init () =
                                                        hide_loading ~id:"learnocaml-main-loading" () ; true) ;
                          let btn_yes = Tyxml_js.Html5.(button [ pcdata "Yes" ]) in
                          Manip.Ev.onclick btn_yes (fun _ ->
-                             let rmv=
-                               match Learnocaml_local_storage.(retrieve (index_state "index")) with
-                               |{Learnocaml_exercise_state.exos ;mtime}-> exos
-                             in
-                             let exos = StringMap.remove exercise_id rmv in
-                             let index = {Learnocaml_exercise_state.exos; mtime = gettimeofday ()} in
-                             Learnocaml_local_storage.(store (index_state "index")) index;
-                             Learnocaml_local_storage.(delete (editor_state exercise_id));
+                             let rmv= get_testhaut id in                            
+                             let testhaut = StringMap.remove question_id rmv in
+                             save_testhaut testhaut id ; 
                              Dom_html.window##.location##reload ; true) ;
                          let div =
                            Tyxml_js.Html5.(div ~a: [ a_class [ "dialog" ] ]
@@ -326,37 +299,30 @@ let testhaut_init () =
                         end ;
                       true) ;button
                 ] ) ::
-              a ~a:[ a_href ("editor.html#id="^exercise_id^"&action=open") ; 
+              a ~a:[ a_href ("test.html#id="^id^"&ïd_question="^question_id^"&action=open") ; 
                      a_class [ "exercise" ] ] [
                   div ~a:[ a_class [ "descr" ] ] [
-                  h1 [ pcdata exercise_title ] ;
-                  p [ match exercise_short_description with
-                      | None -> pcdata "No description available."
-                      | Some text -> pcdata text ] ;
+                  h1 [ pcdata name ] ;
+                  p [   pcdata ty ] ;
                     ]          
               ] ::
               acc)
-            exercises acc
-      | Groups groups ->
-          let h = match lvl with 1 -> h1 | 2 -> h2 | _ -> h3 in
-          StringMap.fold
-            (fun _ { group_title ; group_contents } acc ->
-               format_contents (succ lvl)
-                 (h ~a:[ a_class [ "pack" ] ] [ pcdata group_title ] :: acc)
-                 group_contents)
-            groups acc in
+             contents acc
+    in
+  
+  
      let open Tyxml_js.Html5 in
-    List.rev (format_contents 1 [a ~a:[ a_href ("new_exercise.html#&action=open") ; 
+     List.rev (format_contents  [a ~a:[ a_href ("test.html#id="^id^"&action=open") ; 
         a_class [ "exercise" ] ] [
       div ~a:[ a_class [ "descr" ] ] [
         h1 [ pcdata "New question" ];
         p [pcdata "Create a new question"];];
-      ]] index) in
+      ]] index) in 
   let list_div =
    Tyxml_js.Html5.(div ~a: [Tyxml_js.Html5.a_id "learnocaml-main-exercise-list" ])
-      (format_exercise_list Learnocaml_local_storage.(retrieve all_exercise_states)) in
+      (format_question_list index) in
   Dom.appendChild (Tyxml_js.To_dom.of_div content_div) (Tyxml_js.To_dom.of_div list_div ) ;
-  Lwt.return_unit;;
+  Lwt.return_unit;; 
    
 
 let init_tabs, select_tab =
@@ -615,7 +581,8 @@ let () =
       Learnocaml_local_storage.(store (editor_state id)) nvexo;
       Manip.disable
         (find_component ("learnocaml-exo-button-testhaut")) ;
-      select_tab "test.ml";
+      Ace.set_contents ace_t  (get_testml id);
+      select_tab "test";
       Lwt.return ()
   end ;  
   (* ---- template pane --------------------------------------------------- *)

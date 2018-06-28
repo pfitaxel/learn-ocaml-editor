@@ -261,9 +261,9 @@ let testhaut_init () =
                                output;
                                extra_alea
                                 } acc ->  
-             (* match question_id with
-                "0" -> []
-              | _ ->*)
+              match question_id with
+                "0" -> acc
+              | _ ->
               
               (div ~a:[a_id ("button_delete")] [
                   let button = button ~a:[a_id question_id]
@@ -302,7 +302,7 @@ let testhaut_init () =
                      a_class [ "exercise" ] ] [
                   div ~a:[ a_class [ "descr" ] ] [
                   h1 [ pcdata name ] ;
-                  p [   pcdata ty ] ;
+                  p [ pcdata ty ] ;
                     ]          
               ] ::
               acc)

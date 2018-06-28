@@ -1,5 +1,7 @@
 open Learnocaml_exercise_state
-
+module StringMap=Map.Make(String)
+open Learnocaml_common
+              
 let get_titre id = Learnocaml_local_storage.(retrieve (editor_state id)).titre
 
 let get_diff id = Learnocaml_local_storage.(retrieve (editor_state id)).diff
@@ -11,11 +13,19 @@ let get_testhaut id = Learnocaml_local_storage.(retrieve (editor_state id)).test
 let get_prelude id = Learnocaml_local_storage.(retrieve (editor_state id)).prelude
 let get_prepare id = Learnocaml_local_storage.(retrieve (editor_state id)).prepare
                        
-module StringMap=Map.Make(String)
+let get_test_liste id = Learnocaml_local_storage.(retrieve (editor_state id)).test.testhaut
+let get_test_string id  = Learnocaml_local_storage.(retrieve (editor_state id)).test.testml                             
+
+let get_ty id idQuestion= let test_list = get_test_liste id in StringMap.(find idQuestion test_list).ty
+let get_name_question id idQuestion= let test_list = get_test_liste id in StringMap.(find idQuestion test_list).name                                                                       
+let get_type_question id idQuestion= let test_list = get_test_liste id in StringMap.(find idQuestion test_list).type_question
+let get_extra_alea id idQuestion= let test_list = get_test_liste id in StringMap.(find idQuestion test_list).extra_alea
+let get_input id idQuestion= let test_list = get_test_liste id in StringMap.(find idQuestion test_list).input
+let get_output id idQuestion= let test_list = get_test_liste id in StringMap.(find idQuestion test_list).output
     
 let ajout_question testhaut question id =StringMap.add id question testhaut;; 
 
-open Learnocaml_common
+
 
 let save_testhaut testhaut id =
   match Learnocaml_local_storage.(retrieve (editor_state id) ) with

@@ -116,19 +116,8 @@ let init = "let () =
                   
 (*il faut recuperer la liste des questions dans le local storage et pour chaque questions recuperer ses informations *)
 
-let get_test_liste id = Learnocaml_local_storage.(retrieve (editor_state id)).test.testhaut
-let get_test_string id  = Learnocaml_local_storage.(retrieve (editor_state id)).test.testml                             
-
-                                                  
-                                                  
 let get_id_question id = let test_list = get_test_liste id  in let all_id = StringMap.bindings test_list in redondance (listFst all_id)
-let get_ty id idQuestion= let test_list = get_test_liste id in StringMap.(find idQuestion test_list).ty
-let get_name_question id idQuestion= let test_list = get_test_liste id in StringMap.(find idQuestion test_list).name                                                                       
-let get_type_question id idQuestion= let test_list = get_test_liste id in StringMap.(find idQuestion test_list).type_question
-let get_extra_alea id idQuestion= let test_list = get_test_liste id in StringMap.(find idQuestion test_list).extra_alea
-let get_input id idQuestion= let test_list = get_test_liste id in StringMap.(find idQuestion test_list).input
-let get_output id idQuestion= let test_list = get_test_liste id in StringMap.(find idQuestion test_list).output                                                 
-
+                                                
 let rec constructListeQuest listKey id = match listKey with
   |[]->[]
   |key::suite -> ((get_name_question id key),(get_ty id key),(get_extra_alea id key),(get_input id key),false)::(constructListeQuest suite id)
@@ -157,89 +146,180 @@ let constructFinalSol listeFonction =
 
 
 
+(*_________________________Fonctions pour le bouton Generate______________________________________*)
 
+let string_of_char ch = String.make 1 ch ;;
+
+let rec concatenation listech = match listech with
+  |[]->""
+  |c::l -> (string_of_char c)^(concatenation l);;
+
+
+let rec supprRec listeChar = match listeChar with
+  |[]->[]
+  |'='::l->['=']
+  |' '::'r'::'e'::'c'::' '::l->' '::supprRec l
+  |'\n'::'r'::'e'::'c'::' '::l->' '::supprRec l
+  |c::s -> c::supprRec s ;;
+
+let rec trouver_egal listeChar = match listeChar with
+  |[]->[]
+  |'='::l -> ['=']
+  |ch::suite -> ch :: (trouver_egal suite) ;;
+
+let rec trouver_nom listeChar nom = match listeChar with
+  |[]->nom
+  |' '::suite-> trouver_nom suite nom
+  |ch::' '::suite -> if (ch<>' ') then nom@[ch] else trouver_nom suite nom
+  |ch::suite -> trouver_nom suite (nom@[ch]) ;;
+
+
+let rec get_reste listeChar = match listeChar with
+  |[]-> []
+  |' '::suite -> get_reste suite
+  |ch::' '::suite ->  if (ch=' ') then get_reste suite else ' '::suite
+  |ch::suite -> get_reste suite ;;
+
+let rec suppr_let listeChar = match listeChar with
+  |[]->[]
+  |' '::'l'::'e'::'t'::' '::suite -> suite
+  |'\n'::'l'::'e'::'t'::' '::suite -> suite
+  |ch::suite -> suppr_let suite ;;
+
+let rec get_let listeChar = match listeChar with
+  |[]->[]
+  |' '::'l'::'e'::'t'::' '::suite -> trouver_egal suite
+  |'\n'::'l'::'e'::'t'::' '::suite -> trouver_egal suite
+  |ch::suite -> get_let suite ;;
+
+
+let rec get_args listeChar nbArgs = match listeChar with
+  |[]->nbArgs
+  |'='::suite -> nbArgs
+  |' '::suite -> get_args suite nbArgs
+  |ch::' '::suite -> get_args suite (nbArgs+1)
+  |ch::'='::suite -> nbArgs+1
+  |ch::suite -> get_args suite nbArgs ;;
+
+let rec get_fct listeChar listeRes = match listeChar with
+  |[] -> listeRes
+  |_ -> if (get_let listeChar)<>[] then (get_fct (suppr_let listeChar) (listeRes@[get_let listeChar]))
+        else listeRes;;
+
+let rec genQuestions listeDeListeChar res = match listeDeListeChar with
+  |[]->res
+  |l::suite -> genQuestions suite (res@[concatenation (trouver_nom l []),(get_args (get_reste l) 0)]) ;;
+
+let rec gen_ty nbArgs =  match nbArgs with
+  |0 -> "..."
+  |_ -> "... -> "^(gen_ty (nbArgs-1)) ;;
+
+
+let compute_question_id test_haut =
+  let key_list =List.map (fun (a,b)->int_of_string a) (StringMap.bindings test_haut) in
+  let mi coulvois =
+    let rec aux c n=match c with
+        []->n
+       |x::l->if x<>n then aux l n else aux coulvois (n+1)
+    in aux coulvois 1
+  in string_of_int (mi key_list) ;;
+
+    (*chacun des couples est sauvegarder dans le local storage*)
+let rec save_quest listeQuestions id = match listeQuestions with
+  |[]->()
+  |(nom,nbArgs)::suite ->
+    let name = nom in
+    let ty= gen_ty nbArgs in
+    let type_question = Solution in
+    let input = "" in
+    let output = "" in
+    let extra_alea = 0 in
+    let question = {name ; ty ; type_question ; input ; output ; extra_alea} in
+    let testhaut =  get_testhaut id in
+    let question_id = match arg "questionid" with
+      |exception Not_found ->compute_question_id testhaut
+      |qid->qid
+    in
+    let testhaut = StringMap.add question_id question testhaut in
+    save_testhaut testhaut id ;
+    save_quest suite id;;
 
 
 
                                                                                            
 (*_________________________Fonctions pour generer le template_____________________________________*)                             
-let string_of_char ch = String.make 1 ch ;;
 
 let failchar = [' ';'f';'a';'i';'l';'w';'i';'t';'h';' ';'"';'T';'O';'D';'O';'"';'\n'] ;;
 
 let tail l = match l with
-|[]->[]
-|e::l->l ;;
-
-let rec concatenation listech = match listech with
-|[]->""
-|c::l -> (string_of_char c)^(concatenation l);;
+  |[]->[]
+  |e::l->l ;;
 
 let rec decompositionSol str n = 
-if (n+1= String.length str) then [(str.[n])]
-else ( (str.[n])::(decompositionSol str (n+1)) );;
+  if (n+1= String.length str) then [(str.[n])]
+  else ( (str.[n])::(decompositionSol str (n+1)) );;
 
 let rec commentaire listech cpt = match listech with
-|[]->[]
-|'*'::')'::l -> if cpt = 0 then l else commentaire l (cpt-1)
-|'('::'*'::l -> commentaire l (cpt+1) 
-|c::l->commentaire l cpt;;
+  |[]->[]
+  |'*'::')'::l -> if cpt = 0 then l else commentaire l (cpt-1)
+  |'('::'*'::l -> commentaire l (cpt+1) 
+  |c::l->commentaire l cpt;;
 
 let rec premierLet listech = match listech with 
-|[]->[]
-|'('::'*'::l -> premierLet (commentaire l 0)
-|c::'l'::'e'::'t'::' '::l -> if (c='\n'||c=' ') then ('l'::'e'::'t'::' '::l) else premierLet l
-|'l'::'e'::'t'::' '::l -> 'l'::'e'::'t'::' '::l 
-|' '::l-> premierLet l
-|'\n'::l-> premierLet l
-|_->[];;
+  |[]->[]
+  |'('::'*'::l -> premierLet (commentaire l 0)
+  |c::'l'::'e'::'t'::' '::l -> if (c='\n'||c=' ') then ('l'::'e'::'t'::' '::l) else premierLet l
+  |'l'::'e'::'t'::' '::l -> 'l'::'e'::'t'::' '::l 
+  |' '::l-> premierLet l
+  |'\n'::l-> premierLet l
+  |_->[];;
 
 let rec validationLet listech = match listech with
-|[]->false
-|' '::l->validationLet l
-|'\n'::l->validationLet l
-|'('::l->validationLet l
-|'l'::'e'::'t'::l->false
-|_-> true
+  |[]->false
+  |' '::l->validationLet l
+  |'\n'::l->validationLet l
+  |'('::l->validationLet l
+  |'l'::'e'::'t'::l->false
+  |_-> true
 ;;
 
 let rec rechercheEgal listech = match listech with
-|[]->0
-|'='::l->1
-|' '::'l'::'e'::'t'::' '::l->2
-|'\n'::'l'::'e'::'t'::' '::l->2
-|c::l->rechercheEgal l ;;
+  |[]->0
+  |'='::l->1
+  |' '::'l'::'e'::'t'::' '::l->2
+  |'\n'::'l'::'e'::'t'::' '::l->2
+  |c::l->rechercheEgal l ;;
 
 let rec rechercheLet listech b = match listech with
-|[] -> []
-|'('::'*'::l -> rechercheLet (commentaire l 0) b
-|';'::';'::l -> rechercheLet l true
-|'='::l -> rechercheLet l (validationLet l)
-|_::'t'::'h'::'e'::'n'::_::l -> rechercheLet l (validationLet l)
-|_::'e'::'l'::'s'::'e'::_::l -> rechercheLet l (validationLet l)
-|_::'i'::'n'::_::l -> rechercheLet l (validationLet l)
-|'-'::'>'::l->rechercheLet l (validationLet l)
-|'l'::'e'::'t'::' '::l ->if b && ((rechercheEgal l)=1) then 'l'::'e'::'t'::' '::l else (if ((rechercheEgal l)=0) then rechercheLet l false else rechercheLet l true)
-|c::suite -> rechercheLet suite b
+  |[] -> []
+  |'('::'*'::l -> rechercheLet (commentaire l 0) b
+  |';'::';'::l -> rechercheLet l true
+  |'='::l -> rechercheLet l (validationLet l)
+  |_::'t'::'h'::'e'::'n'::_::l -> rechercheLet l (validationLet l)
+  |_::'e'::'l'::'s'::'e'::_::l -> rechercheLet l (validationLet l)
+  |_::'i'::'n'::_::l -> rechercheLet l (validationLet l)
+  |'-'::'>'::l->rechercheLet l (validationLet l)
+  |'l'::'e'::'t'::' '::l ->if b && ((rechercheEgal l)=1) then 'l'::'e'::'t'::' '::l else (if ((rechercheEgal l)=0) then rechercheLet l false else rechercheLet l true)
+  |c::suite -> rechercheLet suite b
 ;;
 
 let rec decomposition2 listech = match listech with
-     |[] -> []
-     |'='::l -> ['=']
-     |c::l-> c :: (decomposition2 l) ;;
+  |[] -> []
+  |'='::l -> ['=']
+  |c::l-> c :: (decomposition2 l) ;;
 
 let decompoFirst listech = match listech with
-|[]-> []
-|_->(decomposition2 listech)@failchar ;;
+  |[]-> []
+  |_->(decomposition2 listech)@failchar ;;
 
 let rec genLet listech =
-	let liste = rechercheLet listech true in
-	match liste with
-	|[]->[]
-	|_-> (decomposition2 liste)@failchar@(genLet (tail liste)) ;;
+  let liste = rechercheLet listech true in
+  match liste with
+  |[]->[]
+  |_-> (decomposition2 liste)@failchar@(genLet (tail liste)) ;;
 
 let rec genTemplate chaine = if chaine="" then "" else
-	concatenation (genLet (decompositionSol chaine 0));;
+	                       concatenation (genLet (decompositionSol chaine 0));;
 
 
 
@@ -299,7 +379,7 @@ let testhaut_init () =
                         end ;
                       true) ;button
                 ] ) ::
-              a ~a:[ a_href ("test.html#id="^id^"&id_question="^question_id^"&action=open") ; 
+              a ~a:[ a_href ("test.html#id="^id^"&questionid="^question_id^"&action=open") ; 
                      a_class [ "exercise" ] ] [
                   div ~a:[ a_class [ "descr" ] ] [
                   h1 [ pcdata name ] ;
@@ -528,63 +608,7 @@ let () =
   end ;
 
 
-  (* ---- testhaut pane --------------------------------------------------- *)
-(*let editor_testhaut = find_component "learnocaml-exo-test-pane" in
-  let editor_thaut = Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div editor_test) in
-  let ace_thaut = Ocaml_mode.get_editor editor_thaut in
-  Ace.set_contents ace_thaut  (get_testml id); 
-  Ace.set_font_size ace_t 18;
-*)
-   (* let typecheck set_class =
-    Learnocaml_toplevel.check top (Ace.get_contents ace_t) >>= fun res ->
-    let error, warnings =
-      match res with
-      | Toploop_results.Ok ((), warnings) -> None, warnings
-      | Toploop_results.Error (err, warnings) -> Some err, warnings in
-    let transl_loc { Toploop_results.loc_start ; loc_end } =
-      { Ocaml_mode.loc_start ; loc_end } in
-    let error = match error with
-      | None -> None
-      | Some { Toploop_results.locs ; msg ; if_highlight } ->
-          Some { Ocaml_mode.locs = List.map transl_loc locs ;
-                 msg = (if if_highlight <> "" then if_highlight else msg) } in
-    let warnings =
-      List.map
-        (fun { Toploop_results.locs ; msg ; if_highlight } ->
-           { Ocaml_mode.loc = transl_loc (List.hd locs) ;
-             msg = (if if_highlight <> "" then if_highlight else msg) })
-        warnings in
-    Ocaml_mode.report_error ~set_class editor_t error warnings  >>= fun () ->
-    Ace.focus ace_t ;
-    Lwt.return () in *)
-  let _ =testhaut_init () in ();
-  begin testhaut_button
-      ~group: toplevel_buttons_group
-      ~icon: "sync" "Generate" @@ fun () ->
-    Lwt.return () 
-  end ;                             
-  begin testhaut_button
-      ~group: toplevel_buttons_group
-      ~icon: "typecheck" "Check" @@ fun () ->
-    Lwt.return ()
-  end ;
-  begin testhaut_button
-      ~group: toplevel_buttons_group
-      ~icon: "run" "Compile" @@ fun () ->
-    let listeFonction = constructListeQuest (get_id_question id) id in
-    let tests = constructFinalSol listeFonction in 
-    match Learnocaml_local_storage.(retrieve (editor_state id) ) with
-    |{id;titre;prepare;diff;solution;question;template;test;prelude;mtime}->
-      let mtime=gettimeofday () in
-      let test ={testml=tests;testhaut=test.testhaut} in
-      let nvexo= {id;titre;prepare;diff;solution;question;template;test;prelude;mtime} in    
-      Learnocaml_local_storage.(store (editor_state id)) nvexo;
-      Manip.disable
-        (find_component ("learnocaml-exo-button-testhaut")) ;
-      Ace.set_contents ace_t  (get_testml id);
-      select_tab "test";
-      Lwt.return ()
-  end ;  
+
   (* ---- template pane --------------------------------------------------- *)
   let editor_template = find_component "learnocaml-exo-template-pane" in
   let editor_temp = Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div editor_template) in
@@ -873,6 +897,73 @@ let onload () =
     Learnocaml_toplevel.execute_phrase top (Ace.get_contents ace) >>= fun _ ->
     Lwt.return ()
   end ;
+
+
+  (* ---- testhaut pane --------------------------------------------------- *)
+(*let editor_testhaut = find_component "learnocaml-exo-test-pane" in
+  let editor_thaut = Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div editor_test) in
+  let ace_thaut = Ocaml_mode.get_editor editor_thaut in
+  Ace.set_contents ace_thaut  (get_testml id); 
+  Ace.set_font_size ace_t 18;
+*)
+   (* let typecheck set_class =
+    Learnocaml_toplevel.check top (Ace.get_contents ace_t) >>= fun res ->
+    let error, warnings =
+      match res with
+      | Toploop_results.Ok ((), warnings) -> None, warnings
+      | Toploop_results.Error (err, warnings) -> Some err, warnings in
+    let transl_loc { Toploop_results.loc_start ; loc_end } =
+      { Ocaml_mode.loc_start ; loc_end } in
+    let error = match error with
+      | None -> None
+      | Some { Toploop_results.locs ; msg ; if_highlight } ->
+          Some { Ocaml_mode.locs = List.map transl_loc locs ;
+                 msg = (if if_highlight <> "" then if_highlight else msg) } in
+    let warnings =
+      List.map
+        (fun { Toploop_results.locs ; msg ; if_highlight } ->
+           { Ocaml_mode.loc = transl_loc (List.hd locs) ;
+             msg = (if if_highlight <> "" then if_highlight else msg) })
+        warnings in
+    Ocaml_mode.report_error ~set_class editor_t error warnings  >>= fun () ->
+    Ace.focus ace_t ;
+    Lwt.return () in *)
+  let _ =testhaut_init () in ();
+  begin testhaut_button
+      ~group: toplevel_buttons_group
+      ~icon: "sync" "Generate" @@ fun () ->
+    let sol = genTemplate (Ace.get_contents ace) in
+    let listeChars = supprRec (' '::(decompositionSol sol 0)) in
+    (*genQuestions (get_fct (supprRec (' '::(decompositionSol a 0))) [[]]) []*)
+    save_quest (genQuestions (get_fct listeChars []) []) id ;
+    Lwt.return () 
+  end ;                             
+  begin testhaut_button
+      ~group: toplevel_buttons_group
+      ~icon: "typecheck" "Check" @@ fun () ->
+    Lwt.return ()
+  end ;
+  begin testhaut_button
+      ~group: toplevel_buttons_group
+      ~icon: "run" "Compile" @@ fun () ->
+    let listeFonction = constructListeQuest (get_id_question id) id in
+    let tests = constructFinalSol listeFonction in 
+    match Learnocaml_local_storage.(retrieve (editor_state id) ) with
+    |{id;titre;prepare;diff;solution;question;template;test;prelude;mtime}->
+      let mtime=gettimeofday () in
+      let test ={testml=tests;testhaut=test.testhaut} in
+      let nvexo= {id;titre;prepare;diff;solution;question;template;test;prelude;mtime} in    
+      Learnocaml_local_storage.(store (editor_state id)) nvexo;
+      Manip.disable
+        (find_component ("learnocaml-exo-button-testhaut")) ;
+      Ace.set_contents ace_t  (get_testml id);
+      select_tab "test";
+      Lwt.return ()
+  end ;
+
+
+
+  
   (* ---- main toolbar -------------------------------------------------- *)
   let exo_toolbar = find_component "learnocaml-exo-toolbar" in
   let toolbar_button = button ~container: exo_toolbar ~theme: "light" in

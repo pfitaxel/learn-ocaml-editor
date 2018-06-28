@@ -1,7 +1,7 @@
 body{
   background: #eee;
 }
-#title{
+#page_title{
   text-align: center;
   font-size: 25px;
   line-height: 50px; 
@@ -76,7 +76,7 @@ position: absolute;
 	text-align: center;
 }
 #learnocaml-test {
-  left: 0px; top:110px; right: 0px; bottom: 65%;
+  left: 0px; top:110px; right: 0px; bottom: 60%;
 }
 #learnocaml-tab-name{
   padding: 5px;text-align:center;
@@ -95,7 +95,7 @@ position: absolute;
   opacity: 1;
 }
 #learnocaml-tabs {
-  left: 0px; top:35%; right: 0px; bottom: 0px;
+  left: 0px; top:40%; right: 0px; bottom: 0px;
 }
 
 #learnocaml-tabs > * {

@@ -187,7 +187,7 @@ let editor_tab _ _ () =
                              Dom_html.window##.location##reload ; true) ;
                          let div =
                            Tyxml_js.Html5.(div ~a: [ a_class [ "dialog" ] ]
-                                             [ pcdata [%i"Are you sure you want to delete the exercise?\n"] ;
+                                             [ pcdata [%i"Are you sure you want to delete this exercise?\n"] ;
                                                btn_yes ;
                                                pcdata " " ;
                                                btn_no ]) in

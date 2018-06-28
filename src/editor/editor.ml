@@ -274,10 +274,10 @@ let testhaut_init () =
                        let messages = Tyxml_js.Html5.ul [] in
                        let aborted, abort_message =
                          let t, u = Lwt.task () in
-                         let btn_no = Tyxml_js.Html5.(button [ pcdata "No" ]) in
+                         let btn_no = Tyxml_js.Html5.(button [ pcdata [%i"No"] ]) in
                          Manip.Ev.onclick btn_no (fun _ ->
                                                   hide_loading ~id:"learnocaml-main-loading" () ; true) ;
-                         let btn_yes = Tyxml_js.Html5.(button [ pcdata "Yes" ]) in
+                         let btn_yes = Tyxml_js.Html5.(button [ pcdata [%i"Yes"] ]) in
                          Manip.Ev.onclick btn_yes (fun _ ->
                              let rmv= get_testhaut id in                            
                              let testhaut = StringMap.remove question_id rmv in
@@ -285,7 +285,7 @@ let testhaut_init () =
                              Dom_html.window##.location##reload ; true) ;
                          let div =
                            Tyxml_js.Html5.(div ~a: [ a_class [ "dialog" ] ]
-                                             [ pcdata "Are you sure you want to delete this question ?\n" ;
+                                             [ pcdata [%i"Are you sure you want to delete this question?\n"] ;
                                                btn_yes ;
                                                pcdata " " ;
                                                btn_no ]) in
@@ -312,8 +312,8 @@ let testhaut_init () =
      List.rev (format_contents  [a ~a:[ a_href ("test.html#id="^id^"&action=open") ; 
         a_class [ "exercise" ] ] [
       div ~a:[ a_class [ "descr" ] ] [
-        h1 [ pcdata "New question" ];
-        p [pcdata "Create a new question"];];
+        h1 [ pcdata [%i"New question"] ];
+        p [ pcdata [%i"Create a new question"] ];];
       ]] index) in 
   let list_div =
    Tyxml_js.Html5.(div ~a: [Tyxml_js.Html5.a_id "learnocaml-main-exercise-list" ])
@@ -404,6 +404,7 @@ let set_string_translations () =
   "learnocaml-exo-button-toplevel", [%i"Toplevel"];
   "learnocaml-exo-button-question", [%i"Question"];
   "learnocaml-exo-button-test", [%i"Test.ml"];
+  "learnocaml-exo-button-testhaut", [%i"Test"];
   "learnocaml-exo-button-report", [%i"Report"];
   "learnocaml-exo-editor-pane", [%i"Editor"];
   "learnocaml-exo-tab-report", [%i"Click the Grade! button to test your solution"];
@@ -421,6 +422,7 @@ let set_string_translations_titles () =
   "learnocaml-exo-button-prepare", [%i"Type here hidden definitions given to the student"];
   "learnocaml-exo-button-question", [%i"Type here the wording of the exercise in Markdown"];
   "learnocaml-exo-button-test", [%i"Type here the tests sets code"];
+  "learnocaml-exo-button-testhaut", [%i"Generate here the tests set code"];
   ] in
   List.iter
   (fun (id, text) -> Manip.setTitle (find_component id) text)
@@ -433,6 +435,7 @@ let set_lang () =
 		match Js.Optdef.to_option (Dom_html.window##.navigator##.userLanguage) with
 		| Some l -> Ocplib_i18n.set_lang (Js.to_string l)
 		| None -> ()
+
 let () =
   Lwt.async_exception_hook := begin function
     | Failure message -> fatal message
@@ -623,17 +626,17 @@ let () =
     let _ = testhaut_init () in ();
   begin testhaut_button
       ~group: toplevel_buttons_group
-      ~icon: "sync" "Generate" @@ fun () ->
+      ~icon: "sync" [%i"Generate"] @@ fun () ->
     Lwt.return () 
   end ;
   begin testhaut_button
       ~group: toplevel_buttons_group
-      ~icon: "typecheck" "Check" @@ fun () ->
+      ~icon: "typecheck" [%i"Check"] @@ fun () ->
     Lwt.return ()
   end ;
   begin testhaut_button
       ~group: toplevel_buttons_group
-      ~icon: "run" "Compile" @@ fun () ->
+      ~icon: "run" [%i"Compile"] @@ fun () ->
     let listeFonction = constructListeQuest (get_id_question id) id in
     let tests = constructFinalSol listeFonction in 
     match Learnocaml_local_storage.(retrieve (editor_state id) ) with

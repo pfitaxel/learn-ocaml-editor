@@ -42,7 +42,9 @@
         <span>Learn OCaml</span>
         <img src="icons/logo_ocp.svg">
       </div>
-      <input type="submit" id="save" name="save" value="Save"></input>
+      <div class="save">
+    	<button id="save" type="submit">Save</button>
+      </div>
       <!--<div id="learnocaml-test-toolbar" class="buttons"></div>-->
     </div>
     <div id="page_title">
@@ -72,11 +74,11 @@
     <div id="learnocaml-tabs">
       <div id="learnocaml-tab-solution">
 	<div id="learnocaml-tab-solution-input">
-	  <label id="txt_input_tests" for="sol-tests">Input tests:<br></label>
+	  <label id="txt_input_tests_sol" for="sol-tests">Input tests:<br></label>
 	  <textarea id="sol-tests" name="tests" value="" cols="25" rows="10"></textarea>
 	</div>
 	<div id="learnocaml-tab-solution-extra">
-	  <label id="txt_gen" for="sol-gen">Extra alea:<br></label>
+	  <label id="txt_gen_sol" for="sol-gen">Extra alea:<br></label>
 	  <input type="number" name="gen" id="sol-gen" value="0" step="1" min="0" max="20">
 	  </input>
 	</div>
@@ -84,11 +86,11 @@
       
       <div id="learnocaml-tab-spec">
 	<div id="learnocaml-tab-spec-input">
-	  <label id="txt_input_tests" for="spec-tests">Input tests:<br></label>
+	  <label id="txt_input_tests_spec" for="spec-tests">Input tests:<br></label>
 	  <textarea id="spec-tests" name="tests" value="" cols="25" rows="10"></textarea>
 	</div>
 	<div id="learnocaml-tab-spec-extra">
-	  <label id="txt_gen" for="spec-gen">Extra alea:<br></label>
+	  <label id="txt_gen_spec" for="spec-gen">Extra alea:<br></label>
 	  <input type="number" name="gen" id="spec-gen" value="0" step="1" min="0" max="20">
 	  </input>
 	</div>

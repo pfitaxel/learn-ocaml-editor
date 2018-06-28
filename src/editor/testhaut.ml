@@ -8,6 +8,36 @@ open Learnocaml_common
 module StringMap = Map.Make (String)
 
 
+let set_string_translations () =
+  let translations = [
+  "save", [%i"Save"];
+  "txt_test", [%i"Test"];
+  "txt_name", [%i"Name: "];
+  "txt_ty", [%i"Type: "];
+  "txt_sol", [%i"Solution"];
+  "txt_spec", [%i"Specification"];
+  "txt_suite", [%i"Suite"];
+  "txt_input_tests_sol", [%i"Input tests:<br>"];
+  "txt_gen_sol", [%i"Extra alea:<br>"];
+  "txt_input_tests_spec", [%i"Input tests:<br>"];
+  "txt_gen_spec", [%i"Extra alea:<br>"];
+  "txt_specification", [%i"Specification:<br>"];
+  "txt_input", [%i"Input:<br>"];
+  "txt_output", [%i"Output:<br>"];
+  ] in
+  List.iter
+  (fun (id, text) -> Manip.setInnerHtml (find_component id) text)
+  translations
+
+let set_lang () =
+  match Js.Optdef.to_option (Dom_html.window##.navigator##.language) with
+  | Some l -> Ocplib_i18n.set_lang (Js.to_string l)
+  | None ->
+    match Js.Optdef.to_option (Dom_html.window##.navigator##.userLanguage) with
+    | Some l -> Ocplib_i18n.set_lang (Js.to_string l)
+    | None -> ()
+
+
 let init_tabs, select_tab =
   let names = [ "solution"; "spec"; "suite" ] in
   let current = ref "suite" in
@@ -37,10 +67,10 @@ let init_tabs, select_tab =
 
 let id = arg "id";;               
 let name = match getElementById_coerce "name" CoerceTo.input with
-    None -> failwith "element name inconnu"
+    None -> failwith "unknown element name"
    |Some s -> s;;
 let ty = match getElementById_coerce "ty" CoerceTo.input with
-    None -> failwith "element ty inconnu"
+    None -> failwith "unknown element ty"
    |Some s -> s;;
 let solution = getElementById "solution";;
 let spec = getElementById "spec";;
@@ -51,28 +81,28 @@ let suite = match getElementById_coerce "suite" CoerceTo.input with
 
 
 let solutionInput = match getElementById_coerce "sol-tests" CoerceTo.textarea with
-    None -> failwith "element solutionInput inconnu"
+    None -> failwith "unknown element solutionInput"
   | Some s -> s;;
 let extraAleaSol =match getElementById_coerce "sol-gen" CoerceTo.input with
-    None -> failwith "element extraAleaSol inconnu"
+    None -> failwith "unknown element extraAleaSol"
   | Some s -> s;;
 
 let specInput = match getElementById_coerce "spec-tests" CoerceTo.textarea with
-    None -> failwith "element specInput inconnu"
+    None -> failwith "unknown element specInput"
   | Some s -> s;;
 
 let extraAleaSpec = match getElementById_coerce "spec-gen" CoerceTo.input with
-    None -> failwith "element extraAleaSpec inconnu"
+    None -> failwith "unknown element extraAleaSpec"
   | Some s -> s;;
 let specif = match getElementById_coerce "specif" CoerceTo.textarea with
-    None -> failwith "element spec inconnu"
+    None -> failwith "unknown element spec"
   | Some s -> s;;
 
 let input_suite = match getElementById_coerce "input" CoerceTo.textarea with
-    None -> failwith "element input_suite inconnu"
+    None -> failwith "unknown element input_suite"
   | Some s -> s;;
 let output_suite = match getElementById_coerce "output" CoerceTo.textarea with
-    None -> failwith "element output_suite inconnu"
+    None -> failwith "unknown element output_suite"
   | Some s -> s;;
 
 let save = getElementById "save";;
@@ -172,3 +202,6 @@ let _ = save##.onclick:= handler (fun _ ->
         (Js.string ("editor.html#id=" ^ id ^ "&action=open"))
      end;
    Js._true)
+
+let _ = set_lang ()
+let _ = set_string_translations ()

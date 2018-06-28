@@ -49,6 +49,10 @@ body{
     height: 40px;
     width: 100%
   }
+  #save {
+  	height: 40px;
+  	min-width: 40px;
+  }
   #learnocaml-main-toolbar::before {
     top: 41px;
   }
@@ -60,6 +64,10 @@ body{
   #learnocaml-main-toolbar {
     height: 60px;
     width: 100%;
+  }
+  #save {
+  	height: 60px;
+  	min-width: 60px;
   }
   #learnocaml-main-toolbar::before {
     top: 61px;

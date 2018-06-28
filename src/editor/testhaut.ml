@@ -135,18 +135,25 @@ let _ = spec##.onclick:= handler (fun _ -> select_tab "spec"; Js._true);;
 let _ = suite##.onclick:= handler (fun _ -> select_tab "suite"; Js._true);;
 
 
-  Manip.appendChild
+ 
 let _ = save##.onclick:= handler (fun _ ->
    if arg "tab" = "suite" then
      save_suite ();
    let window=Dom_html.window in
    let window=window##.parent in
    let document=window##.document in
-   let div=Js.Opt.case (document##getElementById (Js.string "frame_div"))
-    (fun () -> raise Not_found)
+   let div=match Js.Opt.to_option (document##getElementById (Js.string "learnocaml-exo-loading")) with
+       None-> failwith "titi"
+     |Some d -> d
+   in
+   let exo_list=Js.Opt.case (document##getElementById (Js.string "learnocaml-exo-testhaut-pane"))
+    (fun () -> failwith "toto")
     (fun pnode -> pnode)
-   in 
-   div##setAttribute (Js.string "class") (Js.string "loaded");
+   in
+   let exo_list=Tyxml_js.Of_dom.of_element exo_list in
+   Manip.removeChildren exo_list;
+   let _ =testhaut_init exo_list in ();
+   div##setAttribute (Js.string "class") (Js.string "loading-layer loaded");
 
 
                                       

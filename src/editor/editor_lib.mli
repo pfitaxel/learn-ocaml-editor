@@ -50,6 +50,8 @@ val init : string
 
 val get_id_question : string -> (Map.Make(String).key) list
 
+val suppr_id_0 : (Map.Make(String).key) list -> (Map.Make(String).key) list
+                                                       
 val constructListeQuest :  (Map.Make(String).key) list -> string -> (string * string * int * string * bool) list
 
 val sectionSol : string * string * int * string * 'a -> string

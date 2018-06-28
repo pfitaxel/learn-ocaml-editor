@@ -624,3 +624,9 @@ msgstr "Voulez-vous sauvegarder avant de fermer?\n"
 
 #~ msgid "Output:<br>"
 #~ msgstr "Sortie:<br>"
+
+#~ msgid "New question"
+#~ msgstr "Nouvelle question"
+
+#~ msgid "Create a new question"
+#~ msgstr "Créer une nouvelle question"

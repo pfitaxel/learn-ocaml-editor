@@ -60,6 +60,10 @@ module StringMap = Map.Make (String)
                          
 let recovering_callback = ref (fun ()->())
 
+let _=testhaut_iframe##.width :=Js.string "100%";;
+let _=testhaut_iframe##.height:=Js.string "100%";;  
+
+
 
 (*_________________________Fonctions pour generer le test_____________________________________*)
 
@@ -244,10 +248,8 @@ let rec genTemplate chaine = if chaine="" then "" else
 let id =arg "id";;
 
 
-let testhaut_init () =
-  
 
-       
+let  rec testhaut_init () =       
    
     fetch_test_index id >>= fun index ->  
   let content_div = find_component "learnocaml-exo-testhaut-pane" in
@@ -279,8 +281,10 @@ let testhaut_init () =
                          Manip.Ev.onclick btn_yes (fun _ ->
                              let rmv= get_testhaut id in                            
                              let testhaut = StringMap.remove question_id rmv in
-                             save_testhaut testhaut id ; 
-                             Dom_html.window##.location##reload ; true) ;
+                             save_testhaut testhaut id ;
+                             hide_loading ~id:"learnocaml-main-loading" ();
+                             Manip.removeChildren content_div;
+                             let _ = testhaut_init () in ()  ; true) ;
                          let div =
                            Tyxml_js.Html5.(div ~a: [ a_class [ "dialog" ] ]
                                              [ pcdata "Are you sure you want to delete this question ?\n" ;
@@ -319,7 +323,18 @@ let testhaut_init () =
    Tyxml_js.Html5.(div ~a: [Tyxml_js.Html5.a_id "learnocaml-main-exercise-list" ])
       (format_question_list index) in
   Dom.appendChild (Tyxml_js.To_dom.of_div content_div) (Tyxml_js.To_dom.of_div list_div ) ;
-  Lwt.return_unit;; 
+  let open Dom_html in
+  let new_question=getElementById "new_question" in
+  new_question##.onclick:= handler (fun _ ->
+      let elt = find_div_or_append_to_body "frame_div" in
+      Manip.(addClass elt "loading-layer") ;
+      Manip.(removeClass elt "loaded") ;
+      Manip.(addClass elt "loading") ;Manip.replaceChildren elt
+        [ iframe ] ;
+      testhaut_iframe##.src:=Js.string ("test.html#id="^id^"&action=open");    
+       Manip.SetCss.opacity iframe (Some "1"); 
+      Js._true);
+     Lwt.return_unit;; 
    
 
 let init_tabs, select_tab =

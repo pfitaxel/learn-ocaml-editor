@@ -38,3 +38,8 @@ let fetch_test_index id=
     in
   try Lwt.return (Json_repr_browser.Json_encoding.destruct testhaut_enc json) with exn ->
     Lwt.fail (failwith "" )
+
+let testhaut_iframe = Dom_html.createIframe Dom_html.document ;;
+let iframe=Tyxml_js.Of_dom.of_iFrame testhaut_iframe ;;
+
+let close =ref ()

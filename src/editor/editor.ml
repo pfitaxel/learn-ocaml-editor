@@ -786,10 +786,10 @@ let onload () =
     Ocaml_mode.report_error ~set_class editor_t error warnings  >>= fun () ->
     Ace.focus ace_t ;
     Lwt.return () in *)
-  let _ =testhaut_init () in ();
+  let _ = testhaut_init () in ();
   begin testhaut_button
       ~group: toplevel_buttons_group
-      ~icon: "sync" "Generate" @@ fun () ->
+      ~icon: "sync" [%i"Generate"] @@ fun () ->
     let sol = genTemplate (Ace.get_contents ace) in
     let listeChars = supprRec (' '::(decompositionSol sol 0)) in
     save_quest (genQuestions (get_fct listeChars []) []) id ;
@@ -797,12 +797,12 @@ let onload () =
   end ;                             
   begin testhaut_button
       ~group: toplevel_buttons_group
-      ~icon: "typecheck" "Check" @@ fun () ->
+      ~icon: "typecheck" [%i"Check"] @@ fun () ->
     Lwt.return ()
   end ;
   begin testhaut_button
       ~group: toplevel_buttons_group
-      ~icon: "run" "Compile" @@ fun () ->
+      ~icon: "run" [%i"Compile"] @@ fun () ->
     let listeFonction = constructListeQuest (get_id_question id) id in
     let tests = constructFinalSol listeFonction in 
     match Learnocaml_local_storage.(retrieve (editor_state id) ) with

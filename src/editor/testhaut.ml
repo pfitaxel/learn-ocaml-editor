@@ -137,6 +137,7 @@ let ace_output_suite = Ocaml_mode.get_editor editor_output_suite
 let _ = Ace.set_contents ace_output_suite ("");
         Ace.set_font_size ace_output_suite 18;;
        
+
 let save_suite () =
   let name = Js.to_string name##.value in
   let ty = Js.to_string ty##.value in
@@ -151,9 +152,12 @@ let save_suite () =
     |qid->qid
   in
   let testhaut = StringMap.add question_id question testhaut in
-  save_testhaut testhaut id;
-  Dom_html.window##.location##assign
-    (Js.string ("editor.html#id=" ^ id ^ "&action=open"));;
+  save_testhaut testhaut id
+
+;;
+  
+
+
 
 let save_solution () =
   let name = Js.to_string name##.value in
@@ -168,9 +172,8 @@ let save_solution () =
     |exception Not_found ->compute_question_id testhaut
     |qid->qid in
   let testhaut = StringMap.add question_id question testhaut in
-  save_testhaut testhaut id;
-  Dom_html.window##.location##assign
-    (Js.string ("editor.html#id=" ^ id ^ "&action=open"))
+  save_testhaut testhaut id;;
+
   
 let save_spec () =
   let open Learnocaml_exercise_state in
@@ -187,15 +190,14 @@ let save_spec () =
     |exception Not_found ->compute_question_id testhaut
     |qid->qid in
   let testhaut = StringMap.add question_id question testhaut in
-  save_testhaut testhaut id;
-  Dom_html.window##.location##assign
-    (Js.string ("editor.html#id=" ^ id ^ "&action=open"))
+  save_testhaut testhaut id;;
     
 (* restore suite fields if they are not empty *)
     
 let _ = match arg "questionid" with
     exception Not_found -> select_tab "suite"; suite##.checked := Js.bool true
   | qid ->let testhaut=get_testhaut id in
+
           let name_elt=name in
           let ty_elt=ty in
           match StringMap.find qid testhaut with
@@ -229,16 +231,38 @@ let _ = match arg "questionid" with
                 end;;
 
 
+
 let _ = solution##.onclick:= handler (fun _ -> select_tab "solution"; Js._true);;
 let _ = spec##.onclick:= handler (fun _ -> select_tab "spec"; Js._true);;
 let _ = suite##.onclick:= handler (fun _ -> select_tab "suite"; Js._true);;
+
+
+ 
 let _ = save##.onclick:= handler (fun _ ->
    if arg "tab" = "suite" then
-     save_suite ();
+     save_suite ();  
    if arg "tab" = "solution" then
      save_solution ();
    if arg "tab" = "spec" then
      save_spec ();
+
+   let window=Dom_html.window in
+   let window=window##.parent in
+   let document=window##.document in
+      let div= Js.Opt.case (document##getElementById (Js.string "learnocaml-exo-loading"))
+          (fun ()-> failwith "titi")
+          (fun node->node)
+   in
+   let exo_list=Js.Opt.case (document##getElementById (Js.string "learnocaml-exo-testhaut-pane"))
+       (fun () -> failwith "toto")
+       (fun pnode -> pnode)
+   in
+   let exo_list=Tyxml_js.Of_dom.of_element exo_list in
+   Manip.removeChildren exo_list;
+   
+   let _ =testhaut_init exo_list id  in ();
+   div##setAttribute (Js.string "class") (Js.string "loading-layer loaded");
+   
    Js._true)
 
 let _ = set_lang ()

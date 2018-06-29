@@ -91,15 +91,14 @@ begin library "editor_lib"
   comp_requires = [ "ppx_ocplib_i18n:asm" "ppx_metaquot:asm" ]
 
   files = [
-    "editor_lib.ml" ( comp = ppx_ocplib_i18n )   
+    "editor_lib.ml" ( comp =  ppx_js  ppx_ocplib_i18n )   
   ]
   requires = [
     "ace"
     "learnocaml-repository" 
     "ocplib_i18n"
     "js_of_ocaml.ppx"
-    "learnocaml-app-common"
-    
+    "learnocaml-app-common"    
     ]
 
 end

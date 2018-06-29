@@ -1,7 +1,15 @@
 open Learnocaml_exercise_state
 module StringMap=Map.Make(String)
 open Learnocaml_common
-              
+
+let set_lang () =
+	match Js.Optdef.to_option (Dom_html.window##.navigator##.language) with
+	| Some l -> Ocplib_i18n.set_lang (Js.to_string l)
+	| None ->
+		match Js.Optdef.to_option (Dom_html.window##.navigator##.userLanguage) with
+		| Some l -> Ocplib_i18n.set_lang (Js.to_string l)
+		| None -> ()
+
 let get_titre id = Learnocaml_local_storage.(retrieve (editor_state id)).titre
 
 let get_diff id = Learnocaml_local_storage.(retrieve (editor_state id)).diff
@@ -132,11 +140,11 @@ let  rec testhaut_init content_div id =
                          let messages = Tyxml_js.Html5.ul [] in
                          let aborted, abort_message =
                            let t, u = Lwt.task () in
-                           let btn_no = Tyxml_js.Html5.(button [ pcdata "No" ]) in
+                           let btn_no = Tyxml_js.Html5.(button [ pcdata [%i"No"] ]) in
                            Manip.Ev.onclick btn_no ( fun _ ->
                                hide_load "learnocaml-main-loading" ;
                                true) ;
-                           let btn_yes = Tyxml_js.Html5.(button [ pcdata "Yes" ]) in
+                           let btn_yes = Tyxml_js.Html5.(button [ pcdata [%i"Yes"] ]) in
                            Manip.Ev.onclick btn_yes (fun _ ->
                                let rmv= get_testhaut id in                            
                                let testhaut = StringMap.remove question_id rmv in
@@ -146,7 +154,7 @@ let  rec testhaut_init content_div id =
                                let _ = testhaut_init content_div id in ()  ; true) ;
                            let div =
                              Tyxml_js.Html5.(div ~a: [ a_class [ "dialog" ] ]
-                                               [ pcdata "Are you sure you want to delete this question ?\n" ;
+                                               [ pcdata [%i"Are you sure you want to delete this question ?\n"] ;
                                                  btn_yes ;
                                                  pcdata " " ;
                                                  btn_no ]) in
@@ -191,8 +199,8 @@ let  rec testhaut_init content_div id =
             true); 
         Tyxml_js.Html5.a_class [ "exercise" ] ] [
       Tyxml_js.Html5.div ~a:[ Tyxml_js.Html5.a_class [ "descr" ] ] [
-        Tyxml_js.Html.h1 [ Tyxml_js.Html5.pcdata "New question" ];
-        Tyxml_js.Html5.p [Tyxml_js.Html5.pcdata "Create a new question"];];
+        Tyxml_js.Html.h1 [ Tyxml_js.Html5.pcdata [%i"New question"] ];
+        Tyxml_js.Html5.p [Tyxml_js.Html5.pcdata [%i"Create a new question"]];];
       ]] index) in 
   let list_div =
    Tyxml_js.Html5.(div ~a: [Tyxml_js.Html5.a_id "learnocaml-main-exercise-list" ])
@@ -435,3 +443,4 @@ let rec genLet listech =
 let rec genTemplate chaine = if chaine="" then "" else
 	                       concatenation (genLet (decompositionSol chaine 0));;
 
+let _ = set_lang ()

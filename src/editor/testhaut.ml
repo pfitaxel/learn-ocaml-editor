@@ -16,14 +16,14 @@ let set_string_translations () =
   "txt_ty", [%i"Type: "];
   "txt_sol", [%i"Solution"];
   "txt_spec", [%i"Specification"];
-  "txt_suite", [%i"Suite"];
-  "txt_input_sol", [%i"Input tests:<br>"];
-  "txt_gen_sol", [%i"Extra alea:<br>"];
-  "txt_input_spec", [%i"Input tests:<br>"];
-  "txt_gen_spec", [%i"Extra alea:<br>"];
+  "txt_suite", [%i"Tests suite"];
+  "txt_input_sol", [%i"Arguments:<br>"];
+  "txt_gen_sol", [%i"Number of generate tests:<br>"];
+  "txt_input_spec", [%i"Arguments:<br>"];
+  "txt_gen_spec", [%i"Number of generate tests:<br>"];
   "txt_spec_specification", [%i"Specification:<br>"];
-  "txt_suite_input", [%i"Input:<br>"];
-  "txt_suite_output", [%i"Output:<br>"];
+  "txt_suite_input", [%i"Arguments:<br>"];
+  "txt_suite_output", [%i"Results:<br>"];
   ] in
   List.iter
   (fun (id, text) -> Manip.setInnerHtml (find_component id) text)

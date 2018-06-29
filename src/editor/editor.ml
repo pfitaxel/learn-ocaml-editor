@@ -61,7 +61,6 @@ module StringMap = Map.Make (String)
 let recovering_callback = ref (fun ()->())
 
 
-
 let id=arg "id"
 
 
@@ -142,12 +141,12 @@ let init_tabs, select_tab =
 
 
 let display_report exo report =
-  (* let score, failed = Learnocaml_report.result_of_report report in *)
+  let score, failed = Learnocaml_report.result_of_report report in 
   let report_button = find_component "learnocaml-exo-button-report" in
   Manip.removeClass report_button "success" ;
   Manip.removeClass report_button "failure" ;
   Manip.removeClass report_button "partial" ;
-  let grade = 100 (*score * 100 /*) in
+  let grade = 100 in
   if grade >= 100 then begin
     Manip.addClass report_button "success" ;
     Manip.replaceChildren report_button
@@ -181,7 +180,7 @@ let set_string_translations () =
   "learnocaml-exo-button-testhaut", [%i"Test"];
   "learnocaml-exo-button-report", [%i"Report"];
   "learnocaml-exo-editor-pane", [%i"Editor"];
-  "learnocaml-exo-tab-report", [%i"Click the Grade! button to test your solution"];
+  "txt_grade_report", [%i"Click the Grade! button to test your solution"];
   "learnocaml-exo-test-pane", [%i"Editor"];
   ] in
   List.iter
@@ -736,8 +735,8 @@ let onload () =
                  let test ={testml=tests;testhaut=test.testhaut} in
                  let nvexo= {id;titre;prepare;diff;solution;question;template;test;prelude;mtime} in    
                  Learnocaml_local_storage.(store (editor_state id)) nvexo;
-                 Manip.disable
-                   (find_component ("learnocaml-exo-button-testhaut")) ;
+                 (*Manip.disable
+                   (find_component ("learnocaml-exo-button-testhaut")) ;*)
                  Ace.set_contents ace_t  (get_testml id);
                  select_tab "test" ; true) ;
       let div =
@@ -771,12 +770,53 @@ let onload () =
   
   begin toolbar_button
       ~icon: "upload" [%i"Experiment"] @@ fun ()->
-    recovering () ;
-     Dom_html.window##.location##assign
-        (Js.string ("exercise.html#id=." ^ id ^ "&action=open"));
+    recovering () ; 
+
+  let exo ()=
+  let titre =  get_titre id in
+  let description="" in
+  
+  let exo1= Learnocaml_exercise.set  Learnocaml_exercise.id id Learnocaml_exercise.empty in
+  let exo2= Learnocaml_exercise.set Learnocaml_exercise.title titre exo1 in
+  let exo3 =Learnocaml_exercise.set Learnocaml_exercise.max_score 1 exo2 in
+  let exo4 =Learnocaml_exercise.set Learnocaml_exercise.prepare (get_prepare id) exo3 in
+  let exo5 =Learnocaml_exercise.set Learnocaml_exercise.prelude (get_prelude id) exo4 in
+  let exo6 =Learnocaml_exercise.set Learnocaml_exercise.solution (get_solution id) exo5 in
+  let exo7 =Learnocaml_exercise.set Learnocaml_exercise.test (get_testml id) exo6 in
+  let exo8 =Learnocaml_exercise.set Learnocaml_exercise.template (get_template id) exo7 in
+  Learnocaml_exercise.set Learnocaml_exercise.descr description exo8
+  in
+    
+  let aborted, abort_message =
+     let t, u = Lwt.task () in
+     let btn = Tyxml_js.Html5.(button [ pcdata [%i"abort"] ]) in
+     Manip.Ev.onclick btn (fun _ -> Lwt.wakeup u () ; true) ;
+     let div =
+        Tyxml_js.Html5.(div ~a: [ a_class [ "dialog" ] ]
+                          [ pcdata [%i"Grading is taking a lot of time, "] ;
+                            btn ;
+                            pcdata " ?" ]) in
+     Manip.SetCss.opacity div (Some "0") ;
+     t, div in
+  let worker = ref (Grading_jsoo.get_grade (exo ())) in
+  let correction = Learnocaml_exercise.get Learnocaml_exercise.solution (exo ()) in
+    let grading = 
+      !worker correction >>= fun (report, _, _, _) ->
+      Lwt.return report in
+    let abortion =
+      Lwt_js.sleep 5. >>= fun () ->
+      Manip.SetCss.opacity abort_message (Some "1") ;
+      aborted >>= fun () ->
+      Lwt.return Learnocaml_report.[ Message ([ Text [%i"Grading aborted by user."] ], Failure) ] in
+    Lwt.pick [ grading ; abortion ] >>= fun report_correction ->
+    let score_maxi, failed2 = Learnocaml_report.result_of_report report_correction in
+    
+    Dom_html.window##.location##assign
+        (Js.string ("exercise.html#id=." ^ id ^ "&score="^(string_of_int (score_maxi))^"&action=open"));
     Lwt.return_unit
   end; 
-    
+ 
+  
   let messages = Tyxml_js.Html5.ul [] in
   begin toolbar_button
       ~icon: "list" [%i"Exercises"] @@ fun () ->

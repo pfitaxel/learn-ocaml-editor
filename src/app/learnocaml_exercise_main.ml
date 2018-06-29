@@ -66,64 +66,20 @@ let init_tabs, select_tab =
     select_tab !current in
   init_tabs, select_tab
 
-(*
-let score_maxi exo =               
-let aborted, abort_message =
-     let t, u = Lwt.task () in
-     let btn = Tyxml_js.Html5.(button [ pcdata [%i"abort"] ]) in
-     Manip.Ev.onclick btn (fun _ -> Lwt.wakeup u () ; true) ;
-     let div =
-        Tyxml_js.Html5.(div ~a: [ a_class [ "dialog" ] ]
-                          [ pcdata [%i"Grading is taking a lot of time, "] ;
-                            btn ;
-                            pcdata " ?" ]) in
-     Manip.SetCss.opacity div (Some "0") ;
-     t, div in
-  let worker = ref (Grading_jsoo.get_grade exo) in
-  let correction = Learnocaml_exercise.get Learnocaml_exercise.solution exo in
-    let grading = 
-      !worker correction >>= fun (report, _, _, _) ->
-      Lwt.return report in
-    let abortion =
-      Lwt_js.sleep 5. >>= fun () ->
-      Manip.SetCss.opacity abort_message (Some "1") ;
-      aborted >>= fun () ->
-      Lwt.return Learnocaml_report.[ Message ([ Text [%i"Grading aborted by user."] ], Failure) ] in
-    Lwt.pick [ grading ; abortion ] >>= fun report_correction ->
-    let r,f = Learnocaml_report.result_of_report report_correction in let q = ref_grade = ref r in Lwt.return r  ;;
- *)
-
-
 let display_report exo report =
-  let aborted, abort_message =
-     let t, u = Lwt.task () in
-     let btn = Tyxml_js.Html5.(button [ pcdata [%i"abort"] ]) in
-     Manip.Ev.onclick btn (fun _ -> Lwt.wakeup u () ; true) ;
-     let div =
-        Tyxml_js.Html5.(div ~a: [ a_class [ "dialog" ] ]
-                          [ pcdata [%i"Grading is taking a lot of time, "] ;
-                            btn ;
-                            pcdata " ?" ]) in
-     Manip.SetCss.opacity div (Some "0") ;
-     t, div in
-  let worker = ref (Grading_jsoo.get_grade exo) in
-  let correction = Learnocaml_exercise.get Learnocaml_exercise.solution exo in
-    let grading = 
-      !worker correction >>= fun (report, _, _, _) ->
-      Lwt.return report in
-    let abortion =
-      Lwt_js.sleep 5. >>= fun () ->
-      Manip.SetCss.opacity abort_message (Some "1") ;
-      aborted >>= fun () ->
-      Lwt.return Learnocaml_report.[ Message ([ Text [%i"Grading aborted by user."] ], Failure) ] in
-    Lwt.pick [ grading ; abortion ] >>= fun report_correction ->
-    let score_maxi, failed2 = Learnocaml_report.result_of_report report_correction in
+  let transResultOption = function
+    |None -> false
+    |Some s-> true in
+  let idEditor s = transResultOption (Regexp.string_match (Regexp.regexp "^[.]+") s 0) in
+  let id = arg "id" in
+  let score_maxi =if idEditor id then int_of_string (arg "score") else (Learnocaml_exercise.(get max_score) exo) in
+
   let score, failed = Learnocaml_report.result_of_report report in
   let report_button = find_component "learnocaml-exo-button-report" in
   Manip.removeClass report_button "success" ;
   Manip.removeClass report_button "failure" ;
   Manip.removeClass report_button "partial" ;
-  let grade = score * 100 /score_maxi(*Learnocaml_exercise.get Learnocaml_exercise.max_score exo*) in
+  let grade = score * 100 / score_maxi in
   if grade >= 100 then begin
     Manip.addClass report_button "success" ;
     Manip.replaceChildren report_button
@@ -142,8 +98,7 @@ let display_report exo report =
   let report_container = find_component "learnocaml-exo-tab-report" in
   Manip.setInnerHtml report_container
     (Format.asprintf "%a" Learnocaml_report.(output_html_of_report ~bare: true) report) ;
-  ref_grade = ref grade;
-  Lwt.return ()
+  grade
              
              
 let set_string_translations () =
@@ -181,7 +136,7 @@ let () =
   let transResultOption = function
   |None -> false
   |Some s-> true in
-  let idEditor s = transResultOption (Regexp.string_match (Regexp.regexp "^[.]+") s 0) in
+  let idEditor s = transResultOption (Regexp.string_match (Regexp.regexp "^.+") s 0) in
   let id = arg "id" in
 
   let exercise_fetch = match idEditor id with
@@ -254,7 +209,7 @@ in
   
   let solution = match Learnocaml_local_storage.(retrieve (exercise_state id)) with
     | { Learnocaml_exercise_state.report = Some report ; solution } ->
-        let _ : int = (display_report exo report);!ref_grade in
+        let _ : int = display_report exo report in
         Some solution
     | { Learnocaml_exercise_state.report = None ; solution } ->
         Some solution
@@ -459,13 +414,13 @@ in
           aborted >>= fun () ->
           Lwt.return Learnocaml_report.[ Message ([ Text [%i"Grading aborted by user."] ], Failure) ] in
         Lwt.pick [ grading ; abortion ] >>= fun report ->
-         let _ =(display_report exo report);!ref_grade  in
-       (* if not(idEditor id) then
+        let _ = display_report exo report in
+         (*if not(idEditor id) then*)
           begin
         worker := Grading_jsoo.get_grade ~callback exo ;
-        Learnocaml_local_storage.(store (exercise_state id))
+       (* Learnocaml_local_storage.(store (exercise_state id))
           { Learnocaml_exercise_state.grade = Some grade ; solution ; report = Some report ;
-            mtime = gettimeofday () } end; *)
+            mtime = gettimeofday () }*) end;
         select_tab "report" ;
         Lwt_js.yield () >>= fun () ->
         hide_loading ~id:"learnocaml-exo-loading" () ;
@@ -475,8 +430,8 @@ in
           Learnocaml_report.[ Text [%i"Error in your code."] ; Break ;
                    Text [%i"Cannot start the grader if your code does not typecheck."] ] in
         let report = Learnocaml_report.[ Message (msg, Failure) ] in
-        let _ = (display_report exo report);!ref_grade in
-       (* if not(idEditor id) then
+        let _ = display_report exo report in
+        (* if not(idEditor id) then 
           begin
         Learnocaml_local_storage.(store (exercise_state id))
           { Learnocaml_exercise_state.grade = Some grade ; solution ; report = Some report ;

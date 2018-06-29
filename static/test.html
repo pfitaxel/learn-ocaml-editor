@@ -42,7 +42,9 @@
         <span>Learn OCaml</span>
         <img src="icons/logo_ocp.svg">
       </div>
-      <input type="submit" id="save" name="save" value="Save"></input>
+      <div class="save">
+    	<button id="save" type="submit">Save</button>
+      </div>
       <!--<div id="learnocaml-test-toolbar" class="buttons"></div>-->
     </div>
     <div id="page_title">
@@ -71,42 +73,36 @@
     </div>
     <div id="learnocaml-tabs">
       <div id="learnocaml-tab-solution">
+	<a id="txt_input_sol">Input tests:<br></a>
 	<div id="learnocaml-tab-solution-input">
-	  <label id="txt_input_tests" for="sol-tests">Input tests:<br></label>
-	  <textarea id="sol-tests" name="tests" value="" cols="25" rows="10"></textarea>
 	</div>
 	<div id="learnocaml-tab-solution-extra">
-	  <label id="txt_gen" for="sol-gen">Extra alea:<br></label>
+	  <label id="txt_gen_sol" for="sol-gen">Extra alea:<br></label>
 	  <input type="number" name="gen" id="sol-gen" value="0" step="1" min="0" max="20">
 	  </input>
 	</div>
       </div>
       
       <div id="learnocaml-tab-spec">
+	<a id="txt_input_spec">Input tests:<br></a>
 	<div id="learnocaml-tab-spec-input">
-	  <label id="txt_input_tests" for="spec-tests">Input tests:<br></label>
-	  <textarea id="spec-tests" name="tests" value="" cols="25" rows="10"></textarea>
 	</div>
 	<div id="learnocaml-tab-spec-extra">
-	  <label id="txt_gen" for="spec-gen">Extra alea:<br></label>
+	  <label id="txt_gen_spec" for="spec-gen">Extra alea:<br></label>
 	  <input type="number" name="gen" id="spec-gen" value="0" step="1" min="0" max="20">
 	  </input>
 	</div>
+	<a id="txt_spec_specification">Specification:<br></a>
 	<div id="learnocaml-tab-spec-spec">
-	  <label id="txt_specification" for="specif">Specification:<br></label>
-	  <textarea id="specif" name="tests" value="" cols="25" rows="3"></textarea>
 	</div>
       </div>
       
       <div id="learnocaml-tab-suite">
+	<a id="txt_suite_input">Input:<br></a>
 	<div id="learnocaml-tab-suite-input">
-	  <label id="txt_input" for="input">Input:<br></label>
-	  <textarea id="input" name="tests" value="" cols="25" rows="10"></textarea>
 	</div>
-	
+	<a id="txt_suite_output">Output:<br></a>
 	<div id="learnocaml-tab-suite-output">
-	  <label id="txt_output" for="output">Output:<br></label>
-	  <textarea id="output" name="tests" value="" cols="25" rows="10"></textarea>
 	</div>
       </div>
     </div>

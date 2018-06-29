@@ -95,9 +95,9 @@ let rec nbArgs listeChar = match listeChar with
 
 let test_fun ty =
   let nb = (nbArgs (decomposition ty 0)) in
-  (*if nb<=4
-  then*) "test_function_"^(string_of_int nb)^"_against_solution"
-(*else "test_function_against"*);;
+  if nb<=4
+  then "test_function_"^(string_of_int nb)^"_against_solution"
+  else "test_function_against";;
 
 let testAlea nombreTestAlea = " ~gen:"^(string_of_int nombreTestAlea) ;;
 
@@ -110,10 +110,12 @@ let init = "let () =
             ast_sanity_check code_ast @@ fun () ->\n" ;;
 
 
+let rec suppr_id_0 listKey = match listKey with
+  |[]->[]
+  |k::suite -> if k="0" then (suppr_id_0 suite) else k::(suppr_id_0 suite)
 
 
-
-let get_id_question id = let test_list = get_test_liste id  in let all_id = StringMap.bindings test_list in redondance (listFst all_id)
+let get_id_question id = let test_list = get_test_liste id  in let all_id = StringMap.bindings test_list in suppr_id_0 (redondance (listFst all_id))
                                                                                                                        
 
 let rec constructListeQuest listKey id = match listKey with

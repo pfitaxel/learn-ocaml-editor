@@ -8,6 +8,36 @@ open Learnocaml_common
 module StringMap = Map.Make (String)
 
 
+let set_string_translations () =
+  let translations = [
+  "save", [%i"Save"];
+  "txt_test", [%i"Test"];
+  "txt_name", [%i"Name: "];
+  "txt_ty", [%i"Type: "];
+  "txt_sol", [%i"Solution"];
+  "txt_spec", [%i"Specification"];
+  "txt_suite", [%i"Suite"];
+  "txt_input_sol", [%i"Input tests:<br>"];
+  "txt_gen_sol", [%i"Extra alea:<br>"];
+  "txt_input_spec", [%i"Input tests:<br>"];
+  "txt_gen_spec", [%i"Extra alea:<br>"];
+  "txt_spec_specification", [%i"Specification:<br>"];
+  "txt_suite_input", [%i"Input:<br>"];
+  "txt_suite_output", [%i"Output:<br>"];
+  ] in
+  List.iter
+  (fun (id, text) -> Manip.setInnerHtml (find_component id) text)
+  translations
+
+let set_lang () =
+  match Js.Optdef.to_option (Dom_html.window##.navigator##.language) with
+  | Some l -> Ocplib_i18n.set_lang (Js.to_string l)
+  | None ->
+    match Js.Optdef.to_option (Dom_html.window##.navigator##.userLanguage) with
+    | Some l -> Ocplib_i18n.set_lang (Js.to_string l)
+    | None -> ()
+
+
 let init_tabs, select_tab =
   let names = [ "solution"; "spec"; "suite" ] in
   let current = ref "suite" in
@@ -37,10 +67,10 @@ let init_tabs, select_tab =
 
 let id = arg "id";;               
 let name = match getElementById_coerce "name" CoerceTo.input with
-    None -> failwith "element name inconnu"
+    None -> failwith "unknown element name"
    |Some s -> s;;
 let ty = match getElementById_coerce "ty" CoerceTo.input with
-    None -> failwith "element ty inconnu"
+    None -> failwith "unknown element ty"
    |Some s -> s;;
 let solution = match getElementById_coerce "solution" CoerceTo.input with
     None -> failwith ""
@@ -53,11 +83,11 @@ let suite = match getElementById_coerce "suite" CoerceTo.input with
   |Some s-> s;;
 
 let extraAleaSol =match getElementById_coerce "sol-gen" CoerceTo.input with
-    None -> failwith "element extraAleaSol inconnu"
+    None -> failwith "unknown element extraAleaSol"
   | Some s -> s;;
 
 let extraAleaSpec = match getElementById_coerce "spec-gen" CoerceTo.input with
-    None -> failwith "element extraAleaSpec inconnu"
+    None -> failwith "unknown element extraAleaSpec"
   | Some s -> s;;
 
 let save = getElementById "save";;
@@ -72,8 +102,7 @@ let compute_question_id test_haut =
         []->n
       |x::l->if x<>n then aux l n else aux coulvois (n+1)
     in aux coulvois 1
-  in string_of_int (mi key_list)
-;;
+  in string_of_int (mi key_list);;
 
 open Editor_lib
 open Learnocaml_exercise_state
@@ -197,10 +226,7 @@ let _ = match arg "questionid" with
                   solution##.checked := Js.bool true;
                   ty_elt##.value:=Js.string ty;
                   select_tab "solution"
-                end
-;;
-
-
+                end;;
 
 
 let _ = solution##.onclick:= handler (fun _ -> select_tab "solution"; Js._true);;
@@ -214,3 +240,6 @@ let _ = save##.onclick:= handler (fun _ ->
    if arg "tab" = "spec" then
      save_spec ();
    Js._true)
+
+let _ = set_lang ()
+let _ = set_string_translations ()

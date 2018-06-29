@@ -94,9 +94,6 @@ let aborted, abort_message =
  *)
 
 
-
-
-               
 let display_report exo report =
   let aborted, abort_message =
      let t, u = Lwt.task () in
@@ -184,16 +181,16 @@ let () =
   let transResultOption = function
   |None -> false
   |Some s-> true in
-  let idEditor s = transResultOption (Regexp.string_match (Regexp.regexp "^[\.]+") s 0) in
+  let idEditor s = transResultOption (Regexp.string_match (Regexp.regexp "^[.]+") s 0) in
   let id = arg "id" in
-  
+
   let exercise_fetch = match idEditor id with
     | false -> Server_caller.fetch_exercise id
     | _ -> let id = String.sub id 1 ((String.length id)-1) in
   let exo0 ()=
-  let titre =  get_titre id in
-  let question =get_question id in
-  let question =Omd.to_html (Omd.of_string question) in
+  let titre = get_titre id in
+  let question = get_question id in
+  let question = Omd.to_html (Omd.of_string question) in
 
   let exo1= Learnocaml_exercise.set  Learnocaml_exercise.id id Learnocaml_exercise.empty in
   let exo2= Learnocaml_exercise.set Learnocaml_exercise.title titre exo1 in
@@ -462,28 +459,28 @@ in
           aborted >>= fun () ->
           Lwt.return Learnocaml_report.[ Message ([ Text [%i"Grading aborted by user."] ], Failure) ] in
         Lwt.pick [ grading ; abortion ] >>= fun report ->
-        let grade =(display_report exo report);!ref_grade  in
-        (*if not(idEditor id) then
+         let _ =(display_report exo report);!ref_grade  in
+       (* if not(idEditor id) then
           begin
         worker := Grading_jsoo.get_grade ~callback exo ;
         Learnocaml_local_storage.(store (exercise_state id))
           { Learnocaml_exercise_state.grade = Some grade ; solution ; report = Some report ;
-            mtime = gettimeofday () } end;*)
+            mtime = gettimeofday () } end; *)
         select_tab "report" ;
         Lwt_js.yield () >>= fun () ->
         hide_loading ~id:"learnocaml-exo-loading" () ;
         Lwt.return ()
     | Toploop_results.Error _ ->
-        let msg =
+         let msg =
           Learnocaml_report.[ Text [%i"Error in your code."] ; Break ;
                    Text [%i"Cannot start the grader if your code does not typecheck."] ] in
         let report = Learnocaml_report.[ Message (msg, Failure) ] in
-        let grade = (display_report exo report);!ref_grade in
-        (*if not(idEditor id) then
+        let _ = (display_report exo report);!ref_grade in
+       (* if not(idEditor id) then
           begin
         Learnocaml_local_storage.(store (exercise_state id))
           { Learnocaml_exercise_state.grade = Some grade ; solution ; report = Some report ;
-            mtime = gettimeofday () } end ;*)
+            mtime = gettimeofday () } end ; *)
         select_tab "report" ;
         Lwt_js.yield () >>= fun () ->
         hide_loading ~id:"learnocaml-exo-loading" () ;

@@ -153,7 +153,6 @@ let rec concatenation listech = match listech with
 
 let rec supprRec listeChar = match listeChar with
   |[]->[]
-  |'='::l->['=']
   |' '::'r'::'e'::'c'::' '::l->' '::supprRec l
   |'\n'::'r'::'e'::'c'::' '::l->' '::supprRec l
   |c::s -> c::supprRec s ;;

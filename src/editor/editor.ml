@@ -85,12 +85,9 @@ let rec save_quest listeQuestions id = match listeQuestions with
     let extra_alea = 0 in
     let question = {name ; ty ; type_question ; input ; output ; extra_alea} in
     let testhaut =  get_testhaut id in
-    let question_id = match arg "questionid" with
-      |exception Not_found ->compute_question_id testhaut
-      |qid->qid
-    in
-    let testhaut = StringMap.add question_id question testhaut in
-    save_testhaut testhaut id ;
+    let question_id = compute_question_id testhaut in
+    let new_testhaut = StringMap.add question_id question testhaut in
+    let () = save_testhaut new_testhaut id in
     save_quest suite id;;
 
 (*-------------------------------------------------------------------------*)

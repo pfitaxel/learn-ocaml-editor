@@ -60,10 +60,8 @@ module StringMap = Map.Make (String)
                          
 let recovering_callback = ref (fun ()->())
 
-let _=testhaut_iframe##.width :=Js.string "100%";;
-let _=testhaut_iframe##.height:=Js.string "100%";;  
-let _= Manip.SetCss.opacity iframe (Some "1");;
 
+let id=arg "id"
 
 (*_________________________Fonctions pour generer le test_____________________________________*)
 
@@ -521,7 +519,7 @@ let () =
     Ocaml_mode.report_error ~set_class editor_t error warnings  >>= fun () ->
     Ace.focus ace_t ;
     Lwt.return () in *)
-   let _ =testhaut_init (find_component "learnocaml-exo-testhaut-pane") in ();
+   let _ =testhaut_init (find_component "learnocaml-exo-testhaut-pane") id in ();
   begin testhaut_button
       ~group: toplevel_buttons_group
       ~icon: "typecheck" "Check" @@ fun () ->

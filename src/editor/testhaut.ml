@@ -120,13 +120,16 @@ let _ =match arg "questionid" with
       let name_elt=name in
       let ty_elt=ty in
       match StringMap.find qid testhaut with
-        {name;ty;type_question;input;output}->if type_question= Suite then
-            input_suite##.value:=Js.string input;
-          output_suite##.value:=Js.string output;
-          name_elt##.value:=Js.string name;
-          suite##.checked := Js.bool true;
-          ty_elt##.value:=Js.string ty;
-          select_tab "suite";
+        {name;ty;type_question;input;output}->
+          if type_question= Suite then
+            begin
+              input_suite##.value:=Js.string input;
+              output_suite##.value:=Js.string output;
+              name_elt##.value:=Js.string name;
+              suite##.checked := Js.bool true;
+              ty_elt##.value:=Js.string ty;
+              select_tab "suite";
+            end
 ;;
 
 
@@ -138,27 +141,7 @@ let _ = suite##.onclick:= handler (fun _ -> select_tab "suite"; Js._true);;
  
 let _ = save##.onclick:= handler (fun _ ->
    if arg "tab" = "suite" then
-     save_suite ();
-   let window=Dom_html.window in
-   let window=window##.parent in
-   let document=window##.document in
-   let div=match Js.Opt.to_option (document##getElementById (Js.string "learnocaml-exo-loading")) with
-       None-> failwith "titi"
-     |Some d -> d
-   in
-   let exo_list=Js.Opt.case (document##getElementById (Js.string "learnocaml-exo-testhaut-pane"))
-    (fun () -> failwith "toto")
-    (fun pnode -> pnode)
-   in
-   let exo_list=Tyxml_js.Of_dom.of_element exo_list in
-   Manip.removeChildren exo_list;
-   let _ =testhaut_init exo_list in ();
-   div##setAttribute (Js.string "class") (Js.string "loading-layer loaded");
-
-
-                                      
-   
-   
+     save_suite ();  
    if arg "tab" = "solution" then
      begin
         let name = Js.to_string name##.value in
@@ -169,10 +152,12 @@ let _ = save##.onclick:= handler (fun _ ->
         let extra_alea = int_of_string (Js.to_string extraAleaSol##.value) in
         let question = {name; ty; type_question; input; output; extra_alea} in
         let testhaut = get_testhaut id in
-        let question_id = compute_question_id testhaut in
+        let question_id = match arg "questionid" with
+          exception Not_found->compute_question_id testhaut
+          |qid ->qid
+        in
         let testhaut = StringMap.add question_id question testhaut in
         save_testhaut testhaut id;
-        hide_loading ~id:"learnocaml-exo-loading" ();
        
      end;
    if arg "tab" = "spec" then
@@ -185,8 +170,27 @@ let _ = save##.onclick:= handler (fun _ ->
         let extra_alea = int_of_string (Js.to_string extraAleaSpec##.value) in
         let question = {name; ty; type_question; input; output; extra_alea} in
         let testhaut = get_testhaut id in
-        let question_id = compute_question_id testhaut in
+        let question_id = match arg "questionid" with
+          exception Not_found->compute_question_id testhaut
+          |qid ->qid
+        in
         let testhaut = StringMap.add question_id question testhaut in
         save_testhaut testhaut id;
      end;
+   let window=Dom_html.window in
+   let window=window##.parent in
+   let document=window##.document in
+      let div= Js.Opt.case (document##getElementById (Js.string "learnocaml-exo-loading"))
+          (fun ()-> failwith "titi")
+          (fun node->node)
+   in
+   let exo_list=Js.Opt.case (document##getElementById (Js.string "learnocaml-exo-testhaut-pane"))
+       (fun () -> failwith "toto")
+       (fun pnode -> pnode)
+   in
+   let exo_list=Tyxml_js.Of_dom.of_element exo_list in
+   Manip.removeChildren exo_list;
+   
+   let _ =testhaut_init exo_list id  in ();
+   div##setAttribute (Js.string "class") (Js.string "loading-layer loaded");
    Js._true)

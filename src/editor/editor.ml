@@ -219,7 +219,7 @@ let init_tabs, select_tab =
 
 
 let display_report exo report =
-  let score, failed = Learnocaml_report.result_of_report report in
+  (* let score, failed = Learnocaml_report.result_of_report report in *)
   let report_button = find_component "learnocaml-exo-button-report" in
   Manip.removeClass report_button "success" ;
   Manip.removeClass report_button "failure" ;
@@ -935,14 +935,14 @@ let onload () =
         hide_loading ~id:"learnocaml-exo-loading" () ;
         Lwt.return ()
     | Toploop_results.Error _ ->
-        let msg =
+        (* let msg =
           Learnocaml_report.[ Text [%i"Error in your code."] ; Break ;
                    Text [%i"Cannot start the grader if your code does not typecheck."] ] in
         let report = Learnocaml_report.[ Message (msg, Failure) ] in
         let grade = display_report (exo () ) report in
-        (*Learnocaml_local_storage.(store (exercise_state id))
+        Learnocaml_local_storage.(store (exercise_state id))
           { Learnocaml_exercise_state.grade = Some grade ; solution ; report = Some report ;
-            mtime = gettimeofday () } ;*)
+            mtime = gettimeofday () } ; *)
         select_tab "report" ;
         Lwt_js.yield () >>= fun () ->
         hide_loading ~id:"learnocaml-exo-loading" () ;

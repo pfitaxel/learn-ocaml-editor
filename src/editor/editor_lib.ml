@@ -124,13 +124,12 @@ let rec constructListeQuest listKey id = match listKey with
                   (get_input id key),false)::(constructListeQuest suite id)
 
 
-let sectionSol fct= match fct with
-  |(name,typeF,nbAlea,jdt,b)->"Section
+let sectionSol fct = match fct with
+  | (name,typeF,nbAlea,jdt,b)->"Section
       		               ([ Text \"Function:\" ; Code \""^name^"\" ],\n"
       			      ^(test_fun typeF)^(testAlea nbAlea)^"\n"
       			      ^(typeFct typeF name)^"\n["
       			      ^jdt^"] )"
-  |_->failwith "error" ;;
 
 let rec constructSectionSol listeFonction = match listeFonction with
   |[]->"]"

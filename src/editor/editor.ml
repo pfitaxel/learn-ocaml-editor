@@ -127,7 +127,7 @@ let testhaut_init () =
                          let t, u = Lwt.task () in
                          let btn_no = Tyxml_js.Html5.(button [ pcdata [%i"No"] ]) in
                          Manip.Ev.onclick btn_no (fun _ ->
-                                                  hide_loading ~id:"learnocaml-main-loading" () ; true) ;
+                                                  hide_loading ~id:"learnocaml-exo-loading" () ; true) ;
                          let btn_yes = Tyxml_js.Html5.(button [ pcdata [%i"Yes"] ]) in
                          Manip.Ev.onclick btn_yes (fun _ ->
                              let rmv= get_testhaut id in                            
@@ -144,7 +144,7 @@ let testhaut_init () =
                          t, div in 
                        Manip.replaceChildren messages
                          Tyxml_js.Html5.[ li [ pcdata "" ] ] ;
-                       show_loading ~id:"learnocaml-main-loading" [ abort_message ] ;
+                       show_loading ~id:"learnocaml-exo-loading" [ abort_message ] ;
                        Manip.SetCss.opacity abort_message (Some "1") ;
                         end ;
                       true) ;button
@@ -396,8 +396,7 @@ let () =
   save_testhaut testhaut id;
   let editor_testhaut = find_component "learnocaml-exo-testhaut-edit" in
   let ace_testhaut = Ace.create_editor (Tyxml_js.To_dom.of_div editor_testhaut ) in
-  let buffer =
-  match get_buffer id with
+  let buffer = match get_buffer id with
     exception Not_found -> ""
   | buff -> buff.input in
   Ace.set_contents ace_testhaut buffer ;
@@ -642,16 +641,7 @@ let onload () =
     let question = Ace.get_contents ace_quest in
     let template = Ace.get_contents ace_temp in
     let testml = Ace.get_contents ace_t in
-  (*  let ty = "" in
-  let type_question = Suite in
-  let input = Ace.get_contents ace_testhaut in
-  let output = "" in
-  let extra_alea = 0 in
-  let question = {name; ty; type_question; input; output; extra_alea} in
-  let testhaut = get_testhaut id in
-  let question_id ="0" in
-  let testhaut = StringMap.add question_id question testhaut in
-  save_testhaut testhaut id in*) save_buffer_test ();
+    save_buffer_test ();
     let testhaut= get_testhaut id in
     let prepare= Ace.get_contents ace_prep in
     let prelude =Ace.get_contents ace_prel in 

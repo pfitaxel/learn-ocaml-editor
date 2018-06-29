@@ -199,7 +199,7 @@ let _ = match arg "questionid" with
           let name_elt=name in
           let ty_elt=ty in
           match StringMap.find qid testhaut with
-            {name;ty;type_question;input;output} ->
+            {name;ty;type_question;input;output;extra_alea} ->
              match type_question with
              | Suite ->
                 begin
@@ -217,6 +217,7 @@ let _ = match arg "questionid" with
                   name_elt##.value:=Js.string name;
                   spec##.checked := Js.bool true;
                   ty_elt##.value:=Js.string ty;
+                  extraAleaSpec##.value:= Js.string (string_of_int extra_alea);
                   select_tab "spec"
                 end;
              | _ ->
@@ -225,6 +226,7 @@ let _ = match arg "questionid" with
                   name_elt##.value:=Js.string name;
                   solution##.checked := Js.bool true;
                   ty_elt##.value:=Js.string ty;
+                  extraAleaSol##.value:= Js.string (string_of_int extra_alea);
                   select_tab "solution"
                 end;;
 

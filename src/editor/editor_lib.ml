@@ -138,6 +138,12 @@ let rec constructSectionSol listeFonction = match listeFonction with
 	       then ((sectionSol fct)^" ;\n"^(constructSectionSol suite)) 
 	       else ((sectionSol fct)^(constructSectionSol suite)) ;;
 
+(*let definition id =
+  let buffer = get_buffer id in
+  let contenu = match buffer with
+ *)     
+
+
 let constructFinalSol listeFonction = 
   librairie^init^"["^(constructSectionSol listeFonction)^";;"
 

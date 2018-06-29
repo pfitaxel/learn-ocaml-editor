@@ -81,6 +81,8 @@ module type S = sig
     | Ok of 'a
     | Error of exn
 
+  val typed_printer : 'a Ty.ty -> Format.formatter -> 'a -> unit
+
   val exec : (unit -> 'a) -> ('a * string * string) result
   val result : (unit -> 'a) -> 'a result
 
@@ -282,6 +284,11 @@ module type S = sig
     (('ar -> 'row) Ty.ty, 'ar -> 'urow, 'ret) prot ->
     (('a -> 'ar -> 'row) Ty.ty, ('a -> 'ar -> 'urow), 'ret) prot
 
+  val ty_of_prot :
+    (('p -> 'a) Ty.ty, 'p -> 'c, 'r) prot -> ('p -> 'a) Ty.ty
+  val get_ret_ty :
+    ('p -> 'a) Ty.ty -> ('p -> 'a, 'p -> 'c, 'r) args -> 'r Ty.ty
+    
   type 'a lookup = unit -> [ `Found of string * Learnocaml_report.report * 'a | `Unbound of string * Learnocaml_report.report ]
 
   val lookup : 'a Ty.ty -> ?display_name: string -> string -> 'a lookup

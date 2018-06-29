@@ -459,8 +459,8 @@ in
           aborted >>= fun () ->
           Lwt.return Learnocaml_report.[ Message ([ Text [%i"Grading aborted by user."] ], Failure) ] in
         Lwt.pick [ grading ; abortion ] >>= fun report ->
-        (* let grade =(display_report exo report);!ref_grade  in
-        if not(idEditor id) then
+         let _ =(display_report exo report);!ref_grade  in
+       (* if not(idEditor id) then
           begin
         worker := Grading_jsoo.get_grade ~callback exo ;
         Learnocaml_local_storage.(store (exercise_state id))
@@ -471,12 +471,12 @@ in
         hide_loading ~id:"learnocaml-exo-loading" () ;
         Lwt.return ()
     | Toploop_results.Error _ ->
-        (* let msg =
+         let msg =
           Learnocaml_report.[ Text [%i"Error in your code."] ; Break ;
                    Text [%i"Cannot start the grader if your code does not typecheck."] ] in
         let report = Learnocaml_report.[ Message (msg, Failure) ] in
-        let grade = (display_report exo report);!ref_grade in
-        if not(idEditor id) then
+        let _ = (display_report exo report);!ref_grade in
+       (* if not(idEditor id) then
           begin
         Learnocaml_local_storage.(store (exercise_state id))
           { Learnocaml_exercise_state.grade = Some grade ; solution ; report = Some report ;

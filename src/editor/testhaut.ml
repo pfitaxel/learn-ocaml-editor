@@ -245,6 +245,25 @@ let transResultOption = function
 let nameOk s = transResultOption (Regexp.string_match (Regexp.regexp "^.+") s 0);;
 let typeOk s = transResultOption (Regexp.string_match (Regexp.regexp "^.+") s 0);;
 
+let close_frame () =
+  let window=Dom_html.window in
+  let window=window##.parent in
+  let document=window##.document in
+  let div= Js.Opt.case (document##getElementById (Js.string "learnocaml-exo-loading"))
+      (fun ()-> failwith "titi")
+      (fun node->node)
+  in
+  let exo_list=Js.Opt.case (document##getElementById (Js.string "learnocaml-exo-testhaut-pane"))
+      (fun () -> failwith "toto")
+      (fun pnode -> pnode)
+  in
+  let exo_list=Tyxml_js.Of_dom.of_element exo_list in
+  Manip.removeChildren exo_list;
+  
+  let _ =testhaut_init exo_list id  in ();
+  div##setAttribute (Js.string "class") (Js.string "loading-layer loaded");;
+
+
 let toString = function
   |None -> failwith "incorrect_input"
   |Some input -> Js.to_string input##.value
@@ -282,25 +301,8 @@ let _ = save##.onclick:= handler (fun _ ->
 	   if arg "tab" = "solution" then
 	     save_solution ();
 	   if arg "tab" = "spec" then
-	     save_spec ();
-
-	   let window=Dom_html.window in
-	   let window=window##.parent in
-	   let document=window##.document in
-	      let div= Js.Opt.case (document##getElementById (Js.string "learnocaml-exo-loading"))
-	          (fun ()-> failwith "titi")
-	          (fun node->node)
-	   in
-	   let exo_list=Js.Opt.case (document##getElementById (Js.string "learnocaml-exo-testhaut-pane"))
-	       (fun () -> failwith "toto")
-	       (fun pnode -> pnode)
-	   in
-	   let exo_list=Tyxml_js.Of_dom.of_element exo_list in
-	   Manip.removeChildren exo_list;
-	   
-	   let _ =testhaut_init exo_list id  in ();
-	   div##setAttribute (Js.string "class") (Js.string "loading-layer loaded");
-
+             save_spec ();
+          close_frame ();
     end;
    Js._true
 )
@@ -308,8 +310,7 @@ let _ = save##.onclick:= handler (fun _ ->
 (* Back button *)
 let back = getElementById "back"
 let _ = back##.onclick := handler (fun _ ->
-    Dom_html.window##.location##assign
-    	(Js.string ("editor.html#id=" ^ id ^ "&action=open"));
+    close_frame ();
     Js._true)
 
 let _ = set_lang ()

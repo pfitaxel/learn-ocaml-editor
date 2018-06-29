@@ -83,8 +83,8 @@ let rec save_quest listeQuestions id = match listeQuestions with
     let name = nom in
     let ty= gen_ty nbArgs in
     let type_question = Solution in
-    let input = "" in
-    let output = "" in
+    let input = "[]" in
+    let output = "[]" in
     let extra_alea = 0 in
     let question = {name ; ty ; type_question ; input ; output ; extra_alea} in
     let testhaut =  get_testhaut id in
@@ -737,7 +737,7 @@ let onload () =
       Learnocaml_local_storage.(store (editor_state id)) nvexo;
       (*Manip.disable
         (find_component ("learnocaml-exo-button-testhaut")) ;*)
-      Ace.set_contents ace_t  (get_testml id);
+      Ace.set_contents ace_t (get_testml id);
       select_tab "test";
       Lwt.return ()
   end ;

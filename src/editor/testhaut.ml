@@ -110,13 +110,13 @@ open Learnocaml_exercise_state
 let input_solution_editor = find_component "learnocaml-tab-solution-input";;
 let editor_input_solution = Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div input_solution_editor) ;;
 let ace_input_sol = Ocaml_mode.get_editor editor_input_solution ;;
-let _ = Ace.set_contents ace_input_sol ("");
+let _ = Ace.set_contents ace_input_sol ("[]");
         Ace.set_font_size ace_input_sol 18;;
 
 let input_spec_editor = find_component "learnocaml-tab-spec-input" 
 let editor_input_spec = Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div input_spec_editor) 
 let ace_input_spec = Ocaml_mode.get_editor editor_input_spec 
-let _ = Ace.set_contents ace_input_spec ("");
+let _ = Ace.set_contents ace_input_spec ("[]");
         Ace.set_font_size ace_input_spec 18;;
 
 let spec_spec_editor = find_component "learnocaml-tab-spec-spec"
@@ -128,13 +128,13 @@ let _ =  Ace.set_contents ace_spec_spec ("");
 let input_suite_editor = find_component "learnocaml-tab-suite-input" 
 let editor_input_suite = Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div input_suite_editor)
 let ace_input_suite = Ocaml_mode.get_editor editor_input_suite 
-let _ = Ace.set_contents ace_input_suite ("");
+let _ = Ace.set_contents ace_input_suite ("[]");
         Ace.set_font_size ace_input_suite 18;;
 
 let output_suite_editor = find_component "learnocaml-tab-suite-output" 
 let editor_output_suite = Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div output_suite_editor) 
 let ace_output_suite = Ocaml_mode.get_editor editor_output_suite 
-let _ = Ace.set_contents ace_output_suite ("");
+let _ = Ace.set_contents ace_output_suite ("[]");
         Ace.set_font_size ace_output_suite 18;;
        
 

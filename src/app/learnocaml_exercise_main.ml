@@ -136,7 +136,7 @@ let () =
   let transResultOption = function
   |None -> false
   |Some s-> true in
-  let idEditor s = transResultOption (Regexp.string_match (Regexp.regexp "^[.]+") s 0) in
+  let idEditor s = transResultOption (Regexp.string_match (Regexp.regexp "^.+") s 0) in
   let id = arg "id" in
 
   let exercise_fetch = match idEditor id with

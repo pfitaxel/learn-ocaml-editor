@@ -201,7 +201,7 @@ let _ = match arg "questionid" with
           let name_elt=name in
           let ty_elt=ty in
           match StringMap.find qid testhaut with
-            {name;ty;type_question;input;output} ->
+            {name;ty;type_question;input;output;extra_alea} ->
              match type_question with
              | Suite ->
                 begin
@@ -219,6 +219,7 @@ let _ = match arg "questionid" with
                   name_elt##.value:=Js.string name;
                   spec##.checked := Js.bool true;
                   ty_elt##.value:=Js.string ty;
+                  extraAleaSpec##.value:= Js.string (string_of_int extra_alea);
                   select_tab "spec"
                 end;
              | _ ->
@@ -227,6 +228,7 @@ let _ = match arg "questionid" with
                   name_elt##.value:=Js.string name;
                   solution##.checked := Js.bool true;
                   ty_elt##.value:=Js.string ty;
+                  extraAleaSol##.value:= Js.string (string_of_int extra_alea);
                   select_tab "solution"
                 end;;
 
@@ -237,33 +239,71 @@ let _ = spec##.onclick:= handler (fun _ -> select_tab "spec"; Js._true);;
 let _ = suite##.onclick:= handler (fun _ -> select_tab "suite"; Js._true);;
 
 
- 
-let _ = save##.onclick:= handler (fun _ ->
-   if arg "tab" = "suite" then
-     save_suite ();  
-   if arg "tab" = "solution" then
-     save_solution ();
-   if arg "tab" = "spec" then
-     save_spec ();
+let transResultOption = function
+  |None -> false
+  |Some s-> true;;
+let nameOk s = transResultOption (Regexp.string_match (Regexp.regexp "^.+") s 0);;
+let typeOk s = transResultOption (Regexp.string_match (Regexp.regexp "^.+") s 0);;
 
-   let window=Dom_html.window in
-   let window=window##.parent in
-   let document=window##.document in
-      let div= Js.Opt.case (document##getElementById (Js.string "learnocaml-exo-loading"))
-          (fun ()-> failwith "titi")
-          (fun node->node)
-   in
-   let exo_list=Js.Opt.case (document##getElementById (Js.string "learnocaml-exo-testhaut-pane"))
-       (fun () -> failwith "toto")
-       (fun pnode -> pnode)
-   in
-   let exo_list=Tyxml_js.Of_dom.of_element exo_list in
-   Manip.removeChildren exo_list;
-   
-   let _ =testhaut_init exo_list id  in ();
-   div##setAttribute (Js.string "class") (Js.string "loading-layer loaded");
-   
-   Js._true)
+let toString = function
+  |None -> failwith "incorrect_input"
+  |Some input -> Js.to_string input##.value
+
+let name_error = getElementById "name_error"
+let type_error = getElementById "type_error"
+
+let _ = save##.onclick:= handler (fun _ ->
+  let name = Js.to_string name##.value in
+  let ty = Js.to_string ty##.value in
+  let name_correct = nameOk name in
+  let type_correct = typeOk ty in
+  if not name_correct && not type_correct then
+    begin
+      setInnerHtml name_error [%i"Incorrect name: a name can't be empty"];
+      setInnerHtml type_error [%i"Incorrect type: a type can't be empty"]
+    end
+  else if name_correct && not type_correct then
+    begin
+      setInnerHtml name_error "";
+      setInnerHtml type_error [%i"Incorrect type: a type can't be empty"]
+    end
+  else if not name_correct && type_correct then
+    begin
+      setInnerHtml name_error [%i"Incorrect name: a name can't be empty"];
+      setInnerHtml type_error ""
+    end
+  else
+    begin
+      setInnerHtml name_error "";
+      setInnerHtml type_error "";
+
+	   if arg "tab" = "suite" then
+	     save_suite ();  
+	   if arg "tab" = "solution" then
+	     save_solution ();
+	   if arg "tab" = "spec" then
+	     save_spec ();
+
+	   let window=Dom_html.window in
+	   let window=window##.parent in
+	   let document=window##.document in
+	      let div= Js.Opt.case (document##getElementById (Js.string "learnocaml-exo-loading"))
+	          (fun ()-> failwith "titi")
+	          (fun node->node)
+	   in
+	   let exo_list=Js.Opt.case (document##getElementById (Js.string "learnocaml-exo-testhaut-pane"))
+	       (fun () -> failwith "toto")
+	       (fun pnode -> pnode)
+	   in
+	   let exo_list=Tyxml_js.Of_dom.of_element exo_list in
+	   Manip.removeChildren exo_list;
+	   
+	   let _ =testhaut_init exo_list id  in ();
+	   div##setAttribute (Js.string "class") (Js.string "loading-layer loaded");
+
+    end;
+   Js._true
+)
 
 (* Back button *)
 let back = getElementById "back"

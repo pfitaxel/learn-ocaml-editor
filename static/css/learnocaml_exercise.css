@@ -3,6 +3,15 @@ body {
   padding: 0;
   background: #666;
 }
+
+#learnocaml-main-loading {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+}
+
 /* -------------------- toolbar ----------------------------------- */
 #learnocaml-exo-toolbar {
   position: absolute;
@@ -894,7 +903,20 @@ body {
   font-size: 18px;
   font-family: 'Inconsolata', monospace;
 }
-
+#toolbar{
+	height: 30px;
+}
+#button_delete{
+	position: absolute;
+}
+#up{
+	position: absolute;
+	left: 45px;  
+}
+#down{
+	position: absolute;
+	left: 90px;
+}
 #learnocaml-exo-tab-testhaut > .testhaut-edit {
   position: absolute;
   left: 0; top: 0; bottom: 64%; width: 100%;

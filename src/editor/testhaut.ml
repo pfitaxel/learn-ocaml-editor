@@ -265,5 +265,12 @@ let _ = save##.onclick:= handler (fun _ ->
    
    Js._true)
 
+(* Back button *)
+let back = getElementById "back"
+let _ = back##.onclick := handler (fun _ ->
+    Dom_html.window##.location##assign
+    	(Js.string ("editor.html#id=" ^ id ^ "&action=open"));
+    Js._true)
+
 let _ = set_lang ()
 let _ = set_string_translations ()

@@ -179,7 +179,7 @@ let set_string_translations () =
   "learnocaml-exo-button-testhaut", [%i"Test"];
   "learnocaml-exo-button-report", [%i"Report"];
   "learnocaml-exo-editor-pane", [%i"Editor"];
-  "learnocaml-exo-tab-report", [%i"Click the Grade! button to test your solution"];
+  "txt_grade_report", [%i"Click the Grade! button to test your solution"];
   "learnocaml-exo-test-pane", [%i"Editor"];
   ] in
   List.iter

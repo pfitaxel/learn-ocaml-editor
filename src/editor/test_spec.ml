@@ -4,6 +4,7 @@ module type TYPING = sig
 end
 
 module Make(Test_lib : Test_lib.S) (Typing : TYPING) = struct
+
 open Test_lib
 open Learnocaml_report
 
@@ -43,7 +44,7 @@ type test_qst_typed =
       ; prot: (('ar -> 'row) Ty.ty, 'ar -> 'urow, 'ret) prot
       ; gen: int
       ; suite: ('ar -> 'row, 'ar -> 'urow, 'ret) args list
-      ; spec : ('ar -> 'row) -> ('ar -> 'row, 'ar -> 'urow, 'ret) args -> outcome } -> test_qst_typed
+      ; spec : ('ar -> 'row) -> ('ar -> 'row, 'ar -> 'urow, 'ret) args -> 'ret -> outcome } -> test_qst_typed
   | TestSuite :
       { name: string
       ; prot: (('ar -> 'row) Ty.ty, 'ar -> 'urow, 'ret) prot
@@ -79,9 +80,9 @@ let example_constr_spec =
       prot = (last_ty [%ty: int] [%ty: int]);
       gen = 0;
       suite = [!! 0; !! 1; !! 2];
-      spec = fun f args ->
+      spec = fun f args ret -> (* ret = apply f args *)
       (* Function f should be idempotent *)
-      ~~ (apply f args = apply f (!! (apply f args)))
+      ~~ (ret = apply f (!! ret))
     }
 
 let example_constr_suite =
@@ -110,21 +111,23 @@ let test_question (t : test_qst_typed) =
        (lookup_solution (ty_of_prot t.prot) t.name)
        t.suite
   | TestAgainstSpec t ->
-     (* let to_string ty v = Format.asprintf "%a" (typed_printer ty) v in *)
+     let to_string ty v = Format.asprintf "%a" (typed_printer ty) v in
      let stud = lookup_student (ty_of_prot t.prot) t.name in
      test_value stud @@ fun uf ->
      (* no sampler for the moment *)
      let open Learnocaml_report in
      List.flatten @@ List.map (fun args ->
-       let code = Format.asprintf "@[<hv 2>%s%a@]" t.name (print t.prot) args in
-       (* let ret_ty = get_ret_ty (ty_of_prot t.prot) args in *)
-       Message ([ Text "Computing" ; Code code ], Informative) ::
-       let (text, note) = match t.spec uf args with
+       let code = Format.asprintf "@[<hv 2>%s,%a@]" t.name (print t.prot) args in
+       let ret_ty = get_ret_ty (ty_of_prot t.prot) args in
+       Message ([ Text "Checking spec for" ; Code code ], Informative) ::
+         let ret = apply uf args in
+         let value = to_string ret_ty ret in
+       let (text, note) = match t.spec uf args ret with
          | Correct None -> ("Correct spec", Success 1)
          | Correct (Some message) -> (message, Success 1)
          | Wrong None -> ("Wrong spec", Failure)
          | Wrong (Some message) -> (message, Failure) in
-       [Message ([Text text], note)])
+       [Message ([Text "Got value"; Code value; Text (": " ^ text)], note)])
      t.suite
   | TestSuite t ->
      test_function

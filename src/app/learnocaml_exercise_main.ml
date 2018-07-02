@@ -394,7 +394,7 @@ in
         Tyxml_js.Html5.(div ~a: [ a_class [ "dialog" ] ]
                           [ pcdata [%i"Grading is taking a lot of time, "] ;
                             btn ;
-                            pcdata " ?" ]) in
+                            pcdata "?" ]) in
       Manip.SetCss.opacity div (Some "0") ;
       t, div in
     Manip.replaceChildren messages

@@ -288,7 +288,10 @@ module type S = sig
     (('p -> 'a) Ty.ty, 'p -> 'c, 'r) prot -> ('p -> 'a) Ty.ty
   val get_ret_ty :
     ('p -> 'a) Ty.ty -> ('p -> 'a, 'p -> 'c, 'r) args -> 'r Ty.ty
-    
+  val print :
+    (('p -> 'a) Ty.ty, 'p -> 'c, 'r) prot ->
+    Format.formatter -> ('p -> 'a, 'p -> 'c, 'r) args -> unit
+
   type 'a lookup = unit -> [ `Found of string * Learnocaml_report.report * 'a | `Unbound of string * Learnocaml_report.report ]
 
   val lookup : 'a Ty.ty -> ?display_name: string -> string -> 'a lookup

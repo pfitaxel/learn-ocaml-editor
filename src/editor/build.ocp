@@ -91,7 +91,7 @@ begin library "editor_lib"
   comp_requires = [ "ppx_ocplib_i18n:asm" "ppx_metaquot:asm" ]
 
   files = [
-    "editor_lib.ml" ( comp =  ppx_js  ppx_ocplib_i18n )   
+    "editor_lib.ml" ( comp = [ ppx_js ppx_ocplib_i18n "-ppx" %asm_exe( p = "ppx_metaquot") ] ) 
   ]
   requires = [
     "ace"

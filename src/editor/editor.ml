@@ -150,7 +150,7 @@ let init_tabs, select_tab =
 
 
 let display_report exo report =
-  let score, failed = Learnocaml_report.result_of_report report in 
+  (* let score, failed = Learnocaml_report.result_of_report report in *)
   let report_button = find_component "learnocaml-exo-button-report" in
   Manip.removeClass report_button "success" ;
   Manip.removeClass report_button "failure" ;
@@ -329,7 +329,7 @@ let () =
   let editor_th =Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div editor_testhaut ) in
   let ace_testhaut = Ocaml_mode.get_editor editor_th in
   let buffer = match get_buffer id with
-    exception Not_found -> ""
+    exception Not_found -> "(* incipit (local defs that will be available when you create question) *) "
   | buff -> buff.input in
   Ace.set_contents ace_testhaut buffer ;
   Ace.set_font_size ace_testhaut 18;
@@ -338,7 +338,15 @@ let () =
   let editor_test = find_component "learnocaml-exo-test-pane" in
   let editor_t = Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div editor_test) in
   let ace_t = Ocaml_mode.get_editor editor_t in
-  Ace.set_contents ace_t  (get_testml id); 
+  let contents=
+    let a =get_testml id in
+    if  a=""then "(* the grader code *)"
+    else
+      a
+  in
+  
+  
+  Ace.set_contents ace_t  (contents); 
   Ace.set_font_size ace_t 18;
 
  (*let lib = " module Test_lib = Test_lib.Make(struct\n\
@@ -380,8 +388,14 @@ let () =
   let editor_template = find_component "learnocaml-exo-template-pane" in
   let editor_temp = Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div editor_template) in
   let ace_temp = Ocaml_mode.get_editor editor_temp in
-  Ace.set_contents ace_temp
-    ( get_template id ) ;
+  let contents=
+    let a=get_template id in
+    if a="" then
+      "(* code that the student will have when he starts an exercise *)"
+    else
+      a
+  in
+  Ace.set_contents ace_temp contents ;
   Ace.set_font_size ace_temp 18;
 
   
@@ -416,10 +430,17 @@ let () =
   (*-------question pane  -------------------------------------------------*)
   let editor_question = find_component "learnocaml-exo-question-mark" in
   let ace_quest = Ace.create_editor (Tyxml_js.To_dom.of_div editor_question ) in
-  Ace.set_contents ace_quest (get_question id) ;
+   let question =
+    let a= get_question id in
+    if a ="" then "write your questions in markdown (google it if you don't know the syntax)"
+    else a
+  in
+  
+  Ace.set_contents ace_quest question ;
   Ace.set_font_size ace_quest 18;
 
-  let question =get_question id in
+  let question = get_question id
+  in
   let question =Omd.to_html (Omd.of_string question) in
  
   let text_container = find_component "learnocaml-exo-question-html" in
@@ -482,8 +503,12 @@ let onload () =
   let editor_prelude = find_component "learnocaml-exo-prelude-pane" in
   let editor_prel = Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div editor_prelude) in
   let ace_prel = Ocaml_mode.get_editor editor_prel in
-  Ace.set_contents ace_prel
-    ( get_prelude id ) ;
+  let contents=
+    let a= get_prelude id in
+    if a="" then "(* local defs for the student ( the student can see the this defs) *)"
+    else a
+  in
+  Ace.set_contents ace_prel contents ;
   Ace.set_font_size ace_prel 18;
  
     let typecheck set_class =
@@ -518,9 +543,12 @@ let onload () =
   let editor_prepare = find_component "learnocaml-exo-prepare-pane" in
   let editor_prep = Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div editor_prepare) in
   let ace_prep = Ocaml_mode.get_editor editor_prep in
-  
-  Ace.set_contents ace_prep
-    ( get_prepare id ) ;
+  let contents=
+    let a= get_prepare id in
+     if a= "" then "(* local defs for the student ( the student can't see the this defs) *)"
+    else a
+  in  
+  Ace.set_contents ace_prep contents ;
   Ace.set_font_size ace_prep 18;
 
   let typecheck set_class =
@@ -556,6 +584,15 @@ let onload () =
   let editor = Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div editor_pane) in
   let ace = Ocaml_mode.get_editor editor in
 
+  let contents =
+    let a= get_solution id in
+  if a="" then
+    "(* write your solution here *)"
+  else
+    a
+      in
+  Ace.set_contents ace contents;
+  Ace.set_font_size ace 18;
   let save_buffer_test () =
   let ty = "" in
   let type_question = Suite in
@@ -567,7 +604,6 @@ let onload () =
   let question_id ="0" in
   let testhaut = StringMap.add question_id question testhaut in
   save_testhaut testhaut id in
-  
   let recovering () =
     let solution = Ace.get_contents ace in
     let titre = get_titre id  in
@@ -588,8 +624,6 @@ let onload () =
         diff ; test ; prepare ; prelude;
         mtime = gettimeofday () } in
   recovering_callback:=recovering ;
-  Ace.set_contents ace (get_solution id);
-  Ace.set_font_size ace 18;
   let messages = Tyxml_js.Html5.ul [] in
   begin editor_button
       ~icon: "sync" [%i"Gen. template"] @@ fun () ->
@@ -718,13 +752,22 @@ let onload () =
     save_quest (genQuestions (get_fct listeChars []) []) id ;
     Manip.removeChildren (find_component "learnocaml-exo-testhaut-pane");
     testhaut_init (find_component "learnocaml-exo-testhaut-pane") id ;
-    Lwt.return () 
   end ;                             
   begin testhaut_button
       ~group: toplevel_buttons_group
       ~icon: "typecheck" [%i"Check"] @@ fun () ->
     Lwt.return ()
   end ;
+  let compile () = let listeFonction = constructListeQuest (get_id_question id) id in
+               let tests = constructFinalSol listeFonction in 
+               match Learnocaml_local_storage.(retrieve (editor_state id) ) with
+               |{id;titre;prepare;diff;solution;question;template;test;prelude;mtime}->
+                 let mtime=gettimeofday () in
+                 let test ={testml=tests;testhaut=test.testhaut} in
+                 let nvexo= {id;titre;prepare;diff;solution;question;template;test;prelude;mtime} in    
+                 Learnocaml_local_storage.(store (editor_state id)) nvexo;
+                 Ace.set_contents ace_t  (get_testml id);
+                 select_tab "test" in
   begin testhaut_button
       ~group: toplevel_buttons_group
       ~icon: "run" [%i"Compile"] @@ fun () ->
@@ -736,27 +779,9 @@ let onload () =
            let btn_yes = Tyxml_js.Html5.(button [ pcdata [%i"Yes"] ]) in
            Manip.Ev.onclick btn_yes (fun _ ->
                hide_loading ~id:"learnocaml-exo-loading" ();
-               let listeFonction = constructListeQuest (get_id_question id) id in
-               let tests = constructFinalSol listeFonction in 
-               match Learnocaml_local_storage.(retrieve (editor_state id) ) with
-               |{id;titre;prepare;diff;solution;question;template;test;prelude;mtime}->
-                 let mtime=gettimeofday () in
-                 let test ={testml=tests;testhaut=test.testhaut} in
-                 let nvexo= {id;titre;prepare;diff;solution;question;template;test;prelude;mtime} in    
-                 Learnocaml_local_storage.(store (editor_state id)) nvexo;
-                 Ace.set_contents ace_t  (get_testml id);
-                 select_tab "test"   ;(*
-                 Manip.removeClass
-                   (find_component ("learnocaml-exo-button-testhaut"))
-                   "front-tab" ;
-                 Manip.removeClass
-                   (find_component ("learnocaml-exo-tab-testhaut"))
-                   "front-tab" ;
-                 Manip.disable
-                   (find_component ("learnocaml-exo-button-testhaut"))  ;*) true) ;
-
-      let div =
-        Tyxml_js.Html5.(div ~a: [ a_class [ "dialog" ] ]
+               compile () ; true) ;
+           let div =
+             Tyxml_js.Html5.(div ~a: [ a_class [ "dialog" ] ]
                           [ pcdata [%i"Are you sure you want to overwrite the contents of Test.ml\n"] ;
                             btn_yes ;
                             pcdata " " ;
@@ -885,13 +910,8 @@ let onload () =
   let exo8 =Learnocaml_exercise.set Learnocaml_exercise.template (get_template id) exo7 in
   Learnocaml_exercise.set Learnocaml_exercise.descr description exo8
   in
-  
   let worker () = ref (Grading_jsoo.get_grade ~callback (exo () )  ) in
-  begin toolbar_button2
-      ~icon: "reload" [%i"Grade!"] @@ fun () ->
-    recovering () ;
-
-    let aborted, abort_message =
+  let grade () = let aborted, abort_message =
       let t, u = Lwt.task () in
       let btn = Tyxml_js.Html5.(button [ pcdata [%i "abort" ]]) in
       Manip.Ev.onclick btn (fun _ -> Lwt.wakeup u () ; true) ;
@@ -904,7 +924,7 @@ let onload () =
       t, div in
     Manip.replaceChildren messages
       Tyxml_js.Html5.[ li [ pcdata [%i"Launching the grader"] ] ] ;
-    show_loading ~id:"learnocaml-exo-loading" [ messages ; abort_message ] ;
+    show_loading ~id:"learnocaml-exo-loading" [ messages ; abort_message ];
     Lwt_js.sleep 1. >>= fun () ->
     let solution = Ace.get_contents ace in
     Learnocaml_toplevel.check top solution >>= fun res ->
@@ -940,7 +960,42 @@ let onload () =
         select_tab "report" ;
         Lwt_js.yield () >>= fun () ->
         hide_loading ~id:"learnocaml-exo-loading" () ;
-        typecheck true
+        typecheck true in
+  begin toolbar_button2
+      ~icon: "reload" [%i"Grade!"] @@ fun () ->
+    recovering () ;
+    if arg "tab" = "testhaut" then
+      begin
+        let aborted, abort_message =
+          let t, u = Lwt.task () in
+          let btn_cancel = Tyxml_js.Html5.(button [ pcdata [%i"Cancel"] ]) in
+          Manip.Ev.onclick btn_cancel ( fun _ ->
+                                        hide_loading ~id:"learnocaml-exo-loading" () ; true) ;
+          let btn_compile = Tyxml_js.Html5.(button [ pcdata [%i"Compile"] ]) in
+          Manip.Ev.onclick btn_compile (fun _ ->
+              recovering () ;
+              compile ();
+              grade (); true) ;
+          let btn_no = Tyxml_js.Html5.(button [ pcdata [%i"Grade without compiling Test"] ]) in
+          Manip.Ev.onclick btn_no (fun _ -> grade () ; true);
+          let div =
+            Tyxml_js.Html5.(div ~a: [ a_class [ "dialog" ] ]
+                              [ pcdata [%i"The Grade feature relies on the contents of Test.ml. Do you want to compile the high-level tests and overwrite Test.ml?\n"] ;
+                                btn_compile ;
+                                pcdata " " ;
+                                btn_no ;
+                                pcdata " " ;
+                                btn_cancel ]) in
+          Manip.SetCss.opacity div (Some "0") ;
+          t, div in 
+        Manip.replaceChildren messages
+          Tyxml_js.Html5.[ li [ pcdata "" ] ] ;
+        show_loading ~id:"learnocaml-exo-loading" [ abort_message ] ;
+        Manip.SetCss.opacity abort_message (Some "1") ;
+        Lwt.return ()
+      end
+    else
+      grade ()
   end ;
   grade_black:= (fun ()->
     let button_grade = getElementById "grade_id" in

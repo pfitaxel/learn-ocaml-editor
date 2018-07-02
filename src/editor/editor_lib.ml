@@ -131,7 +131,8 @@ let  rec testhaut_init content_div id =
                                 } acc ->  
               match question_id with
                 "0" -> acc
-              | _ ->              
+              | _ -> 
+                 div ~a:[a_id ("toolbar"); a_class ["button"]] [
               (div ~a:[a_id ("button_delete")] [
                   let button =button ~a:[a_id question_id]  [img ~src:("icons/icon_cleanup_dark.svg") ~alt:"" () ; pcdata "" ]in 
                   Manip.Ev.onclick button
@@ -166,8 +167,53 @@ let  rec testhaut_init content_div id =
                          Manip.SetCss.opacity abort_message (Some "1") ;
                        end ;
                        true) ;button
-                ] ) ::
-              a ~a:[ a_onclick (fun _ ->
+              ] );
+                    (div ~a:[a_id ("up")] [
+                     let buttonUp = button ~a:[a_id question_id]  [img ~src:("icons/icon_down_dark.svg") ~alt:"" () ; pcdata "" ] in 
+                     Manip.Ev.onclick buttonUp
+                       (fun _ ->
+                         begin
+                           let qid = question_id in
+                           let testhaut = get_testhaut id in
+                            let question = StringMap.find qid testhaut in
+                            let suivant = string_of_int ((int_of_string qid) +1) in
+                            let testhaut  = match StringMap.find suivant testhaut with
+                              | exception Not_found -> testhaut
+                              | qsuivante -> let map = StringMap.add qid qsuivante testhaut in
+                                             StringMap.add suivant question map in
+                            save_testhaut testhaut id;
+                            Manip.removeChildren content_div;
+                            let _ = testhaut_init content_div id in ()
+                          end;
+                         true) ;
+                     buttonUp;
+            ]);
+                  (div ~a:[a_id ("down")] [
+                     let buttonDown =button ~a:[a_id question_id]  [img ~src:("icons/icon_up_dark.svg") ~alt:"" () ; pcdata "" ] in 
+                     Manip.Ev.onclick buttonDown
+                       (fun _ ->
+                         begin
+                           let qid = question_id in
+                           let testhaut = get_testhaut id in
+                           let question = StringMap.find qid testhaut in
+                           let intp = (int_of_string qid) -1 in
+                            let prec = string_of_int (if intp=0 then intp+1 else intp ) in
+                            let testhaut  = match StringMap.find prec testhaut with
+                              | exception Not_found -> testhaut
+                              | qprec -> let map = StringMap.add qid qprec testhaut in
+                                             StringMap.add prec question map in
+                            save_testhaut testhaut id;
+                            Manip.removeChildren content_div;
+                            let _ = testhaut_init content_div id in ()
+                          end;
+                         true) ;
+                     buttonDown;
+            ] ) ]  
+
+
+
+                
+            ::  a ~a:[ a_onclick (fun _ ->
                   
                   let elt = find_div "learnocaml-exo-loading" in
                   Manip.(addClass elt "loading-layer") ;
@@ -287,8 +333,8 @@ let sectionSol fct = match fct with
   | (name,typeF,nbAlea,jdt,b)->"Section
       		               ([ Text \"Function:\" ; Code \""^name^"\" ],\n"
       			      ^(test_fun typeF)^(testAlea nbAlea)^"\n"
-      			      ^(typeFct typeF name)^"\n["
-      			      ^jdt^"] )"
+      			      ^(typeFct typeF name)^"\n"
+      			      ^jdt^" )"
 
 let rec constructSectionSol listeFonction = match listeFonction with
   |[]->"]"

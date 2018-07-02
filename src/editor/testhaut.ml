@@ -110,13 +110,13 @@ open Learnocaml_exercise_state
 let input_solution_editor = find_component "learnocaml-tab-solution-input";;
 let editor_input_solution = Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div input_solution_editor) ;;
 let ace_input_sol = Ocaml_mode.get_editor editor_input_solution ;;
-let _ = Ace.set_contents ace_input_sol ("");
+let _ = Ace.set_contents ace_input_sol ("[]");
         Ace.set_font_size ace_input_sol 18;;
 
 let input_spec_editor = find_component "learnocaml-tab-spec-input" 
 let editor_input_spec = Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div input_spec_editor) 
 let ace_input_spec = Ocaml_mode.get_editor editor_input_spec 
-let _ = Ace.set_contents ace_input_spec ("");
+let _ = Ace.set_contents ace_input_spec ("[]");
         Ace.set_font_size ace_input_spec 18;;
 
 let spec_spec_editor = find_component "learnocaml-tab-spec-spec"
@@ -128,13 +128,13 @@ let _ =  Ace.set_contents ace_spec_spec ("");
 let input_suite_editor = find_component "learnocaml-tab-suite-input" 
 let editor_input_suite = Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div input_suite_editor)
 let ace_input_suite = Ocaml_mode.get_editor editor_input_suite 
-let _ = Ace.set_contents ace_input_suite ("");
+let _ = Ace.set_contents ace_input_suite ("[]");
         Ace.set_font_size ace_input_suite 18;;
 
 let output_suite_editor = find_component "learnocaml-tab-suite-output" 
 let editor_output_suite = Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div output_suite_editor) 
 let ace_output_suite = Ocaml_mode.get_editor editor_output_suite 
-let _ = Ace.set_contents ace_output_suite ("");
+let _ = Ace.set_contents ace_output_suite ("[]");
         Ace.set_font_size ace_output_suite 18;;
        
 
@@ -201,7 +201,7 @@ let _ = match arg "questionid" with
           let name_elt=name in
           let ty_elt=ty in
           match StringMap.find qid testhaut with
-            {name;ty;type_question;input;output} ->
+            {name;ty;type_question;input;output;extra_alea} ->
              match type_question with
              | Suite ->
                 begin
@@ -219,6 +219,7 @@ let _ = match arg "questionid" with
                   name_elt##.value:=Js.string name;
                   spec##.checked := Js.bool true;
                   ty_elt##.value:=Js.string ty;
+                  extraAleaSpec##.value:= Js.string (string_of_int extra_alea);
                   select_tab "spec"
                 end;
              | _ ->
@@ -227,6 +228,7 @@ let _ = match arg "questionid" with
                   name_elt##.value:=Js.string name;
                   solution##.checked := Js.bool true;
                   ty_elt##.value:=Js.string ty;
+                  extraAleaSol##.value:= Js.string (string_of_int extra_alea);
                   select_tab "solution"
                 end;;
 
@@ -242,6 +244,25 @@ let transResultOption = function
   |Some s-> true;;
 let nameOk s = transResultOption (Regexp.string_match (Regexp.regexp "^.+") s 0);;
 let typeOk s = transResultOption (Regexp.string_match (Regexp.regexp "^.+") s 0);;
+
+let close_frame () =
+  let window=Dom_html.window in
+  let window=window##.parent in
+  let document=window##.document in
+  let div= Js.Opt.case (document##getElementById (Js.string "learnocaml-exo-loading"))
+      (fun ()-> failwith "titi")
+      (fun node->node)
+  in
+  let exo_list=Js.Opt.case (document##getElementById (Js.string "learnocaml-exo-testhaut-pane"))
+      (fun () -> failwith "toto")
+      (fun pnode -> pnode)
+  in
+  let exo_list=Tyxml_js.Of_dom.of_element exo_list in
+  Manip.removeChildren exo_list;
+  
+  let _ =testhaut_init exo_list id  in ();
+  div##setAttribute (Js.string "class") (Js.string "loading-layer loaded");;
+
 
 let toString = function
   |None -> failwith "incorrect_input"
@@ -280,25 +301,8 @@ let _ = save##.onclick:= handler (fun _ ->
 	   if arg "tab" = "solution" then
 	     save_solution ();
 	   if arg "tab" = "spec" then
-	     save_spec ();
-
-	   let window=Dom_html.window in
-	   let window=window##.parent in
-	   let document=window##.document in
-	      let div= Js.Opt.case (document##getElementById (Js.string "learnocaml-exo-loading"))
-	          (fun ()-> failwith "titi")
-	          (fun node->node)
-	   in
-	   let exo_list=Js.Opt.case (document##getElementById (Js.string "learnocaml-exo-testhaut-pane"))
-	       (fun () -> failwith "toto")
-	       (fun pnode -> pnode)
-	   in
-	   let exo_list=Tyxml_js.Of_dom.of_element exo_list in
-	   Manip.removeChildren exo_list;
-	   
-	   let _ =testhaut_init exo_list id  in ();
-	   div##setAttribute (Js.string "class") (Js.string "loading-layer loaded");
-
+             save_spec ();
+          close_frame ();
     end;
    Js._true
 )
@@ -306,8 +310,7 @@ let _ = save##.onclick:= handler (fun _ ->
 (* Back button *)
 let back = getElementById "back"
 let _ = back##.onclick := handler (fun _ ->
-    Dom_html.window##.location##assign
-    	(Js.string ("editor.html#id=" ^ id ^ "&action=open"));
+    close_frame ();
     Js._true)
 
 let _ = set_lang ()

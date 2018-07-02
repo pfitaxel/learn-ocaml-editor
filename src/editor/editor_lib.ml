@@ -154,7 +154,7 @@ let  rec testhaut_init content_div id =
                                let _ = testhaut_init content_div id in ()  ; true) ;
                            let div =
                              Tyxml_js.Html5.(div ~a: [ a_class [ "dialog" ] ]
-                                               [ pcdata [%i"Are you sure you want to delete this question ?\n"] ;
+                                               [ pcdata [%i"Are you sure you want to delete this question?\n"] ;
                                                  btn_yes ;
                                                  pcdata " " ;
                                                  btn_no ]) in

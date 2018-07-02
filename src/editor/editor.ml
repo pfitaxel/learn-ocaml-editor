@@ -20,7 +20,8 @@ open Lwt.Infix
 open Learnocaml_common
 open Learnocaml_exercise_state
 open Js_of_ocaml
-open Editor_lib       
+open Editor_lib
+open Dom_html
 (*
 module Report = Learnocaml_report
 
@@ -94,13 +95,21 @@ let rec save_quest listeQuestions id = match listeQuestions with
     save_quest suite id;;
 (*-------------------------------------------------------------------------*)
 let id = arg "id";; 
-
+let grade_black =ref (fun ()->());;
+let grade_red=ref (fun()->());;
 let init_tabs, select_tab =
   let names = [ "toplevel" ; "report" ; "editor" ; "template" ; "test" ;
                 "question" ; "prelude" ; "prepare" ; "testhaut" ] in
   let current = ref "question" in
   let select_tab name =
     set_arg "tab" name ;
+   
+    if (name = "testhaut") then
+      !grade_red ()
+
+    else
+      !grade_black ();
+
     Manip.removeClass
       (find_component ("learnocaml-exo-button-" ^ !current))
       "front-tab" ;
@@ -765,8 +774,6 @@ let onload () =
                  let test ={testml=tests;testhaut=test.testhaut} in
                  let nvexo= {id;titre;prepare;diff;solution;question;template;test;prelude;mtime} in    
                  Learnocaml_local_storage.(store (editor_state id)) nvexo;
-                 (*Manip.disable
-                   (find_component ("learnocaml-exo-button-testhaut")) ;*)
                  Ace.set_contents ace_t  (get_testml id);
                  select_tab "test" in
   begin testhaut_button
@@ -774,18 +781,16 @@ let onload () =
       ~icon: "run" [%i"Compile"] @@ fun () ->
          let aborted, abort_message =
            let t, u = Lwt.task () in
-           let btn_no = Tyxml_js.Html5.(button [ pcdata [%i"Cancel"] ]) in
+           let btn_no = Tyxml_js.Html5.(button [ pcdata [%i"No"] ]) in
            Manip.Ev.onclick btn_no ( fun _ ->
               hide_loading ~id:"learnocaml-exo-loading" () ; true) ;
            let btn_yes = Tyxml_js.Html5.(button [ pcdata [%i"Yes"] ]) in
            Manip.Ev.onclick btn_yes (fun _ ->
                hide_loading ~id:"learnocaml-exo-loading" ();
                compile () ; true) ;
-      let div =
-        Tyxml_js.Html5.(div ~a: [ a_class [ "dialog" ] ]
-                          [ pcdata [%i"Are you sure you want to compile the tests \
-                          to standard learn-ocaml format (plain and editable OCaml code)? \
-                          This action cannot be cancelled.\n"] ;
+           let div =
+             Tyxml_js.Html5.(div ~a: [ a_class [ "dialog" ] ]
+                          [ pcdata [%i"Are you sure you want to overwrite the contents of Test.ml\n"] ;
                             btn_yes ;
                             pcdata " " ;
                             btn_no; ]) in
@@ -804,6 +809,7 @@ let onload () =
   (* ---- main toolbar -------------------------------------------------- *)
   let exo_toolbar = find_component "learnocaml-exo-toolbar" in
   let toolbar_button = button ~container: exo_toolbar ~theme: "light" in
+  let toolbar_button2 = button2 ~container: exo_toolbar ~theme: "light" in
   begin toolbar_button
       ~icon: "left" [%i"Metadata"] @@ fun () ->
       recovering () ;
@@ -963,7 +969,7 @@ let onload () =
         Lwt_js.yield () >>= fun () ->
         hide_loading ~id:"learnocaml-exo-loading" () ;
         typecheck true in
-  begin toolbar_button
+  begin toolbar_button2
       ~icon: "reload" [%i"Grade!"] @@ fun () ->
     recovering () ;
     if arg "tab" = "testhaut" then
@@ -1000,7 +1006,12 @@ let onload () =
     else
       grade ()
   end ;
-
+  grade_black:= (fun ()->
+    let button_grade = getElementById "grade_id" in
+    button_grade##.style##.background := (Js.string "#222") );
+  grade_red:= (fun ()->
+    let button_grade = getElementById "grade_id" in
+    button_grade##.style##.background := (Js.string "#aaa") );                  
   (* ---- return -------------------------------------------------------- *)
   toplevel_launch >>= fun _ ->
   typecheck false >>= fun () ->

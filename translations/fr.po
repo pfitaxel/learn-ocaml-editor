@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: learn-ocaml ~dev\n"
-"PO-Revision-Date: 2018-07-02 23:41+0200\n"
+"PO-Revision-Date: 2018-07-03 01:07+0200\n"
 "Last-Translator: Louis Gesbert <Louis.gesbert@ocamlpro.com>\n"
 "Language-Team: OCamlPro\n"
 "Language: french\n"
@@ -508,12 +508,12 @@ msgstr "Tapez ici les définitions cachées données à l'étudiant"
 msgid "Type here the wording of the exercise in Markdown"
 msgstr "Tapez ici l'énoncé de l'exercice en Markdown"
 
-#: src/editor/editor.ml:206,35--66
-msgid "Type here the tests sets code"
+#: src/editor/editor.ml:206,35--61
+msgid "Type here the tests code"
 msgstr "Tapez ici le code des jeux de tests"
 
-#: src/editor/editor.ml:207,39--74
-msgid "Generate here the tests sets code"
+#: src/editor/editor.ml:207,39--69
+msgid "Generate here the tests code"
 msgstr "Générez ici le code des jeux de tests"
 
 #: src/editor/editor.ml:333,15--124
@@ -537,7 +537,6 @@ msgstr ""
 "quand il commencera l'exercice *)\n"
 
 #: src/editor/editor.ml:438,22--126
-#, fuzzy
 msgid ""
 "# Questions\n"
 "\n"
@@ -716,3 +715,4 @@ msgstr ""
 #: src/grader/grader_jsoo_worker.ml:64,17--38
 msgid "Unexpected error:\n"
 msgstr "Erreur inattendue:\n"
+

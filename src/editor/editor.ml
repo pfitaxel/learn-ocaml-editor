@@ -203,8 +203,8 @@ let set_string_translations_titles () =
   "learnocaml-exo-button-prelude", [%i"Type here the definitions of types and functions given to the student"];
   "learnocaml-exo-button-prepare", [%i"Type here hidden definitions given to the student"];
   "learnocaml-exo-button-question", [%i"Type here the wording of the exercise in Markdown"];
-  "learnocaml-exo-button-test", [%i"Type here the tests sets code"];
-  "learnocaml-exo-button-testhaut", [%i"Generate here the tests sets code"];
+  "learnocaml-exo-button-test", [%i"Type here the tests code"];
+  "learnocaml-exo-button-testhaut", [%i"Generate here the tests code"];
   ] in
   List.iter
   (fun (id, text) -> Manip.setTitle (find_component id) text)

@@ -221,9 +221,9 @@ let button ~container ~theme ?group ?state ~icon lbl cb =
     | Some group -> group in
   let button =
     Tyxml_js.Html.(button [
-        img ~alt:(lbl ^ " icon") ~src:("icons/icon_" ^ icon ^ "_" ^ theme ^ ".svg") () ;
+        img  ~alt:(lbl ^ " icon") ~src:("icons/icon_" ^ icon ^ "_" ^ theme ^ ".svg") () ;
         pcdata " " ;
-        span ~a:[ a_class [ "label" ] ] [ pcdata lbl ]
+        span ~a:[ a_class [ "label" ] ] [ pcdata lbl ];
       ]) in
   Manip.Ev.onclick button
     (fun _ ->
@@ -246,6 +246,39 @@ let button ~container ~theme ?group ?state ~icon lbl cb =
     dom_button##.disabled := Js.bool true ;
   Manip.appendChild container button
 
+let button2 ~container ~theme ?group ?state ~icon lbl cb =
+  let (others, mutex, cnt) as group =
+    match group with
+    | None -> button_group ()
+    | Some group -> group in
+  let button =
+    Tyxml_js.Html.(button ~a:[a_id "grade_id"] [
+        img  ~alt:(lbl ^ " icon") ~src:("icons/icon_" ^ icon ^ "_" ^ theme ^ ".svg") () ;
+        pcdata " " ;
+        span ~a:[ a_class [ "label" ] ] [ pcdata lbl ];
+      ]) in
+  Manip.Ev.onclick button
+    (fun _ ->
+       begin Lwt.async @@ fun () ->
+         Lwt_mutex.with_lock mutex @@ fun () ->
+         disabling_button_group group cb
+       end ;
+       true) ;
+  let dom_button =
+    (Tyxml_js.To_dom.of_button button
+     :> < disabled : bool Js.t Js.prop > Js.t) in
+  let self_disabled =
+    match state with
+    | None -> ref false
+    | Some (disabled, self) ->
+        self := Some (group, dom_button) ;
+        disabled in
+  others := (dom_button, self_disabled) :: !others ;
+  if !self_disabled || !cnt > 0 then
+    dom_button##.disabled := Js.bool true ;
+  Manip.appendChild container button
+
+                    
 let gettimeofday () =
   let now = new%js Js.date_now in
   floor ((now ## getTime) *. 1000.) +. float (now ## getTimezoneOffset)

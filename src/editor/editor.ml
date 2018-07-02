@@ -320,7 +320,7 @@ let () =
   let editor_th =Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div editor_testhaut ) in
   let ace_testhaut = Ocaml_mode.get_editor editor_th in
   let buffer = match get_buffer id with
-    exception Not_found -> ""
+    exception Not_found -> "(* incipit (local defs that will be available when you create question) *) "
   | buff -> buff.input in
   Ace.set_contents ace_testhaut buffer ;
   Ace.set_font_size ace_testhaut 18;
@@ -329,7 +329,15 @@ let () =
   let editor_test = find_component "learnocaml-exo-test-pane" in
   let editor_t = Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div editor_test) in
   let ace_t = Ocaml_mode.get_editor editor_t in
-  Ace.set_contents ace_t  (get_testml id); 
+  let contents=
+    let a =get_testml id in
+    if  a=""then "(* the grader code *)"
+    else
+      a
+  in
+  
+  
+  Ace.set_contents ace_t  (contents); 
   Ace.set_font_size ace_t 18;
 
  (*let lib = " module Test_lib = Test_lib.Make(struct\n\
@@ -371,8 +379,14 @@ let () =
   let editor_template = find_component "learnocaml-exo-template-pane" in
   let editor_temp = Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div editor_template) in
   let ace_temp = Ocaml_mode.get_editor editor_temp in
-  Ace.set_contents ace_temp
-    ( get_template id ) ;
+  let contents=
+    let a=get_template id in
+    if a="" then
+      "(* code that the student will have when he starts an exercise *)"
+    else
+      a
+  in
+  Ace.set_contents ace_temp contents ;
   Ace.set_font_size ace_temp 18;
 
   
@@ -407,10 +421,17 @@ let () =
   (*-------question pane  -------------------------------------------------*)
   let editor_question = find_component "learnocaml-exo-question-mark" in
   let ace_quest = Ace.create_editor (Tyxml_js.To_dom.of_div editor_question ) in
-  Ace.set_contents ace_quest (get_question id) ;
+   let question =
+    let a= get_question id in
+    if a ="" then "write your questions in markdown (google it if you don't know the syntax)"
+    else a
+  in
+  
+  Ace.set_contents ace_quest question ;
   Ace.set_font_size ace_quest 18;
 
-  let question =get_question id in
+  let question = get_question id
+  in
   let question =Omd.to_html (Omd.of_string question) in
  
   let text_container = find_component "learnocaml-exo-question-html" in
@@ -473,8 +494,12 @@ let onload () =
   let editor_prelude = find_component "learnocaml-exo-prelude-pane" in
   let editor_prel = Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div editor_prelude) in
   let ace_prel = Ocaml_mode.get_editor editor_prel in
-  Ace.set_contents ace_prel
-    ( get_prelude id ) ;
+  let contents=
+    let a= get_prelude id in
+    if a="" then "(* local defs for the student ( the student can see the this defs) *)"
+    else a
+  in
+  Ace.set_contents ace_prel contents ;
   Ace.set_font_size ace_prel 18;
  
     let typecheck set_class =
@@ -509,9 +534,12 @@ let onload () =
   let editor_prepare = find_component "learnocaml-exo-prepare-pane" in
   let editor_prep = Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div editor_prepare) in
   let ace_prep = Ocaml_mode.get_editor editor_prep in
-  
-  Ace.set_contents ace_prep
-    ( get_prepare id ) ;
+  let contents=
+    let a= get_prepare id in
+     if a= "" then "(* local defs for the student ( the student can't see the this defs) *)"
+    else a
+  in  
+  Ace.set_contents ace_prep contents ;
   Ace.set_font_size ace_prep 18;
 
   let typecheck set_class =
@@ -547,6 +575,15 @@ let onload () =
   let editor = Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div editor_pane) in
   let ace = Ocaml_mode.get_editor editor in
 
+  let contents =
+    let a= get_solution id in
+  if a="" then
+    "(* write your solution here *)"
+  else
+    a
+      in
+  Ace.set_contents ace contents;
+  Ace.set_font_size ace 18;
   let save_buffer_test () =
   let ty = "" in
   let type_question = Suite in
@@ -558,7 +595,6 @@ let onload () =
   let question_id ="0" in
   let testhaut = StringMap.add question_id question testhaut in
   save_testhaut testhaut id in
-  
   let recovering () =
     let solution = Ace.get_contents ace in
     let titre = get_titre id  in
@@ -579,8 +615,6 @@ let onload () =
         diff ; test ; prepare ; prelude;
         mtime = gettimeofday () } in
   recovering_callback:=recovering ;
-  Ace.set_contents ace (get_solution id);
-  Ace.set_font_size ace 18;
   let messages = Tyxml_js.Html5.ul [] in
   begin editor_button
       ~icon: "sync" [%i"Gen. template"] @@ fun () ->
@@ -709,7 +743,6 @@ let onload () =
     save_quest (genQuestions (get_fct listeChars []) []) id ;
     Manip.removeChildren (find_component "learnocaml-exo-testhaut-pane");
     testhaut_init (find_component "learnocaml-exo-testhaut-pane") id ;
-    Lwt.return () 
   end ;                             
   begin testhaut_button
       ~group: toplevel_buttons_group

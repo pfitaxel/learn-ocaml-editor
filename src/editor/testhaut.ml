@@ -295,14 +295,13 @@ let _ = save##.onclick:= handler (fun _ ->
     begin
       setInnerHtml name_error "";
       setInnerHtml type_error "";
-
-	   if arg "tab" = "suite" then
-	     save_suite ();  
-	   if arg "tab" = "solution" then
-	     save_solution ();
-	   if arg "tab" = "spec" then
-             save_spec ();
-          close_frame ();
+      if arg "tab" = "suite" then
+	save_suite ();  
+      if arg "tab" = "solution" then
+	save_solution ();
+      if arg "tab" = "spec" then
+        save_spec ();
+      close_frame ();
     end;
    Js._true
 )

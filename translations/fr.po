@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: learn-ocaml ~dev\n"
-"PO-Revision-Date: 2018-07-02 17:40+0200\n"
+"PO-Revision-Date: 2018-07-02 23:27+0200\n"
 "Last-Translator: Louis Gesbert <Louis.gesbert@ocamlpro.com>\n"
 "Language-Team: OCamlPro\n"
 "Language: french\n"
@@ -297,10 +297,10 @@ msgstr ""
 "Sauvegardez sur le serveur avec le bouton <img src=\"icons/icon_sync_white."
 "svg\" class=\"icon\" alt=\"Sync\">."
 
-#: src/app/learnocaml_index_main.ml:819,42--48 src/editor/testhaut.ml:13,13--19
-#: src/editor/new_exercise.ml:21,13--19
+#: src/app/learnocaml_index_main.ml:819,42--48
 #: src/app/learnocaml_exercise_main.ml:312,23--29
-#: src/editor/editor.ml:669,23--29
+#: src/editor/editor.ml:669,23--29 src/editor/testhaut.ml:13,13--19
+#: src/editor/new_exercise.ml:21,13--19
 msgid "Save"
 msgstr "Sauvegarder"
 
@@ -358,126 +358,6 @@ msgstr "Nouvelle question"
 #: src/editor/editor_lib.ml:249,51--74
 msgid "Create a new question"
 msgstr "Créer une nouvelle question"
-
-#: src/editor/testhaut.ml:14,17--23 src/editor/editor.ml:189,39--45
-msgid "Test"
-msgstr "Test"
-
-#: src/editor/testhaut.ml:15,17--25
-msgid "Name: "
-msgstr "Nom: "
-
-#: src/editor/testhaut.ml:16,15--23
-msgid "Type: "
-msgstr "Type: "
-
-#: src/editor/testhaut.ml:17,16--26 src/editor/editor.ml:182,37--47
-msgid "Solution"
-msgstr "Solution"
-
-#: src/editor/testhaut.ml:18,17--32
-msgid "Specification"
-msgstr "Spécification"
-
-#: src/editor/testhaut.ml:19,18--31
-msgid "Tests suite"
-msgstr "Série de tests"
-
-#: src/editor/testhaut.ml:20,22--38 src/editor/testhaut.ml:22,23--39
-#: src/editor/testhaut.ml:25,24--40
-msgid "Arguments:<br>"
-msgstr "Arguments:<br>"
-
-#: src/editor/testhaut.ml:21,20--51 src/editor/testhaut.ml:23,21--52
-msgid "Number of generate tests:<br>"
-msgstr "Nombre de tests générés:<br>"
-
-#: src/editor/testhaut.ml:24,31--51
-msgid "Specification:<br>"
-msgstr "Spécification:<br>"
-
-#: src/editor/testhaut.ml:26,25--39
-msgid "Results:<br>"
-msgstr "Résultats:<br>"
-
-#: src/editor/testhaut.ml:281,33--72 src/editor/testhaut.ml:291,33--72
-msgid "Incorrect name: a name can't be empty"
-msgstr "Nom incorrect: un nom ne peut pas être vide"
-
-#: src/editor/testhaut.ml:282,33--72 src/editor/testhaut.ml:287,33--72
-msgid "Incorrect type: a type can't be empty"
-msgstr "Type incorrect: un type ne peut pas être vide"
-
-#: src/editor/new_exercise.ml:16,15--39
-msgid "Unique identifier:<br>"
-msgstr "Identificateur unique:<br>"
-
-#: src/editor/new_exercise.ml:17,18--43
-msgid "Title (unique too):<br>"
-msgstr "Titre (également unique):<br>"
-
-#: src/editor/new_exercise.ml:18,18--52
-msgid "Description of the exercise:<br>"
-msgstr "Description de l'exercice:<br>"
-
-#: src/editor/new_exercise.ml:19,17--40
-msgid "Difficulty level:<br>"
-msgstr "Niveau de difficulté:<br>"
-
-#: src/editor/new_exercise.ml:20,15--23 src/editor/editor.ml:645,61--69
-#: src/editor/editor.ml:875,58--66 src/editor/editor.ml:979,62--70
-msgid "Cancel"
-msgstr "Annuler"
-
-#: src/editor/new_exercise.ml:145,31--220
-#: src/editor/new_exercise.ml:153,31--220
-#: src/editor/new_exercise.ml:160,31--220
-msgid ""
-"Incorrect identifier: an identifier can't be empty, and only lower case "
-"letters, numerals, dashes and underscores are allowed"
-msgstr ""
-"Identificateur incorrect: un identificateur ne peut être vide, et seuls les "
-"lettres minuscules, chiffres, tirets et soulignés sont autorisés"
-
-#: src/editor/new_exercise.ml:148,34--145
-#: src/editor/new_exercise.ml:168,34--148
-#: src/editor/new_exercise.ml:184,34--148
-msgid ""
-"Incorrect title: a title can't be empty, or begin or end with a space or a "
-"tab"
-msgstr ""
-"Titre incorrect: un titre ne peut être vide, ou commencer ou finir par un "
-"espace ou une tabulation"
-
-#: src/editor/new_exercise.ml:156,34--89 src/editor/new_exercise.ml:174,34--89
-#: src/editor/new_exercise.ml:190,34--89
-msgid "This title is already used, please choose another one"
-msgstr "Ce titre est déjà utilisé, veuillez en choisir un autre"
-
-#: src/editor/new_exercise.ml:167,31--91 src/editor/new_exercise.ml:173,31--91
-#: src/editor/new_exercise.ml:178,31--91
-msgid "This identifier is already used, please choose another one"
-msgstr "Cet identificateur est déjà utilisé, veuillez en choisir un autre"
-
-#: src/grader/grader_jsoo_worker.ml:58,17--44
-msgid "Error in your solution:\n"
-msgstr "Erreur dans votre solution:\n"
-
-#: src/grader/grader_jsoo_worker.ml:60,17--34
-msgid "Internal error "
-msgstr "Erreur interne "
-
-#: src/grader/grader_jsoo_worker.ml:62,17--71
-msgid ""
-"Internal error:\n"
-"The grader did not return a report."
-msgstr ""
-"Erreur interne:\n"
-"Le correcteur n'a pas retourné de rapport."
-
-#: src/grader/grader_jsoo_worker.ml:64,17--38
-msgid "Unexpected error:\n"
-msgstr "Erreur inattendue:\n"
 
 #: src/app/learnocaml_exercise_main.ml:86,33--41
 #: src/app/learnocaml_exercise_main.ml:90,33--41
@@ -576,6 +456,10 @@ msgstr "Erreur dans le code."
 msgid "Cannot start the grader if your code does not typecheck."
 msgstr "La notation ne peut être lancée si le code ne type pas."
 
+#: src/editor/editor.ml:182,37--47 src/editor/testhaut.ml:17,16--26
+msgid "Solution"
+msgstr "Solution"
+
 #: src/editor/editor.ml:183,39--49
 msgid "Template"
 msgstr "Patron"
@@ -595,6 +479,10 @@ msgstr "Question"
 #: src/editor/editor.ml:188,35--44
 msgid "Test.ml"
 msgstr "Test.ml"
+
+#: src/editor/editor.ml:189,39--45 src/editor/testhaut.ml:14,17--23
+msgid "Test"
+msgstr "Test"
 
 #: src/editor/editor.ml:192,25--72
 msgid "Click the Grade! button to test your solution"
@@ -656,15 +544,13 @@ msgstr ""
 "Vous pouvez écrire vos questions ici\n"
 "en utilisant le langage de balisage **Markdown**\n"
 
-#: src/editor/editor.ml:513,9--67
-msgid "(* Local defintions the student will be able to see *)\n"
-msgstr "(* Défintions locales que l'étudiant va pouvoir voir *)\n"
+#: src/editor/editor.ml:513,9--68
+msgid "(* Local definitions the student will be able to see *)\n"
+msgstr "(* Définitions locales que l'étudiant va pouvoir voir *)\n"
 
 #: src/editor/editor.ml:555,9--69
 msgid "(* Local definitions the student won't be able to see *)\n"
-msgstr ""
-"(* Défintions locales que l'étudiant\n"
-"ne va pas pouvoir voir *)\n"
+msgstr "(* Définitions locales que l'étudiant ne va pas pouvoir voir *)\n"
 
 #: src/editor/editor.ml:598,7--30
 msgid "(* Your solution *)\n"
@@ -673,6 +559,11 @@ msgstr "(* Votre solution *)\n"
 #: src/editor/editor.ml:637,23--38
 msgid "Gen. template"
 msgstr "Créer le patron"
+
+#: src/editor/editor.ml:645,61--69 src/editor/editor.ml:875,58--66
+#: src/editor/editor.ml:979,62--70 src/editor/new_exercise.ml:20,15--23
+msgid "Cancel"
+msgstr "Annuler"
 
 #: src/editor/editor.ml:654,41--79
 msgid "Do you want to crush the template?\n"
@@ -714,3 +605,109 @@ msgstr ""
 "La fonctionnalité de notation automatique s'appuie sur le contenu de Test."
 "ml. Voulez-vous compiler les tests de haut niveau et écraser Test.ml?\n"
 
+#: src/editor/testhaut.ml:15,17--34
+msgid "Function name: "
+msgstr "Nom de la fonction: "
+
+#: src/editor/testhaut.ml:16,15--23
+msgid "Type: "
+msgstr "Type: "
+
+#: src/editor/testhaut.ml:18,17--32
+msgid "Specification"
+msgstr "Spécification"
+
+#: src/editor/testhaut.ml:19,18--31
+msgid "Tests suite"
+msgstr "Série de tests"
+
+#: src/editor/testhaut.ml:20,22--38 src/editor/testhaut.ml:22,23--39
+#: src/editor/testhaut.ml:25,24--40
+msgid "Arguments:<br>"
+msgstr "Arguments:<br>"
+
+#: src/editor/testhaut.ml:21,20--52 src/editor/testhaut.ml:23,21--53
+msgid "Number of generated tests:<br>"
+msgstr "Nombre de tests générés:<br>"
+
+#: src/editor/testhaut.ml:24,31--51
+msgid "Specification:<br>"
+msgstr "Spécification:<br>"
+
+#: src/editor/testhaut.ml:26,25--39
+msgid "Results:<br>"
+msgstr "Résultats:<br>"
+
+#: src/editor/testhaut.ml:281,33--72 src/editor/testhaut.ml:291,33--72
+msgid "Incorrect name: a name can't be empty"
+msgstr "Nom incorrect: un nom ne peut pas être vide"
+
+#: src/editor/testhaut.ml:282,33--72 src/editor/testhaut.ml:287,33--72
+msgid "Incorrect type: a type can't be empty"
+msgstr "Type incorrect: un type ne peut pas être vide"
+
+#: src/editor/new_exercise.ml:16,15--39
+msgid "Unique identifier:<br>"
+msgstr "Identificateur unique:<br>"
+
+#: src/editor/new_exercise.ml:17,18--43
+msgid "Title (unique too):<br>"
+msgstr "Titre (également unique):<br>"
+
+#: src/editor/new_exercise.ml:18,18--52
+msgid "Description of the exercise:<br>"
+msgstr "Description de l'exercice:<br>"
+
+#: src/editor/new_exercise.ml:19,17--40
+msgid "Difficulty level:<br>"
+msgstr "Niveau de difficulté:<br>"
+
+#: src/editor/new_exercise.ml:145,31--220
+#: src/editor/new_exercise.ml:153,31--220
+#: src/editor/new_exercise.ml:160,31--220
+msgid ""
+"Incorrect identifier: an identifier can't be empty, and only lower case "
+"letters, numerals, dashes and underscores are allowed"
+msgstr ""
+"Identificateur incorrect: un identificateur ne peut être vide, et seuls les "
+"lettres minuscules, chiffres, tirets et soulignés sont autorisés"
+
+#: src/editor/new_exercise.ml:148,34--145
+#: src/editor/new_exercise.ml:168,34--148
+#: src/editor/new_exercise.ml:184,34--148
+msgid ""
+"Incorrect title: a title can't be empty, or begin or end with a space or a "
+"tab"
+msgstr ""
+"Titre incorrect: un titre ne peut être vide, ou commencer ou finir par un "
+"espace ou une tabulation"
+
+#: src/editor/new_exercise.ml:156,34--89 src/editor/new_exercise.ml:174,34--89
+#: src/editor/new_exercise.ml:190,34--89
+msgid "This title is already used, please choose another one"
+msgstr "Ce titre est déjà utilisé, veuillez en choisir un autre"
+
+#: src/editor/new_exercise.ml:167,31--91 src/editor/new_exercise.ml:173,31--91
+#: src/editor/new_exercise.ml:178,31--91
+msgid "This identifier is already used, please choose another one"
+msgstr "Cet identificateur est déjà utilisé, veuillez en choisir un autre"
+
+#: src/grader/grader_jsoo_worker.ml:58,17--44
+msgid "Error in your solution:\n"
+msgstr "Erreur dans votre solution:\n"
+
+#: src/grader/grader_jsoo_worker.ml:60,17--34
+msgid "Internal error "
+msgstr "Erreur interne "
+
+#: src/grader/grader_jsoo_worker.ml:62,17--71
+msgid ""
+"Internal error:\n"
+"The grader did not return a report."
+msgstr ""
+"Erreur interne:\n"
+"Le correcteur n'a pas retourné de rapport."
+
+#: src/grader/grader_jsoo_worker.ml:64,17--38
+msgid "Unexpected error:\n"
+msgstr "Erreur inattendue:\n"

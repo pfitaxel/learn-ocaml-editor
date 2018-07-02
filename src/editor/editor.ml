@@ -510,7 +510,7 @@ let onload () =
   let contents=
     let a = get_prelude id in
     if a = "" then
-      [%i"(* Local defintions the student will be able to see *)\n"]
+      [%i"(* Local definitions the student will be able to see *)\n"]
     else
       a
   in

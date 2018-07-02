@@ -12,15 +12,15 @@ let set_string_translations () =
   let translations = [
   "save", [%i"Save"];
   "txt_test", [%i"Test"];
-  "txt_name", [%i"Name: "];
+  "txt_name", [%i"Function name: "];
   "txt_ty", [%i"Type: "];
   "txt_sol", [%i"Solution"];
   "txt_spec", [%i"Specification"];
   "txt_suite", [%i"Tests suite"];
   "txt_input_sol", [%i"Arguments:<br>"];
-  "txt_gen_sol", [%i"Number of generate tests:<br>"];
+  "txt_gen_sol", [%i"Number of generated tests:<br>"];
   "txt_input_spec", [%i"Arguments:<br>"];
-  "txt_gen_spec", [%i"Number of generate tests:<br>"];
+  "txt_gen_spec", [%i"Number of generated tests:<br>"];
   "txt_spec_specification", [%i"Specification:<br>"];
   "txt_suite_input", [%i"Arguments:<br>"];
   "txt_suite_output", [%i"Results:<br>"];

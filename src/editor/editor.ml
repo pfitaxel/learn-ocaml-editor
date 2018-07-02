@@ -141,7 +141,7 @@ let init_tabs, select_tab =
 
 
 let display_report exo report =
-  let score, failed = Learnocaml_report.result_of_report report in 
+  (* let score, failed = Learnocaml_report.result_of_report report in *)
   let report_button = find_component "learnocaml-exo-button-report" in
   Manip.removeClass report_button "success" ;
   Manip.removeClass report_button "failure" ;

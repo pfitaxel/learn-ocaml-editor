@@ -195,7 +195,7 @@ let set_string_translations_titles () =
   "learnocaml-exo-button-prepare", [%i"Type here hidden definitions given to the student"];
   "learnocaml-exo-button-question", [%i"Type here the wording of the exercise in Markdown"];
   "learnocaml-exo-button-test", [%i"Type here the tests sets code"];
-  "learnocaml-exo-button-testhaut", [%i"Generate here the tests set code"];
+  "learnocaml-exo-button-testhaut", [%i"Generate here the tests sets code"];
   ] in
   List.iter
   (fun (id, text) -> Manip.setTitle (find_component id) text)
@@ -246,7 +246,7 @@ let () =
     end >>= fun r1 ->
     Learnocaml_toplevel.load ~print_outcome:false top
      "" >>= fun r2 ->
-    if not r1 || not r2 then failwith [%i "error in prelude"] ;
+    if not r1 || not r2 then failwith [%i"error in prelude"] ;
     Learnocaml_toplevel.set_checking_environment top >>= fun () ->
     Lwt.return () in
   let timeout_prompt =
@@ -320,8 +320,10 @@ let () =
   let editor_th =Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div editor_testhaut ) in
   let ace_testhaut = Ocaml_mode.get_editor editor_th in
   let buffer = match get_buffer id with
-    exception Not_found -> "(* incipit (local defs that will be available when you create question) *) "
-  | buff -> buff.input in
+    exception Not_found -> ""
+  | buff -> [%i"(* Incipit: contains local definitions that\n\
+  will be reachable when you will create a new question *)\n"]
+    ^ buff.input in
   Ace.set_contents ace_testhaut buffer ;
   Ace.set_font_size ace_testhaut 18;
 
@@ -330,13 +332,13 @@ let () =
   let editor_t = Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div editor_test) in
   let ace_t = Ocaml_mode.get_editor editor_t in
   let contents=
-    let a =get_testml id in
-    if  a=""then "(* the grader code *)"
+    let a = get_testml id in
+    if a = "" then
+      [%i"(* Grader and tests sets code *)\n"]
     else
       a
   in
-  
-  
+
   Ace.set_contents ace_t  (contents); 
   Ace.set_font_size ace_t 18;
 
@@ -380,9 +382,10 @@ let () =
   let editor_temp = Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div editor_template) in
   let ace_temp = Ocaml_mode.get_editor editor_temp in
   let contents=
-    let a=get_template id in
-    if a="" then
-      "(* code that the student will have when he starts an exercise *)"
+    let a = get_template id in
+    if a = "" then
+      [%i"(* Code the student will have\n\
+      when he will start the exercise *)\n"]
     else
       a
   in
@@ -422,8 +425,9 @@ let () =
   let editor_question = find_component "learnocaml-exo-question-mark" in
   let ace_quest = Ace.create_editor (Tyxml_js.To_dom.of_div editor_question ) in
    let question =
-    let a= get_question id in
-    if a ="" then "write your questions in markdown (google it if you don't know the syntax)"
+    let a = get_question id in
+    if a = "" then [%i"You can write here your questions using\n\
+    the **Markdown** markup language\n"]
     else a
   in
   
@@ -495,9 +499,11 @@ let onload () =
   let editor_prel = Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div editor_prelude) in
   let ace_prel = Ocaml_mode.get_editor editor_prel in
   let contents=
-    let a= get_prelude id in
-    if a="" then "(* local defs for the student ( the student can see the this defs) *)"
-    else a
+    let a = get_prelude id in
+    if a = "" then
+      [%i"(* Local defintions the student will be able to see *)\n"]
+    else
+      a
   in
   Ace.set_contents ace_prel contents ;
   Ace.set_font_size ace_prel 18;
@@ -536,8 +542,10 @@ let onload () =
   let ace_prep = Ocaml_mode.get_editor editor_prep in
   let contents=
     let a= get_prepare id in
-     if a= "" then "(* local defs for the student ( the student can't see the this defs) *)"
-    else a
+    if a = "" then
+      [%i"(* Local definitions the student won't be able to see *)\n"]
+    else
+      a
   in  
   Ace.set_contents ace_prep contents ;
   Ace.set_font_size ace_prep 18;
@@ -577,8 +585,8 @@ let onload () =
 
   let contents =
     let a= get_solution id in
-  if a="" then
-    "(* write your solution here *)"
+  if a = "" then
+    [%i"(* Your solution *)\n"]
   else
     a
       in
@@ -775,7 +783,9 @@ let onload () =
                compile () ; true) ;
       let div =
         Tyxml_js.Html5.(div ~a: [ a_class [ "dialog" ] ]
-                          [ pcdata [%i"Are you sure you want to compile the tests to standard learn-ocaml format (plain, editable OCaml code)? This action cannot be cancelled.\n"] ;
+                          [ pcdata [%i"Are you sure you want to compile the tests \
+                          to standard learn-ocaml format (plain and editable OCaml code)? \
+                          This action cannot be cancelled.\n"] ;
                             btn_yes ;
                             pcdata " " ;
                             btn_no; ]) in
@@ -829,7 +839,7 @@ let onload () =
         Tyxml_js.Html5.(div ~a: [ a_class [ "dialog" ] ]
                           [ pcdata [%i"Grading is taking a lot of time, "] ;
                             btn ;
-                            pcdata " ?" ]) in
+                            pcdata "?" ]) in
      Manip.SetCss.opacity div (Some "0") ;
      t, div in
   let worker = ref (Grading_jsoo.get_grade (exo ())) in
@@ -972,7 +982,8 @@ let onload () =
           Manip.Ev.onclick btn_no (fun _ -> grade () ; true);
           let div =
             Tyxml_js.Html5.(div ~a: [ a_class [ "dialog" ] ]
-                              [ pcdata [%i"The Grade feature relies on the contents of Test.ml. Do you want to compile the high-level tests and overwrite Test.ml?\n"] ;
+                              [ pcdata [%i"The Grade feature relies on the contents of Test.ml. \
+                              Do you want to compile the high-level tests and overwrite Test.ml?\n"] ;
                                 btn_compile ;
                                 pcdata " " ;
                                 btn_no ;

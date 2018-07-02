@@ -435,7 +435,8 @@ let () =
   let ace_quest = Ace.create_editor (Tyxml_js.To_dom.of_div editor_question ) in
    let question =
     let a = get_question id in
-    if a = "" then [%i"You can write here your questions using\n\
+    if a = "" then [%i"# Questions\n\n\
+    You can write here your questions using\n\
     the **Markdown** markup language\n"]
     else a
   in

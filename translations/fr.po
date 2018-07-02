@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: learn-ocaml ~dev\n"
-"PO-Revision-Date: 2018-07-02 23:27+0200\n"
+"PO-Revision-Date: 2018-07-02 23:41+0200\n"
 "Last-Translator: Louis Gesbert <Louis.gesbert@ocamlpro.com>\n"
 "Language-Team: OCamlPro\n"
 "Language: french\n"
@@ -177,14 +177,14 @@ msgid "Loading editor"
 msgstr "Chargement de l'éditeur"
 
 #: src/app/learnocaml_index_main.ml:174,73--77
-#: src/editor/editor_lib.ml:144,75--79 src/editor/editor.ml:784,59--63
-#: src/editor/editor.ml:883,54--58
+#: src/editor/editor_lib.ml:144,75--79 src/editor/editor.ml:785,59--63
+#: src/editor/editor.ml:884,54--58
 msgid "No"
 msgstr "Non"
 
 #: src/app/learnocaml_index_main.ml:177,74--79
-#: src/editor/editor_lib.ml:148,76--81 src/editor/editor.ml:648,58--63
-#: src/editor/editor.ml:787,60--65 src/editor/editor.ml:878,55--60
+#: src/editor/editor_lib.ml:148,76--81 src/editor/editor.ml:649,58--63
+#: src/editor/editor.ml:788,60--65 src/editor/editor.ml:879,55--60
 msgid "Yes"
 msgstr "Oui"
 
@@ -299,7 +299,7 @@ msgstr ""
 
 #: src/app/learnocaml_index_main.ml:819,42--48
 #: src/app/learnocaml_exercise_main.ml:312,23--29
-#: src/editor/editor.ml:669,23--29 src/editor/testhaut.ml:13,13--19
+#: src/editor/editor.ml:670,23--29 src/editor/testhaut.ml:13,13--19
 #: src/editor/new_exercise.ml:21,13--19
 msgid "Save"
 msgstr "Sauvegarder"
@@ -326,7 +326,7 @@ msgstr "Cours"
 
 #: src/app/learnocaml_index_main.ml:863,23--34
 #: src/app/learnocaml_exercise_main.ml:378,23--34
-#: src/editor/editor.ml:872,23--34
+#: src/editor/editor.ml:873,23--34
 msgid "Exercises"
 msgstr "Exercices"
 
@@ -403,19 +403,19 @@ msgid "Show"
 msgstr "Montrer"
 
 #: src/app/learnocaml_exercise_main.ml:324,27--37
-#: src/editor/editor.ml:675,27--37
+#: src/editor/editor.ml:676,27--37
 msgid "Download"
 msgstr "Télécharger"
 
 #: src/app/learnocaml_exercise_main.ml:354,28--35
 #: src/editor/editor.ml:384,28--35 src/editor/editor.ml:429,28--35
-#: src/editor/editor.ml:544,28--35 src/editor/editor.ml:586,28--35
-#: src/editor/editor.ml:714,28--35 src/editor/editor.ml:766,28--35
+#: src/editor/editor.ml:545,28--35 src/editor/editor.ml:587,28--35
+#: src/editor/editor.ml:715,28--35 src/editor/editor.ml:767,28--35
 msgid "Check"
 msgstr "Valider"
 
 #: src/app/learnocaml_exercise_main.ml:359,22--33
-#: src/editor/editor.ml:719,22--33
+#: src/editor/editor.ml:720,22--33
 msgid "Eval code"
 msgstr "Évaluer le code"
 
@@ -424,27 +424,27 @@ msgid "Edit"
 msgstr "Éditer"
 
 #: src/app/learnocaml_exercise_main.ml:388,25--33
-#: src/editor/editor.ml:973,25--33
+#: src/editor/editor.ml:974,25--33
 msgid "Grade!"
 msgstr "Noter!"
 
 #: src/app/learnocaml_exercise_main.ml:391,51--58
-#: src/editor/editor.ml:842,50--57 src/editor/editor.ml:924,52--59
+#: src/editor/editor.ml:843,50--57 src/editor/editor.ml:925,52--59
 msgid "abort"
 msgstr "abandonner"
 
 #: src/app/learnocaml_exercise_main.ml:395,38--73
-#: src/editor/editor.ml:846,38--73 src/editor/editor.ml:928,38--73
+#: src/editor/editor.ml:847,38--73 src/editor/editor.ml:929,38--73
 msgid "Grading is taking a lot of time, "
 msgstr "La notation prend longtemps, "
 
 #: src/app/learnocaml_exercise_main.ml:401,38--60
-#: src/editor/editor.ml:934,38--60
+#: src/editor/editor.ml:935,38--60
 msgid "Launching the grader"
 msgstr "Lancement de la notation"
 
 #: src/app/learnocaml_exercise_main.ml:415,60--86
-#: src/editor/editor.ml:860,56--82 src/editor/editor.ml:948,60--86
+#: src/editor/editor.ml:861,56--82 src/editor/editor.ml:949,60--86
 msgid "Grading aborted by user."
 msgstr "Notation annulée par l'utilisateur"
 
@@ -536,68 +536,73 @@ msgstr ""
 "(* Code qu'aura l'étudiant\n"
 "quand il commencera l'exercice *)\n"
 
-#: src/editor/editor.ml:438,22--105
+#: src/editor/editor.ml:438,22--126
+#, fuzzy
 msgid ""
+"# Questions\n"
+"\n"
 "You can write here your questions using\n"
 "the **Markdown** markup language\n"
 msgstr ""
+"# Questions\n"
+"\n"
 "Vous pouvez écrire vos questions ici\n"
 "en utilisant le langage de balisage **Markdown**\n"
 
-#: src/editor/editor.ml:513,9--68
+#: src/editor/editor.ml:514,9--68
 msgid "(* Local definitions the student will be able to see *)\n"
 msgstr "(* Définitions locales que l'étudiant va pouvoir voir *)\n"
 
-#: src/editor/editor.ml:555,9--69
+#: src/editor/editor.ml:556,9--69
 msgid "(* Local definitions the student won't be able to see *)\n"
 msgstr "(* Définitions locales que l'étudiant ne va pas pouvoir voir *)\n"
 
-#: src/editor/editor.ml:598,7--30
+#: src/editor/editor.ml:599,7--30
 msgid "(* Your solution *)\n"
 msgstr "(* Votre solution *)\n"
 
-#: src/editor/editor.ml:637,23--38
+#: src/editor/editor.ml:638,23--38
 msgid "Gen. template"
 msgstr "Créer le patron"
 
-#: src/editor/editor.ml:645,61--69 src/editor/editor.ml:875,58--66
-#: src/editor/editor.ml:979,62--70 src/editor/new_exercise.ml:20,15--23
+#: src/editor/editor.ml:646,61--69 src/editor/editor.ml:876,58--66
+#: src/editor/editor.ml:980,62--70 src/editor/new_exercise.ml:20,15--23
 msgid "Cancel"
 msgstr "Annuler"
 
-#: src/editor/editor.ml:654,41--79
+#: src/editor/editor.ml:655,41--79
 msgid "Do you want to crush the template?\n"
 msgstr "Voulez-vous écraser le patron?\n"
 
-#: src/editor/editor.ml:757,23--33
+#: src/editor/editor.ml:758,23--33
 msgid "Generate"
 msgstr "Générer"
 
-#: src/editor/editor.ml:781,22--31 src/editor/editor.ml:982,63--72
+#: src/editor/editor.ml:782,22--31 src/editor/editor.ml:983,63--72
 msgid "Compile"
 msgstr "Compiler"
 
-#: src/editor/editor.ml:793,38--100
+#: src/editor/editor.ml:794,38--100
 msgid "Are you sure you want to overwrite the content of Test.ml?\n"
 msgstr "Êtes-vous sûr de vouloir écraser le contenu de Test.ml?\n"
 
-#: src/editor/editor.ml:814,23--33
+#: src/editor/editor.ml:815,23--33
 msgid "Metadata"
 msgstr "Métadonnées"
 
-#: src/editor/editor.ml:822,25--37
+#: src/editor/editor.ml:823,25--37
 msgid "Experiment"
 msgstr "Tester"
 
-#: src/editor/editor.ml:889,38--77
+#: src/editor/editor.ml:890,38--77
 msgid "Do you want to save before closing?\n"
 msgstr "Voulez-vous sauvegarder avant de fermer?\n"
 
-#: src/editor/editor.ml:987,58--88
+#: src/editor/editor.ml:988,58--88
 msgid "Grade without compiling Test"
 msgstr "Noter sans compiler Test"
 
-#: src/editor/editor.ml:991,42--197
+#: src/editor/editor.ml:992,42--197
 msgid ""
 "The Grade feature relies on the contents of Test.ml. Do you want to compile "
 "the high-level tests and overwrite Test.ml?\n"

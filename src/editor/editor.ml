@@ -329,7 +329,7 @@ let () =
   let editor_th =Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div editor_testhaut ) in
   let ace_testhaut = Ocaml_mode.get_editor editor_th in
   let buffer = match get_buffer id with
-    exception Not_found -> ""
+  | exception Not_found -> ""
   | buff -> [%i"(* Incipit: contains local definitions that\n\
   will be reachable when you will create a new question *)\n"]
     ^ buff.input in
@@ -790,7 +790,7 @@ let onload () =
                compile () ; true) ;
            let div =
              Tyxml_js.Html5.(div ~a: [ a_class [ "dialog" ] ]
-                          [ pcdata [%i"Are you sure you want to overwrite the contents of Test.ml\n"] ;
+                          [ pcdata [%i"Are you sure you want to overwrite the content of Test.ml?\n"] ;
                             btn_yes ;
                             pcdata " " ;
                             btn_no; ]) in

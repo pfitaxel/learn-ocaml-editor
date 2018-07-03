@@ -7,7 +7,7 @@ body{
   line-height: 50px; 
 }
 #learnocaml-main-toolbar {
-  position: absolute;
+  position: fixed;
   left: 0; top: 0;
   color: #fff;
   z-index: 1004;
@@ -46,6 +46,10 @@ body{
     height: 40px;
     width: 100%
   }
+  .button {
+    height: 40px;
+    min-width: 40px;
+  }
   #learnocaml-main-toolbar::before {
     top: 41px;
   }
@@ -58,7 +62,26 @@ body{
     height: 60px;
     width: 100%;
   }
+  .button {
+    height: 60px;
+    min-width: 60px;
+  }
   #learnocaml-main-toolbar::before {
     top: 61px;
   }
+}
+
+#learnocaml-tabs > * {
+  position: absolute;
+  z-index: 997;
+  background: #eee;
+  padding: 0;
+  opacity: 0;
+}
+#learnocaml-tabs > *.front-tab {
+  z-index: 998;
+  opacity: 1;
+}
+#learnocaml-tabs > * {
+  left: 0px; top: 15px; right: 0px; bottom: 0px;
 }

@@ -122,8 +122,8 @@ let exercises_tab _ _ () =
 
 let init ()= Learnocaml_local_storage.(store (index_state "index")) {Learnocaml_exercise_state.exos=StringMap.empty;mtime=gettimeofday ()};; 
 
-(*test*)
-let editor_tab _ _ () =
+
+let rec editor_tab _ _ () =
   Learnocaml_local_storage.init ();
   let pct_init=None in
     let pct_signal, pct_signal_set = React.S.create pct_init in
@@ -253,13 +253,84 @@ let editor_tab _ _ () =
                  (h ~a:[ a_class [ "pack" ] ] [ pcdata group_title ] :: acc)
                  group_contents)
             groups acc in
-     let open Tyxml_js.Html5 in
+    let open Tyxml_js.Html5 in
+    let restore_bar = a ~a:[ a_onclick (fun _ ->
+        let _ =begin
+            Learnocaml_common.fake_upload () >>= fun (_, contents) ->
+          let open Learnocaml_exercise_state in
+          let save_file =
+            Json_repr_browser.Json_encoding.destruct
+              Learnocaml_exercise_state.editor_state_enc 
+              (Js._JSON##(parse contents)) in
+          let titleUnique () =
+            let exos=
+              match Learnocaml_local_storage.(retrieve (index_state "index")) with
+              |{Learnocaml_exercise_state.exos ;mtime}-> exos
+            in
+            let open Learnocaml_index in
+            match StringMap.find_first_opt (fun key->(StringMap.find key exos).exercise_title=save_file.titre) exos with
+              None->true
+            | _ -> false      
+          in
+          let idUnique () =
+            match Learnocaml_local_storage.(retrieve (editor_state save_file.id)) with
+            | exception Not_found -> true
+            | _ -> false
+          in
+          let store2 () =
+            let exercise_title = save_file.titre in
+            let stars = match save_file.diff with None -> failwith "" | Some f -> f in
+            let exercise_stars = stars in
+            let open Learnocaml_index in
+            let exercise_kind = Learnocaml_exercise in
+            let exercise_short_description = None in
+            let exo = {exercise_kind; exercise_stars; exercise_title; exercise_short_description} in
+    match Learnocaml_local_storage.(retrieve (index_state "index")) with
+    | {Learnocaml_exercise_state.exos; mtime} ->
+        let anciensexos =  exos in
+        let exos = StringMap.add save_file.id exo anciensexos in
+        let index = {Learnocaml_exercise_state.exos; mtime = gettimeofday ()} in
+        Learnocaml_local_storage.(store (index_state "index")) index;
+  in
+          let messages = Tyxml_js.Html5.ul [] in
+          if idUnique () && titleUnique () then
+            (Learnocaml_local_storage.(store (editor_state save_file.id ) save_file);store2 ();Dom_html.window##.location##reload;Lwt.return_unit)
+          else
+            begin
+              let aborted, abort_message =
+                let t, u = Lwt.task () in
+                let btn_ok = Tyxml_js.Html5.(button [ pcdata [%i"Ok"] ]) in
+                Manip.Ev.onclick btn_ok ( fun _ ->
+                    hide_loading ~id:"learnocaml-main-loading" () ; true) ;
+                
+                let div =
+                  Tyxml_js.Html5.(div ~a: [ a_class [ "dialog" ] ]
+                                    [ pcdata [%i"Title,id not unique(s)\n"] ;
+                                      btn_ok 
+                                    ]) in
+                Manip.SetCss.opacity div (Some "0") ;
+                t, div in
+              Manip.replaceChildren messages
+                Tyxml_js.Html5.[ li [ pcdata "" ] ] ;
+              show_loading ~id:"learnocaml-main-loading" [ abort_message ] ;
+              Manip.SetCss.opacity abort_message (Some "1");
+              Lwt.return_unit
+            end;
+           Lwt.return ();
+        end in () ;
+true) ; a_class [ "exercise"] ]
+[
+      div ~a:[ a_class [ "descr" ] ] [
+        h1 [ pcdata [%i"Import exercise"] ];
+        p [pcdata [%i"Import a new exercise from json"]];];
+    ]
+in
     List.rev (format_contents 1 [a ~a:[ a_href ("new_exercise.html#&action=open") ; 
         a_class [ "exercise" ] ] [
       div ~a:[ a_class [ "descr" ] ] [
         h1 [ pcdata [%i"New exercise"] ];
         p [pcdata [%i"Create a new exercise"]];];
-      ]] index) in
+      ];restore_bar] index) in
   let list_div =
     Tyxml_js.Html5.(div ~a: [ Tyxml_js.Html5.a_id "learnocaml-main-exercise-list" ])
       (format_exercise_list Learnocaml_local_storage.(retrieve all_exercise_states)) in

@@ -331,8 +331,9 @@ let () =
   let buffer = match get_buffer id with
   | exception Not_found -> ""
   | buff -> if (buff.input="")
-            then [%i"(* Incipit: contains local definitions that\n\
-                     will be reachable when you will create a new question *)\n"]
+            then [%i"(* Incipit: contains local definitions\n\
+            		 that will be reachable when you will create\n\
+        			 a new question *)\n"]
             else buff.input in
   Ace.set_contents ace_testhaut buffer ;
   Ace.set_font_size ace_testhaut 18;
@@ -344,7 +345,7 @@ let () =
   let contents=
     let a = get_testml id in
     if a = "" then
-      [%i"(* Grader and tests sets code *)\n"]
+      [%i"(* Grader and tests code *)\n"]
     else
       a
   in
@@ -395,7 +396,7 @@ let () =
     let a = get_template id in
     if a = "" then
       [%i"(* Code the student will have\n\
-      when he will start the exercise *)\n"]
+      	  when he will start the exercise *)\n"]
     else
       a
   in
@@ -514,7 +515,8 @@ let onload () =
   let contents=
     let a = get_prelude id in
     if a = "" then
-      [%i"(* Local definitions the student will be able to see *)\n"]
+      [%i"(* Local definitions the student\n\
+      	  will be able to see *)\n"]
     else
       a
   in
@@ -556,7 +558,8 @@ let onload () =
   let contents=
     let a= get_prepare id in
     if a = "" then
-      [%i"(* Local definitions the student won't be able to see *)\n"]
+      [%i"(* Local definitions the student\n\
+      	  won't be able to see *)\n"]
     else
       a
   in  

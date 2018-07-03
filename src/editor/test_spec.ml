@@ -73,7 +73,11 @@ let example_constr_sol =
       gen = 0;
       suite = [!! 0; !! 1; !! 2; !! ~-1]
     }
+<<<<<<< HEAD
 *)
+
+
+    
 
 let example_constr_spec =
   TestAgainstSpec
@@ -100,7 +104,7 @@ let example_constr_suite =
 let local_dummy : 'a sampler = fun () -> failwith "dummy sampler"
 (* à n'utiliser que si on passe l'argument ~gen:0 (pas d'alea) *)
 
-                                    
+
 let test_question (t : test_qst_typed) =
   match t with
   | TestAgainstSol t ->
@@ -150,9 +154,7 @@ let rec to_string_aux char_list =match char_list with
   |c::l -> (string_of_char c) ^( to_string_aux l)
 ;;
   
-let to_ty str= "[%ty :"^str^" ]"
-   
-;;
+let to_ty str= "[%ty :"^str^" ]";;
 
 
 

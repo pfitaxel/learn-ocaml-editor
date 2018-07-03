@@ -330,9 +330,10 @@ let () =
   let ace_testhaut = Ocaml_mode.get_editor editor_th in
   let buffer = match get_buffer id with
   | exception Not_found -> ""
-  | buff -> [%i"(* Incipit: contains local definitions that\n\
-  will be reachable when you will create a new question *)\n"]
-    ^ buff.input in
+  | buff -> if (buff.input="")
+            then [%i"(* Incipit: contains local definitions that\n\
+                     will be reachable when you will create a new question *)\n"]
+            else buff.input in
   Ace.set_contents ace_testhaut buffer ;
   Ace.set_font_size ace_testhaut 18;
 
@@ -429,6 +430,8 @@ let () =
       ~icon: "typecheck" [%i"Check"] @@ fun () ->
     typecheck true
   end ;
+
+
 
   (*-------question pane  -------------------------------------------------*)
   let editor_question = find_component "learnocaml-exo-question-mark" in
@@ -634,9 +637,8 @@ let onload () =
         mtime = gettimeofday () } in
   recovering_callback:=recovering ;
   let messages = Tyxml_js.Html5.ul [] in
-  begin editor_button
+  begin template_button
       ~icon: "sync" [%i"Gen. template"] @@ fun () ->
-    select_tab "template";
     if (Ace.get_contents ace_temp) = "" then        
         Ace.set_contents ace_temp (genTemplate (Ace.get_contents ace) )
     else
@@ -665,7 +667,7 @@ let onload () =
       end;
     Lwt.return ()
   end ;
-
+ 
   begin editor_button
       ~icon: "save" [%i"Save"] @@ fun () ->
     recovering () ;
@@ -778,6 +780,8 @@ let onload () =
                  let nvexo= {id;titre;prepare;diff;solution;question;template;test;prelude;mtime} in    
                  Learnocaml_local_storage.(store (editor_state id)) nvexo;
                  Ace.set_contents ace_t  (get_testml id);
+                 Manip.removeChildren (find_component "learnocaml-exo-testhaut-pane");
+                 testhaut_init (find_component "learnocaml-exo-testhaut-pane") id ;
                  select_tab "test" in
   begin testhaut_button
       ~group: toplevel_buttons_group
@@ -903,7 +907,6 @@ let onload () =
     Manip.SetCss.opacity abort_message (Some "1") ;
     Lwt.return ()
   end ;
-  
   let messages = Tyxml_js.Html5.ul [] in
   let callback text =
     Manip.appendChild messages Tyxml_js.Html5.(li [ pcdata text ]) in

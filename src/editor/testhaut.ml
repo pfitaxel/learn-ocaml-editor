@@ -23,7 +23,6 @@ let set_string_translations () =
   "txt_gen_spec", [%i"Number of generated tests:<br>"];
   "txt_spec_specification", [%i"Specification:<br>"];
   "txt_suite_input", [%i"Arguments:<br>"];
-  "txt_suite_output", [%i"Results:<br>"];
   ] in
   List.iter
   (fun (id, text) -> Manip.setInnerHtml (find_component id) text)
@@ -130,20 +129,14 @@ let editor_input_suite = Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div 
 let ace_input_suite = Ocaml_mode.get_editor editor_input_suite 
 let _ = Ace.set_contents ace_input_suite ("[]");
         Ace.set_font_size ace_input_suite 18;;
-
-let output_suite_editor = find_component "learnocaml-tab-suite-output" 
-let editor_output_suite = Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div output_suite_editor) 
-let ace_output_suite = Ocaml_mode.get_editor editor_output_suite 
-let _ = Ace.set_contents ace_output_suite ("[]");
-        Ace.set_font_size ace_output_suite 18;;
-       
+      
 
 let save_suite () =
   let name = Js.to_string name##.value in
   let ty = Js.to_string ty##.value in
   let type_question = Suite in
   let input = Ace.get_contents ace_input_suite in
-  let output = Ace.get_contents ace_output_suite in
+  let output = "" in
   let extra_alea = 0 in
   let question = {name; ty; type_question; input; output; extra_alea} in
   let testhaut =  get_testhaut id in
@@ -152,12 +145,7 @@ let save_suite () =
     |qid->qid
   in
   let testhaut = StringMap.add question_id question testhaut in
-  save_testhaut testhaut id
-
-;;
-  
-
-
+  save_testhaut testhaut id;;
 
 let save_solution () =
   let name = Js.to_string name##.value in
@@ -206,7 +194,6 @@ let _ = match arg "questionid" with
              | Suite ->
                 begin
                   Ace.set_contents ace_input_suite input;
-                  Ace.set_contents ace_output_suite output;
                   name_elt##.value:=Js.string name;
                   suite##.checked := Js.bool true;
                   ty_elt##.value:=Js.string ty;

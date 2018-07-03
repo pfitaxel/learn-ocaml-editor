@@ -157,7 +157,7 @@ let to_ty str= "[%ty :"^str^" ]";;
 
 let parse_type string =
   let without_spaces = List.filter (fun c ->c <> ' ') in
-  let char_list_ref = ref (without_spaces (decomposition string 0)) in
+  let char_list_ref = ref (List.rev (without_spaces (decomposition string 0))) in
   
   if (nbArgs !char_list_ref) < 2 then failwith "" ;
   
@@ -169,24 +169,24 @@ let parse_type string =
         if elt='>' then
           match l with
             '-'::l2 -> char_list_ref:=l2;acc
-          |_ -> failwith ""
+          |_ -> failwith "toto"
         else
           last_arg l ( elt::acc )
   in
 
   
   let init_acc () =
-    let arg1=last_arg (List.rev (!char_list_ref) ) [] in                               
-    let arg2=last_arg (List.rev (!char_list_ref) ) [] in
+    let arg1=last_arg (!char_list_ref ) [] in                               
+    let arg2=last_arg (!char_list_ref)  [] in
     let ty1=to_ty (to_string_aux arg1) in 
     let ty2=to_ty (to_string_aux arg2) in
     "last_ty "^ty2^" "^ty1
   in 
   let acc =ref (init_acc ()) in
   while !char_list_ref <>[] do
-    let arg=last_arg (List.rev (!char_list_ref)) [] in
+    let arg=last_arg (!char_list_ref) [] in
     let ty= to_ty (to_string_aux arg) in
-    acc:="arg_ty "^ty^" "^(!acc) ;
+    acc:="arg_ty "^ty^" ("^(!acc)^")" ;
   done;
   !acc;;
     

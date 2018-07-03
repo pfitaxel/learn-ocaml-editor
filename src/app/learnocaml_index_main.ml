@@ -163,6 +163,7 @@ let editor_tab _ _ () =
                     | Some pct when  pct >= 100 -> [ "stats" ; "success" ]
                     | Some _ -> [ "stats" ; "partial" ])
                   pct_signal in
+              div ~a:[a_id ("toolbar"); a_class ["button"]] [
               (div ~a:[a_id ("button_delete")] [
                   let button =button ~a:[a_id exercise_id]  [img ~src:("icons/icon_cleanup_dark.svg") ~alt:"" () ; pcdata "" ]in 
                    Manip.Ev.onclick button
@@ -199,7 +200,22 @@ let editor_tab _ _ () =
                        Manip.SetCss.opacity abort_message (Some "1") ;
                         end ;
                       true) ;button
-                ] ) ::
+              ] );
+                (div ~a:[a_id ("button_download")] [
+                  let button =button ~a:[a_id exercise_id]  [img ~src:("icons/icon_download_dark.svg") ~alt:"" () ; pcdata "" ] in 
+                   Manip.Ev.onclick button
+                   (fun _ ->
+                     let name = exercise_id ^ ".json" in
+                     let content =Learnocaml_local_storage.(retrieve (editor_state exercise_id)) in  
+                     let json =
+                       Json_repr_browser.Json_encoding.construct
+                         Learnocaml_exercise_state.editor_state_enc
+                         content in
+                     let contents =
+                       (Js._JSON##stringify (json)) in
+                     Learnocaml_common.fake_download ~name ~contents;
+                     true) ;button
+                ] )] ::
               a ~a:[ a_href ("editor.html#id="^exercise_id^"&action=open") ; 
                      a_class [ "exercise" ] ] [
                   div ~a:[ a_class [ "descr" ] ] [

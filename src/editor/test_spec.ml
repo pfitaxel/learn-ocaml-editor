@@ -65,14 +65,15 @@ let (!!) b = b :: []
 let (@:!!) a b = a @: !! b
  *)
 (* TODO missing: nth_arg *)
-
+(*
 let example_constr_sol =
   TestAgainstSol
     { name = "opp"; 
-      prot = (last_ty [%ty int] [%ty int] );
+      prot = (last_ty [%ty: int] [%ty: int] );
       gen = 0;
       suite = [!! 0; !! 1; !! 2; !! ~-1]
     }
+*)
 
 let example_constr_spec =
   TestAgainstSpec
@@ -137,7 +138,7 @@ let test_question (t : test_qst_typed) =
        t.suite
 
 end
-(*
+
 open Editor_lib
  
 (*let types_de_base =
@@ -149,13 +150,8 @@ let rec to_string_aux char_list =match char_list with
   |c::l -> (string_of_char c) ^( to_string_aux l)
 ;;
   
-let to_ty =function
-    ['i';'n';'t']->[%ty int]
-  |['c';'h';'a';'r']->[%ty char]
-  | ['f';'l';'o';'a';'t']->[%ty float]
-  |['s';'t';'r';'i';'n';'g']->[%ty string]
-  |['b';'o';'o';'l']->[%ty bool]
-  |_ ->failwith "wip"
+let to_ty str= "[%ty :"^str^" ]"
+   
 ;;
 
 
@@ -183,16 +179,16 @@ let parse_type string =
   let init_acc () =
     let arg1=last_arg (List.rev (!char_list_ref) ) [] in                               
     let arg2=last_arg (List.rev (!char_list_ref) ) [] in
-    let ty1=to_ty arg1 in 
-    let ty2=to_ty arg2 in
-    last_ty ty2 ty1
+    let ty1=to_ty (to_string_aux arg1) in 
+    let ty2=to_ty (to_string_aux arg2) in
+    "last_ty "^ty2^" "^ty1
   in 
   let acc =ref (init_acc ()) in
   while !char_list_ref <>[] do
     let arg=last_arg (List.rev (!char_list_ref)) [] in
-    let ty= to_ty arg in
-    acc:=arg_ty ty !acc ;
+    let ty= to_ty (to_string_aux arg) in
+    acc:="arg_ty "^ty^" "^(!acc) ;
   done;
   !acc;;
     
-  *)
+  

@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: learn-ocaml ~dev\n"
-"PO-Revision-Date: 2018-07-03 14:37+0200\n"
+"PO-Revision-Date: 2018-07-03 18:14+0200\n"
 "Last-Translator: Louis Gesbert <Louis.gesbert@ocamlpro.com>\n"
 "Language-Team: OCamlPro\n"
 "Language: french\n"
@@ -61,22 +61,6 @@ msgstr "@[<v 2>Important: %a@]"
 #: src/state/learnocaml_report.ml:533,58--83
 msgid "@[<v 2>Success %d: %a@]"
 msgstr "@[<v 2>Réussite %d: %a@]"
-
-#: src/editor/test_spec.ml:122,26--45
-msgid "Checking spec for"
-msgstr "Vérification de la spec pour"
-
-#: src/editor/test_spec.ml:126,31--45
-msgid "Correct spec"
-msgstr "Spec correcte"
-
-#: src/editor/test_spec.ml:128,29--41
-msgid "Wrong spec"
-msgstr "Spec fausse"
-
-#: src/editor/test_spec.ml:130,26--37
-msgid "Got value"
-msgstr "Valeur obtenue"
 
 #: src/grader/grading.ml:27,31--61
 msgid ""
@@ -152,7 +136,7 @@ msgid "Loading exercises"
 msgstr "Chargement des exercices"
 
 #: src/app/learnocaml_index_main.ml:71,42--69
-#: src/app/learnocaml_index_main.ml:208,42--69
+#: src/app/learnocaml_index_main.ml:224,42--69
 msgid "No description available."
 msgstr "Aucune description."
 
@@ -176,104 +160,120 @@ msgstr "exercice"
 msgid "Loading editor"
 msgstr "Chargement de l'éditeur"
 
-#: src/app/learnocaml_index_main.ml:174,73--77
-#: src/editor/editor_lib.ml:144,75--79 src/editor/editor.ml:792,59--63
-#: src/editor/editor.ml:891,54--58
+#: src/app/learnocaml_index_main.ml:175,73--77
+#: src/editor/editor_lib.ml:144,75--79 src/editor/editor.ml:795,59--63
+#: src/editor/editor.ml:894,54--58
 msgid "No"
 msgstr "Non"
 
-#: src/app/learnocaml_index_main.ml:177,74--79
+#: src/app/learnocaml_index_main.ml:178,74--79
 #: src/editor/editor_lib.ml:148,76--81 src/editor/editor.ml:654,58--63
-#: src/editor/editor.ml:795,60--65 src/editor/editor.ml:886,55--60
+#: src/editor/editor.ml:798,60--65 src/editor/editor.ml:889,55--60
 msgid "Yes"
 msgstr "Oui"
 
-#: src/app/learnocaml_index_main.ml:190,57--107
+#: src/app/learnocaml_index_main.ml:191,57--107
 msgid "Are you sure you want to delete this exercise?\n"
 msgstr "Êtes-vous sûr de vouloir supprimer cet exercice?\n"
 
-#: src/app/learnocaml_index_main.ml:244,23--37
+#: src/app/learnocaml_index_main.ml:302,64--68
+msgid "OK"
+msgstr "OK"
+
+#: src/app/learnocaml_index_main.ml:308,48--86
+msgid "Identifier and/or title not unique\n"
+msgstr "Identificateur et/ou titre non unique(s)\n"
+
+#: src/app/learnocaml_index_main.ml:324,23--40
+msgid "Import exercise"
+msgstr "Importer l'exercice"
+
+#: src/app/learnocaml_index_main.ml:325,21--61
+msgid "Import a new exercise from a json file"
+msgstr "Importer un nouvel exercice depuis un fichier json"
+
+#: src/app/learnocaml_index_main.ml:331,23--37
 #: src/editor/new_exercise.ml:15,20--34
 msgid "New exercise"
 msgstr "Nouvel exercice"
 
-#: src/app/learnocaml_index_main.ml:245,21--44
+#: src/app/learnocaml_index_main.ml:332,21--44
 msgid "Create a new exercise"
 msgstr "Créer un nouvel exercice"
 
-#: src/app/learnocaml_index_main.ml:258,41--58
+#: src/app/learnocaml_index_main.ml:345,41--58
 msgid "Loading lessons"
 msgstr "Chargement des cours"
 
-#: src/app/learnocaml_index_main.ml:293,45--69
+#: src/app/learnocaml_index_main.ml:380,45--69
 msgid "Running OCaml examples"
 msgstr "Lancement des exemples d'OCaml"
 
-#: src/app/learnocaml_index_main.ml:361,39--45
-#: src/app/learnocaml_index_main.ml:582,39--45
+#: src/app/learnocaml_index_main.ml:448,39--45
+#: src/app/learnocaml_index_main.ml:669,39--45
 msgid "Prev"
 msgstr "Prec."
 
-#: src/app/learnocaml_index_main.ml:377,40--46
-#: src/app/learnocaml_index_main.ml:599,40--46
+#: src/app/learnocaml_index_main.ml:464,40--46
+#: src/app/learnocaml_index_main.ml:686,40--46
 msgid "Next"
 msgstr "Suiv."
 
-#: src/app/learnocaml_index_main.ml:466,41--60
+#: src/app/learnocaml_index_main.ml:553,41--60
 msgid "Loading tutorials"
 msgstr "Chargement des tutoriels"
 
-#: src/app/learnocaml_index_main.ml:620,57--64
-#: src/app/learnocaml_index_main.ml:686,57--64
+#: src/app/learnocaml_index_main.ml:707,57--64
+#: src/app/learnocaml_index_main.ml:773,57--64
 #: src/app/learnocaml_exercise_main.ml:220,26--33
 #: src/editor/editor.ml:297,26--33
 msgid "Clear"
 msgstr "Effacer"
 
-#: src/app/learnocaml_index_main.ml:627,24--31
-#: src/app/learnocaml_index_main.ml:691,24--31
+#: src/app/learnocaml_index_main.ml:714,24--31
+#: src/app/learnocaml_index_main.ml:778,24--31
 #: src/app/learnocaml_exercise_main.ml:225,25--32
 #: src/app/learnocaml_exercise_main.ml:307,26--33
 #: src/editor/editor.ml:302,25--32
 msgid "Reset"
 msgstr "Réinitialiser"
 
-#: src/app/learnocaml_index_main.ml:633,53--66
-#: src/app/learnocaml_index_main.ml:695,53--66
+#: src/app/learnocaml_index_main.ml:720,53--66
+#: src/app/learnocaml_index_main.ml:782,53--66
 #: src/app/learnocaml_exercise_main.ml:231,22--35
 #: src/editor/editor.ml:308,22--35
 msgid "Eval phrase"
 msgstr "Évaluer la phrase"
 
-#: src/app/learnocaml_index_main.ml:653,41--58
+#: src/app/learnocaml_index_main.ml:740,41--58
 msgid "Launching OCaml"
 msgstr "Démarrage d'OCaml"
 
-#: src/app/learnocaml_index_main.ml:775,7--56
+#: src/app/learnocaml_index_main.ml:862,7--56
 msgid "Welcome to <emph>LearnOCaml</emph> by OCamlPro."
 msgstr "Bienvenue sur <emph>LearnOCaml</emph> par OCamlPro."
 
-#: src/app/learnocaml_index_main.ml:777,7--46
+#: src/app/learnocaml_index_main.ml:864,7--46
 msgid "This App is still under construction."
 msgstr "Cette application est encore en construction."
 
-#: src/app/learnocaml_index_main.ml:779,7--36
+#: src/app/learnocaml_index_main.ml:866,7--36
 msgid "Choose your activity below."
 msgstr "Sélectionnez une activité:"
 
-#: src/app/learnocaml_index_main.ml:781,7--50
+#: src/app/learnocaml_index_main.ml:868,7--50
 msgid "Your storage token on OCamlPro's servers:"
 msgstr "Votre identifiant de stockage sur le serveur:"
 
-#: src/app/learnocaml_index_main.ml:783,7--42
+#: src/app/learnocaml_index_main.ml:870,7--42
 msgid "You can share it between devices."
 msgstr "Il peut être partagé entre appareils."
 
-#: src/app/learnocaml_index_main.ml:785,7--53
+#: src/app/learnocaml_index_main.ml:872,7--53
 msgid "Progression is saved locally in the browser."
 msgstr "Vos progrès sont sauvegardés dans le navigateur."
 
-#: src/app/learnocaml_index_main.ml:787,7--132
+#: src/app/learnocaml_index_main.ml:874,7--132
 msgid ""
 "Save it to a file using the <img src=\"icons/icon_download_white.svg\" class="
 "\"icon\" alt=\"save\"> button above."
@@ -281,7 +281,7 @@ msgstr ""
 "Sauvegardez dans un fichier local avec le bouton <img src=\"icons/"
 "icon_download_white.svg\" class=\"icon\" alt=\"Sauvegarder\">."
 
-#: src/app/learnocaml_index_main.ml:790,7--148
+#: src/app/learnocaml_index_main.ml:877,7--148
 msgid ""
 "Restore it from a file using the <img src=\"icons/icon_upload_white.svg\" "
 "class=\"icon\" alt=\"restore\"> button above."
@@ -289,7 +289,7 @@ msgstr ""
 "Restaurez depuis un fichier avec le bouton <img src=\"icons/"
 "icon_upload_white.svg\" class=\"icon\" alt=\"Restaurer\">."
 
-#: src/app/learnocaml_index_main.ml:794,7--122
+#: src/app/learnocaml_index_main.ml:881,7--122
 msgid ""
 "Save online using the <img src=\"icons/icon_sync_white.svg\" class=\"icon\" "
 "alt=\"sync\"> button above."
@@ -297,53 +297,53 @@ msgstr ""
 "Sauvegardez sur le serveur avec le bouton <img src=\"icons/icon_sync_white."
 "svg\" class=\"icon\" alt=\"Sync\">."
 
-#: src/app/learnocaml_index_main.ml:819,42--48 src/editor/testhaut.ml:13,13--19
+#: src/app/learnocaml_index_main.ml:906,42--48 src/editor/testhaut.ml:13,13--19
 #: src/editor/new_exercise.ml:20,13--19
 #: src/app/learnocaml_exercise_main.ml:312,23--29
 #: src/editor/editor.ml:675,23--29
 msgid "Save"
 msgstr "Sauvegarder"
 
-#: src/app/learnocaml_index_main.ml:832,40--49
+#: src/app/learnocaml_index_main.ml:919,40--49
 msgid "Restore"
 msgstr "Restaurer"
 
-#: src/app/learnocaml_index_main.ml:844,38--44
+#: src/app/learnocaml_index_main.ml:931,38--44
 msgid "Sync"
 msgstr "Sync"
 
-#: src/app/learnocaml_index_main.ml:851,38--44
+#: src/app/learnocaml_index_main.ml:938,38--44
 msgid "Menu"
 msgstr "Menu"
 
-#: src/app/learnocaml_index_main.ml:861,22--33
+#: src/app/learnocaml_index_main.ml:948,22--33
 msgid "Try OCaml"
 msgstr "Try OCaml"
 
-#: src/app/learnocaml_index_main.ml:862,21--30
+#: src/app/learnocaml_index_main.ml:949,21--30
 msgid "Lessons"
 msgstr "Cours"
 
-#: src/app/learnocaml_index_main.ml:863,23--34
+#: src/app/learnocaml_index_main.ml:950,23--34
 #: src/app/learnocaml_exercise_main.ml:378,23--34
-#: src/editor/editor.ml:880,23--34
+#: src/editor/editor.ml:883,23--34
 msgid "Exercises"
 msgstr "Exercices"
 
-#: src/app/learnocaml_index_main.ml:864,22--32
+#: src/app/learnocaml_index_main.ml:951,22--32
 #: src/app/learnocaml_exercise_main.ml:108,41--51
 #: src/editor/editor.ml:186,39--49
 msgid "Toplevel"
 msgstr "Toplevel"
 
-#: src/app/learnocaml_index_main.ml:865,20--28
+#: src/app/learnocaml_index_main.ml:952,20--28
 #: src/app/learnocaml_exercise_main.ml:107,39--47
 #: src/app/learnocaml_exercise_main.ml:111,37--45
 #: src/editor/editor.ml:191,35--43 src/editor/editor.ml:193,33--41
 msgid "Editor"
 msgstr "Éditeur"
 
-#: src/app/learnocaml_index_main.ml:927,41--62
+#: src/app/learnocaml_index_main.ml:1014,41--62
 msgid "Choose an activity."
 msgstr "Sélectionnez une activité."
 
@@ -351,13 +351,29 @@ msgstr "Sélectionnez une activité."
 msgid "Are you sure you want to delete this question?\n"
 msgstr "Êtes-vous sûr de vouloir supprimer cette question?\n"
 
-#: src/editor/editor_lib.ml:248,52--66
+#: src/editor/editor_lib.ml:244,52--66
 msgid "New question"
 msgstr "Nouvelle question"
 
-#: src/editor/editor_lib.ml:249,51--74
+#: src/editor/editor_lib.ml:245,51--74
 msgid "Create a new question"
 msgstr "Créer une nouvelle question"
+
+#: src/editor/test_spec.ml:125,26--45
+msgid "Checking spec for"
+msgstr "Vérification de la spec pour"
+
+#: src/editor/test_spec.ml:129,31--45
+msgid "Correct spec"
+msgstr "Spec correcte"
+
+#: src/editor/test_spec.ml:131,29--41
+msgid "Wrong spec"
+msgstr "Spec fausse"
+
+#: src/editor/test_spec.ml:133,26--37
+msgid "Got value"
+msgstr "Valeur obtenue"
 
 #: src/editor/testhaut.ml:14,17--23 src/editor/editor.ml:189,39--45
 msgid "Test"
@@ -384,7 +400,6 @@ msgid "Tests suite"
 msgstr "Série de tests"
 
 #: src/editor/testhaut.ml:20,22--38 src/editor/testhaut.ml:22,23--39
-#: src/editor/testhaut.ml:25,24--40
 msgid "Arguments:<br>"
 msgstr "Arguments:<br>"
 
@@ -396,15 +411,15 @@ msgstr "Nombre de tests générés:<br>"
 msgid "Specification:<br>"
 msgstr "Spécification:<br>"
 
-#: src/editor/testhaut.ml:26,25--39
-msgid "Results:<br>"
-msgstr "Résultats:<br>"
+#: src/editor/testhaut.ml:25,24--52
+msgid "Arguments and results:<br>"
+msgstr "Arguments et résultats:<br>"
 
-#: src/editor/testhaut.ml:281,33--72 src/editor/testhaut.ml:291,33--72
+#: src/editor/testhaut.ml:268,33--72 src/editor/testhaut.ml:278,33--72
 msgid "Incorrect name: a name can't be empty"
 msgstr "Nom incorrect: un nom ne peut pas être vide"
 
-#: src/editor/testhaut.ml:282,33--72 src/editor/testhaut.ml:287,33--72
+#: src/editor/testhaut.ml:269,33--72 src/editor/testhaut.ml:274,33--72
 msgid "Incorrect type: a type can't be empty"
 msgstr "Type incorrect: un type ne peut pas être vide"
 
@@ -539,27 +554,27 @@ msgid "Edit"
 msgstr "Éditer"
 
 #: src/app/learnocaml_exercise_main.ml:388,25--33
-#: src/editor/editor.ml:981,25--33
+#: src/editor/editor.ml:983,25--33
 msgid "Grade!"
 msgstr "Noter!"
 
 #: src/app/learnocaml_exercise_main.ml:391,51--58
-#: src/editor/editor.ml:850,50--57 src/editor/editor.ml:932,52--59
+#: src/editor/editor.ml:853,50--57 src/editor/editor.ml:934,52--59
 msgid "abort"
 msgstr "abandonner"
 
 #: src/app/learnocaml_exercise_main.ml:395,38--73
-#: src/editor/editor.ml:854,38--73 src/editor/editor.ml:936,38--73
+#: src/editor/editor.ml:857,38--73 src/editor/editor.ml:938,38--73
 msgid "Grading is taking a lot of time, "
 msgstr "La notation prend du temps, "
 
 #: src/app/learnocaml_exercise_main.ml:401,38--60
-#: src/editor/editor.ml:942,38--60
+#: src/editor/editor.ml:944,38--60
 msgid "Launching the grader"
 msgstr "Lancement de la notation"
 
 #: src/app/learnocaml_exercise_main.ml:415,60--86
-#: src/editor/editor.ml:868,56--82 src/editor/editor.ml:956,60--86
+#: src/editor/editor.ml:871,56--82 src/editor/editor.ml:958,60--86
 msgid "Grading aborted by user."
 msgstr "Notation annulée par l'utilisateur"
 
@@ -683,8 +698,8 @@ msgstr "(* Votre solution *)\n"
 msgid "Gen. template"
 msgstr "Créer le patron"
 
-#: src/editor/editor.ml:651,61--69 src/editor/editor.ml:883,58--66
-#: src/editor/editor.ml:987,62--70
+#: src/editor/editor.ml:651,61--69 src/editor/editor.ml:886,58--66
+#: src/editor/editor.ml:989,62--70
 msgid "Cancel"
 msgstr "Annuler"
 
@@ -696,31 +711,31 @@ msgstr "Voulez-vous écraser le patron?\n"
 msgid "Generate"
 msgstr "Générer"
 
-#: src/editor/editor.ml:789,22--31 src/editor/editor.ml:990,63--72
+#: src/editor/editor.ml:792,22--31 src/editor/editor.ml:992,63--72
 msgid "Compile"
 msgstr "Compiler"
 
-#: src/editor/editor.ml:801,38--100
+#: src/editor/editor.ml:804,38--100
 msgid "Are you sure you want to overwrite the content of Test.ml?\n"
 msgstr "Êtes-vous sûr de vouloir écraser le contenu de Test.ml?\n"
 
-#: src/editor/editor.ml:822,23--33
+#: src/editor/editor.ml:825,23--33
 msgid "Metadata"
 msgstr "Métadonnées"
 
-#: src/editor/editor.ml:830,25--37
+#: src/editor/editor.ml:833,25--37
 msgid "Experiment"
 msgstr "Tester"
 
-#: src/editor/editor.ml:897,38--77
+#: src/editor/editor.ml:900,38--77
 msgid "Do you want to save before closing?\n"
 msgstr "Voulez-vous sauvegarder avant de fermer?\n"
 
-#: src/editor/editor.ml:995,58--88
+#: src/editor/editor.ml:997,58--88
 msgid "Grade without compiling Test"
 msgstr "Noter sans compiler Test"
 
-#: src/editor/editor.ml:999,42--197
+#: src/editor/editor.ml:1001,42--197
 msgid ""
 "The Grade feature relies on the contents of Test.ml. Do you want to compile "
 "the high-level tests and overwrite Test.ml?\n"

@@ -70,7 +70,7 @@ end
 
 
 begin library "test-spec"
-  comp_requires = "ppx_metaquot:asm"
+  comp_requires = "ppx_metaquot:asm" "ppx_ocplib_i18n:asm"
   link += [ "-linkall" ]
   requires = [
     "ty"
@@ -81,9 +81,10 @@ begin library "test-spec"
     "learnocaml-state"
     "learnocaml-repository"
     "testing"
+    "ocplib_i18n"
   ]
   files = [
-    "test_spec.ml" ( comp += [ "-ppx" %asm_exe( p = "ppx_metaquot") ] )
+    "test_spec.ml" ( comp += [ "-ppx" %asm_exe( p = "ppx_metaquot") ppx_ocplib_i18n ] )
   ]
 end
 
@@ -91,7 +92,7 @@ begin library "editor_lib"
   comp_requires = [ "ppx_ocplib_i18n:asm" "ppx_metaquot:asm" ]
 
   files = [
-    "editor_lib.ml" ( comp =  ppx_js  ppx_ocplib_i18n )   
+    "editor_lib.ml" ( comp = [ ppx_js ppx_ocplib_i18n "-ppx" %asm_exe( p = "ppx_metaquot") ] ) 
   ]
   requires = [
     "ace"

@@ -430,6 +430,8 @@ let () =
     typecheck true
   end ;
 
+
+
   (*-------question pane  -------------------------------------------------*)
   let editor_question = find_component "learnocaml-exo-question-mark" in
   let ace_quest = Ace.create_editor (Tyxml_js.To_dom.of_div editor_question ) in
@@ -634,9 +636,8 @@ let onload () =
         mtime = gettimeofday () } in
   recovering_callback:=recovering ;
   let messages = Tyxml_js.Html5.ul [] in
-  begin editor_button
+  begin template_button
       ~icon: "sync" [%i"Gen. template"] @@ fun () ->
-    select_tab "template";
     if (Ace.get_contents ace_temp) = "" then        
         Ace.set_contents ace_temp (genTemplate (Ace.get_contents ace) )
     else
@@ -665,7 +666,7 @@ let onload () =
       end;
     Lwt.return ()
   end ;
-
+ 
   begin editor_button
       ~icon: "save" [%i"Save"] @@ fun () ->
     recovering () ;

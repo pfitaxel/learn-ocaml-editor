@@ -172,7 +172,7 @@ position: absolute;
 }
 
 #learnocaml-tab-suite-input{
-  	left: 0px; top: 10px; right: 50%; bottom: 0%;
+  	left: 25%; top: 10px; right: 25%; bottom: 0px;
 	position: absolute;
 	margin: 10px;
 	background : #666;
@@ -180,22 +180,10 @@ position: absolute;
 }
 
 #txt_suite_input {
-	left: 10px;	
+	left: 25%;	
 	position: absolute;
 }
 
-#learnocaml-tab-suite-output{
-  	left: 50%; top: 10px; right: 0px; bottom: 0px;
-	position: absolute;
-	margin: 10px;
-	background : #666;
-	border : 3px solid #fff
-}
-
-#txt_suite_output{
-	position: absolute;
-	left: 51%
-}
 
 /* ace */
 	/* solution input */
@@ -382,49 +370,3 @@ position: absolute;
 #learnocaml-tab-spec-spec .ace_selection { background: #e80; opacity: 0.4; }
 #learnocaml-tab-spec-spec .ace_active-line { background: #acf; opacity: 0.2; }
 #learnocaml-tab-spec-spec .ace_selected-word { background: #e80; opacity: 0.2; }
-
-	/* suite output */
-#learnocaml-tab-suite-output {
-  font-size: 18px;
-  font-family: 'Inconsolata', monospace;
-}
-#learnocaml-tab-suite-output .ace_gutter {
-  background: linear-gradient(to left, transparent 0, #444 8px, #ccc 8px, #ccc 9px, #444 9px) ;
-  color: #ccc;
-}
-#learnocaml-tab-suite-output .ace_gutter-active-line {
-  background: linear-gradient(to left, #777 0, #456 8px, #ccc 8px, #ccc 9px, #678 9px) ;
-  color: #888;
-}
-#learnocaml-tab-suite-output .ace_gutter-cell {
-  padding: 0 14px 0 0;
-}
-#learnocaml-tab-suite-output .ace_gutter-cell.ace_warning {
-  background: linear-gradient(to right, #980 0, #980 4px, transparent 80%) ;
-}
-#learnocaml-tab-suite-output .ace_gutter-cell.ace_error {
-  background: linear-gradient(to right, #900 0, #900 4px, transparent 80%) ;
-}
-#learnocaml-tab-suite-output .ace_comment { color: #aaa; font-style: italic; }
-#learnocaml-tab-suite-output .ace_keyword { color: #e80; font-weight:bold; }
-#learnocaml-tab-suite-output .ace_constant { color: #acf; }
-#learnocaml-tab-suite-output .ace_string { color: #acf; }
-#learnocaml-tab-suite-output .ace_function { color: #fff; }
-#learnocaml-tab-suite-output .ace_type { color: #fff; }
-#learnocaml-tab-suite-output .ace_operator { color: #fff; }
-#learnocaml-tab-suite-output .ace_meta { color: #fff; }
-#learnocaml-tab-suite-output .ace_variable { color: #fff; }
-#learnocaml-tab-suite-output .ace_text { color: #fff; }
-#learnocaml-tab-suite-output .error {
-  border-bottom: 2px #b00 solid;
-  position: absolute;
-}
-
-#learnocaml-tab-suite-output .warning {
-  border-bottom: 2px #ca0 solid;
-  position: absolute;
-}
-
-#learnocaml-tab-suite-output .ace_selection { background: #e80; opacity: 0.4; }
-#learnocaml-tab-suite-output .ace_active-line { background: #acf; opacity: 0.2; }
-#learnocaml-tab-suite-output .ace_selected-word { background: #e80; opacity: 0.2; }

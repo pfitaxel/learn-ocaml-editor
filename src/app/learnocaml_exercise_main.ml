@@ -136,7 +136,7 @@ let () =
   let transResultOption = function
   |None -> false
   |Some s-> true in
-  let idEditor s = transResultOption (Regexp.string_match (Regexp.regexp "^.+") s 0) in
+  let idEditor s = transResultOption (Regexp.string_match (Regexp.regexp "^[.]+") s 0) in
   let id = arg "id" in
 
   let exercise_fetch = match idEditor id with
@@ -394,7 +394,7 @@ in
         Tyxml_js.Html5.(div ~a: [ a_class [ "dialog" ] ]
                           [ pcdata [%i"Grading is taking a lot of time, "] ;
                             btn ;
-                            pcdata "?" ]) in
+                            pcdata " ?" ]) in
       Manip.SetCss.opacity div (Some "0") ;
       t, div in
     Manip.replaceChildren messages

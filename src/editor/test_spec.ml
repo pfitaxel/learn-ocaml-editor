@@ -102,24 +102,6 @@ let example_constr_suite =
 
 let local_dummy : 'a sampler = fun () -> failwith "dummy sampler"
 (* à n'utiliser que si on passe l'argument ~gen:0 (pas d'alea) *)
-
-(*parse_type (string : ex: int -> int) ==> (string : prot)*)
-
-(*let question_typed id id_question =
-  let name = get_name_question id id_question in
-  let prot = parse_type (get_ty id id_question) in
-  let type_question = get_type_question id id_question in
-  match type_question with
-  | Suite -> (let suite = print_string (get_input id id_question) in
-             let question = TestSuite {name; prot; suite} in
-  | Spec -> (let spec = get_output id id_question in
-            let suite = get_input id id_question in
-            let gen = get_extra_alea id id_question in
-            let question = TestAgainstSpec {name; prot; gen; suite; spec} in)
-  | Solution -> (let suite = get_input id id_question in
-            let gen = get_extra_alea id id_question in
-            let question = TestAgainstSol {name; prot; gen; suite; spec}) in
-    question*)
                                                
 let test_question (t : test_qst_typed) =
   match t with
@@ -157,7 +139,6 @@ let test_question (t : test_qst_typed) =
        (lookup_student (ty_of_prot t.prot) t.name)
        t.suite
 
-end
 
 open Editor_lib
  
@@ -210,3 +191,30 @@ let parse_type string =
   !acc;;
     
   
+
+(*parse_type (string : ex: int -> int) ==> (string : prot)*)
+
+let question_typed id id_question =
+
+  let acc="let name = " ^ (get_name_question id id_question) in
+  let acc=acc ^ "in \nlet prot = " ^ (parse_type (get_ty id id_question)) in
+  let acc=acc ^ "in \nlet type_question = " in
+  let acc=acc ^ (match (get_type_question id id_question) with
+                 | Suite -> "Suite"
+                 | Spec -> "Spec"
+                 | Solution -> "Solution") in
+  let acc=acc ^ "match type_question with \n
+                 | Suite -> let question = let suite =" ^ (get_input id id_question) in
+  let acc=acc ^ "in \n TestSuite {name; prot; suite}in \n" in
+  let acc=acc ^ "| Spec -> let question = let spec =" ^ (get_output id id_question) in
+  let acc=acc ^ "in \n let suite =" ^ (get_input id id_question) in
+  let acc=acc ^ "in \n let gen =" ^ string_of_int((get_extra_alea id id_question)) in
+  let acc=acc ^ "in \n TestAgainstSpec {name; prot; gen; suite; spec} "in
+  let acc=acc ^ "in \n| Solution -> let question = let suite =" ^ (get_input id id_question) in
+  let acc=acc ^ "in \n let gen =" ^ string_of_int (get_extra_alea id id_question) in
+  let acc=acc ^ "in \n TestAgainstSol {name; prot; gen; suite; spec}" in
+  let acc=acc ^ "in \n question" in
+  acc
+end
+
+                                                         

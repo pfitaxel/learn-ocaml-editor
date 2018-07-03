@@ -65,15 +65,19 @@ let (!!) b = b :: []
 let (@:!!) a b = a @: !! b
  *)
 (* TODO missing: nth_arg *)
-
+(*
 let example_constr_sol =
   TestAgainstSol
-    { name = "opp";
-      prot = (last_ty [%ty: int] [%ty: int]);
+    { name = "opp"; 
+      prot = (last_ty [%ty: int] [%ty: int] );
       gen = 0;
       suite = [!! 0; !! 1; !! 2; !! ~-1]
     }
+*)
+
+
     
+
 let example_constr_spec =
   TestAgainstSpec
     { name = "idempotent";
@@ -98,7 +102,25 @@ let example_constr_suite =
 
 let local_dummy : 'a sampler = fun () -> failwith "dummy sampler"
 (* à n'utiliser que si on passe l'argument ~gen:0 (pas d'alea) *)
-                                       
+
+(*parse_type (string : ex: int -> int) ==> (string : prot)*)
+
+(*let question_typed id id_question =
+  let name = get_name_question id id_question in
+  let prot = parse_type (get_ty id id_question) in
+  let type_question = get_type_question id id_question in
+  match type_question with
+  | Suite -> (let suite = print_string (get_input id id_question) in
+             let question = TestSuite {name; prot; suite} in
+  | Spec -> (let spec = get_output id id_question in
+            let suite = get_input id id_question in
+            let gen = get_extra_alea id id_question in
+            let question = TestAgainstSpec {name; prot; gen; suite; spec} in)
+  | Solution -> (let suite = get_input id id_question in
+            let gen = get_extra_alea id id_question in
+            let question = TestAgainstSol {name; prot; gen; suite; spec}) in
+    question*)
+                                               
 let test_question (t : test_qst_typed) =
   match t with
   | TestAgainstSol t ->
@@ -136,3 +158,55 @@ let test_question (t : test_qst_typed) =
        t.suite
 
 end
+
+open Editor_lib
+ 
+(*let types_de_base =
+  [ ['i';'n';'t'];['c';'h';'a';'r'];['f';'l';'o';'a';'t'];
+    ['s';'t';'r';'i';'n';'g'];['b';'o';'o';'l'] ] ;;
+*)
+let rec to_string_aux char_list =match char_list with
+    []-> ""
+  |c::l -> (string_of_char c) ^( to_string_aux l)
+;;
+  
+let to_ty str= "[%ty :"^str^" ]";;
+
+
+
+let parse_type string =
+  let without_spaces = List.filter (fun c ->c <> ' ') in
+  let char_list_ref = ref (List.rev (without_spaces (decomposition string 0))) in
+  
+  if (nbArgs !char_list_ref) < 2 then failwith "" ;
+  
+  (*reverse char_list before using it *)
+  let rec last_arg char_list acc= 
+    match char_list with
+      []->char_list_ref:=[];acc
+    |elt :: l ->
+        if elt='>' then
+          match l with
+            '-'::l2 -> char_list_ref:=l2;acc
+          |_ -> failwith "toto"
+        else
+          last_arg l ( elt::acc )
+  in
+
+  
+  let init_acc () =
+    let arg1=last_arg (!char_list_ref ) [] in                               
+    let arg2=last_arg (!char_list_ref)  [] in
+    let ty1=to_ty (to_string_aux arg1) in 
+    let ty2=to_ty (to_string_aux arg2) in
+    "last_ty "^ty2^" "^ty1
+  in 
+  let acc =ref (init_acc ()) in
+  while !char_list_ref <>[] do
+    let arg=last_arg (!char_list_ref) [] in
+    let ty= to_ty (to_string_aux arg) in
+    acc:="arg_ty "^ty^" ("^(!acc)^")" ;
+  done;
+  !acc;;
+    
+  

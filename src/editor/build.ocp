@@ -68,26 +68,6 @@ begin program "testhaut"
   ]
 end
 
-
-begin library "test-spec"
-  comp_requires = "ppx_metaquot:asm" "ppx_ocplib_i18n:asm"
-  link += [ "-linkall" ]
-  requires = [
-    "ty"
-    "toploop"
-    "ppx_metaquot"
-    "ppx_metaquot_lib"
-    "ocplib-json-typed"
-    "learnocaml-state"
-    "learnocaml-repository"
-    "testing"
-    "ocplib_i18n"
-  ]
-  files = [
-    "test_spec.ml" ( comp += [ "-ppx" %asm_exe( p = "ppx_metaquot") ppx_ocplib_i18n ] )
-  ]
-end
-
 begin library "editor_lib"
   comp_requires = [ "ppx_ocplib_i18n:asm" "ppx_metaquot:asm" ]
 
@@ -102,6 +82,27 @@ begin library "editor_lib"
     "learnocaml-app-common"    
     ]
 
+end
+
+
+begin library "test-spec"
+  comp_requires = "ppx_metaquot:asm" "ppx_ocplib_i18n:asm"
+  link += [ "-linkall" ]
+  requires = [
+    "ty"
+    "toploop"
+    "ppx_metaquot"
+    "ppx_metaquot_lib"
+    "ocplib-json-typed"
+    "learnocaml-state"
+    "learnocaml-repository"
+    "testing"
+    "ocplib_i18n"
+    "editor_lib"
+  ]
+  files = [
+    "test_spec.ml" ( comp += [ "-ppx" %asm_exe( p = "ppx_metaquot") ppx_ocplib_i18n ] )
+  ]
 end
 
 

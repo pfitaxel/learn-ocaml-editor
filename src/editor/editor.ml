@@ -907,7 +907,6 @@ let onload () =
     Manip.SetCss.opacity abort_message (Some "1") ;
     Lwt.return ()
   end ;
-  
   let messages = Tyxml_js.Html5.ul [] in
   let callback text =
     Manip.appendChild messages Tyxml_js.Html5.(li [ pcdata text ]) in

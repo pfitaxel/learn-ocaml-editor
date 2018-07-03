@@ -209,11 +209,7 @@ let  rec testhaut_init content_div id =
                          true) ;
                      buttonDown;
             ] ) ]  
-
-
-
-                
-            ::  a ~a:[ a_onclick (fun _ ->
+                 ::  a ~a:[ a_onclick (fun _ ->
                   
                   let elt = find_div "learnocaml-exo-loading" in
                   Manip.(addClass elt "loading-layer") ;

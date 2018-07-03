@@ -23,7 +23,6 @@ let set_string_translations () =
   "txt_gen_spec", [%i"Number of generated tests:<br>"];
   "txt_spec_specification", [%i"Specification:<br>"];
   "txt_suite_input", [%i"Arguments:<br>"];
-  "txt_suite_output", [%i"Results:<br>"];
   ] in
   List.iter
   (fun (id, text) -> Manip.setInnerHtml (find_component id) text)
@@ -146,8 +145,7 @@ let save_suite () =
     |qid->qid
   in
   let testhaut = StringMap.add question_id question testhaut in
-  save_testhaut testhaut id
-;;
+  save_testhaut testhaut id;;
 
 let save_solution () =
   let name = Js.to_string name##.value in

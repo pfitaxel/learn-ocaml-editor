@@ -73,6 +73,15 @@ val button :
   icon:string ->
   string -> (unit -> unit Lwt.t) ->
   unit
+
+val button2 :
+  container: 'a Tyxml_js.Html.elt ->
+  theme: string ->
+  ?group: button_group ->
+  ?state: button_state ->
+  icon:string ->
+  string -> (unit -> unit Lwt.t) ->
+  unit
     
 val render_rich_text :
   ?on_runnable_clicked: (string -> unit) ->

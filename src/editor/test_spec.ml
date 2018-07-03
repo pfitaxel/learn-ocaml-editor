@@ -125,15 +125,15 @@ let test_question (t : test_qst_typed) =
      List.flatten @@ List.map (fun args ->
        let code = Format.asprintf "@[<hv 2>%s,%a@]" t.name (print t.prot) args in
        let ret_ty = get_ret_ty (ty_of_prot t.prot) args in
-       Message ([ Text "Checking spec for" ; Code code ], Informative) ::
+       Message ([ Text [%i"Checking spec for"] ; Code code ], Informative) ::
          let ret = apply uf args in
          let value = to_string ret_ty ret in
        let (text, note) = match t.spec uf args ret with
-         | Correct None -> ("Correct spec", Success 1)
+         | Correct None -> ([%i"Correct spec"], Success 1)
          | Correct (Some message) -> (message, Success 1)
-         | Wrong None -> ("Wrong spec", Failure)
+         | Wrong None -> ([%i"Wrong spec"], Failure)
          | Wrong (Some message) -> (message, Failure) in
-       [Message ([Text "Got value"; Code value; Text (": " ^ text)], note)])
+       [Message ([Text [%i"Got value"]; Code value; Text (": " ^ text)], note)])
      t.suite
   | TestSuite t ->
      test_function

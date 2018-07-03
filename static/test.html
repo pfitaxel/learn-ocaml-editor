@@ -21,8 +21,7 @@
       }
       input:invalid
       {
-      	border: 1px red;
-      	box-shadow: 0 0 2px 1px red;
+      	box-shadow: 0 0 1px 1px red;
   	  }
   	  .error
   	  {
@@ -56,15 +55,15 @@
     <div id="learnocaml-test">
       <!--form-->
       <div id="learnocaml-tab-name">
-        <label id="txt_name" for="name">Name: </label>
+        <label id="txt_name" for="name">Function name: </label>
         <input type="text" id="name" name="name" value=""
-               maxlength="250" size="40" autofocus />
+               maxlength="250" size="40" required autofocus />
         <span id="name_error" class="error" aria-live="polite"></span>
       </div>
       <div id="learnocaml-tab-type">
         <label id="txt_ty" for="ty">Type: </label>
         <input type="text" id="ty" name="ty" value=""
-               size="40" />
+               size="40" required />
         <span id="type_error" class="error" aria-live="polite"></span>
       </div>
       <div id="learnocaml-tab-choix">

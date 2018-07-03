@@ -757,10 +757,12 @@ let onload () =
       ~group: toplevel_buttons_group
       ~icon: "sync" [%i"Generate"] @@ fun () ->
     let sol = genTemplate (Ace.get_contents ace) in
-    let listeChars = supprRec (' '::(decompositionSol sol 0)) in
-    save_quest (genQuestions (get_fct listeChars []) []) id ;
-    Manip.removeChildren (find_component "learnocaml-exo-testhaut-pane");
-    testhaut_init (find_component "learnocaml-exo-testhaut-pane") id ;
+    if (sol<>"") then    
+        (let listeChars = supprRec (' '::(decompositionSol sol 0)) in
+        save_quest (genQuestions (get_fct listeChars []) []) id ;
+        Manip.removeChildren (find_component "learnocaml-exo-testhaut-pane");
+        testhaut_init (find_component "learnocaml-exo-testhaut-pane") id )
+    else Lwt.return ();
   end ;                             
   begin testhaut_button
       ~group: toplevel_buttons_group

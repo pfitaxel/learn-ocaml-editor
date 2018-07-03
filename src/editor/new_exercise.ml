@@ -17,7 +17,6 @@ let set_string_translations () =
   "txt_title", [%i"Title (unique too):<br>"];
   "txt_descr", [%i"Description of the exercise:<br>"];
   "txt_diff", [%i"Difficulty level:<br>"];
-  "cancel", [%i"Cancel"];
   "save", [%i"Save"];
   ] in
   List.iter

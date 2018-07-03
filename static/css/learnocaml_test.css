@@ -10,7 +10,7 @@ body{
 	text-align: center;
 }
 #learnocaml-main-toolbar {
-  position: absolute;
+  position: fixed
   left: 0; top: 0;
   color: #fff;
   z-index: 1004;
@@ -76,12 +76,12 @@ body{
 
 
 #learnocaml-test {
-position: absolute;
+  position: absolute;
   z-index: 998;
   background: #eee;
   padding: 0;
   opacity: 1;
-	text-align: center;
+  text-align: center;
 }
 #learnocaml-test {
   left: 0px; top:110px; right: 0px; bottom: 60%;
@@ -96,7 +96,7 @@ position: absolute;
   padding: 5px;text-align:center;
 }
 #learnocaml-tabs {
-position: absolute;
+  position: absolute;
   z-index: 998;
   background: #eee;
   padding: 0;

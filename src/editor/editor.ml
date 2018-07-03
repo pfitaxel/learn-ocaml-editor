@@ -330,9 +330,10 @@ let () =
   let ace_testhaut = Ocaml_mode.get_editor editor_th in
   let buffer = match get_buffer id with
   | exception Not_found -> ""
-  | buff -> [%i"(* Incipit: contains local definitions that\n\
-  will be reachable when you will create a new question *)\n"]
-    ^ buff.input in
+  | buff -> if (buff.input="")
+            then [%i"(* Incipit: contains local definitions that\n\
+                     will be reachable when you will create a new question *)\n"]
+            else buff.input in
   Ace.set_contents ace_testhaut buffer ;
   Ace.set_font_size ace_testhaut 18;
 

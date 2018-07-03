@@ -780,6 +780,8 @@ let onload () =
                  let nvexo= {id;titre;prepare;diff;solution;question;template;test;prelude;mtime} in    
                  Learnocaml_local_storage.(store (editor_state id)) nvexo;
                  Ace.set_contents ace_t  (get_testml id);
+                 Manip.removeChildren (find_component "learnocaml-exo-testhaut-pane");
+                 testhaut_init (find_component "learnocaml-exo-testhaut-pane") id ;
                  select_tab "test" in
   begin testhaut_button
       ~group: toplevel_buttons_group

@@ -277,7 +277,6 @@ let button2 ~container ~theme ?group ?state ~icon lbl cb =
   if !self_disabled || !cnt > 0 then
     dom_button##.disabled := Js.bool true ;
   Manip.appendChild container button
-
                     
 let gettimeofday () =
   let now = new%js Js.date_now in

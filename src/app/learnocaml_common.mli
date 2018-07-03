@@ -73,7 +73,7 @@ val button :
   icon:string ->
   string -> (unit -> unit Lwt.t) ->
   unit
-
+    
 val render_rich_text :
   ?on_runnable_clicked: (string -> unit) ->
   Learnocaml_index.text ->

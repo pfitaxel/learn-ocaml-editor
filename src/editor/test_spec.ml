@@ -73,7 +73,7 @@ let example_constr_sol =
       gen = 0;
       suite = [!! 0; !! 1; !! 2; !! ~-1]
     }
-
+    
 let example_constr_spec =
   TestAgainstSpec
     { name = "idempotent";
@@ -99,6 +99,12 @@ let example_constr_suite =
 let local_dummy : 'a sampler = fun () -> failwith "dummy sampler"
 (* à n'utiliser que si on passe l'argument ~gen:0 (pas d'alea) *)
 
+let rec premierArg s arg = match s with
+    [] -> arg
+  | a::[] -> if a=' ' then [] else [a]
+  | a::b::suite -> if a<>' ' then premierArg (b::suite) (arg@[a]) else arg;;
+let rec stringToSuite s = premierArg s :: stringToSuite (suite s)
+  
                                        
 let test_question (t : test_qst_typed) =
   match t with

@@ -94,7 +94,7 @@ let rec save_quest listeQuestions id = match listeQuestions with
     save_quest suite id;;
 (*-------------------------------------------------------------------------*)
 let id = arg "id";; 
-
+                       
 let init_tabs, select_tab =
   let names = [ "toplevel" ; "report" ; "editor" ; "template" ; "test" ;
                 "question" ; "prelude" ; "prepare" ; "testhaut" ] in
@@ -884,7 +884,6 @@ let onload () =
     Manip.SetCss.opacity abort_message (Some "1") ;
     Lwt.return ()
   end ;
-  
   let messages = Tyxml_js.Html5.ul [] in
   let callback text =
     Manip.appendChild messages Tyxml_js.Html5.(li [ pcdata text ]) in
@@ -989,8 +988,8 @@ let onload () =
     else
       grade ()
   end ;
-
-  (* ---- return -------------------------------------------------------- *)
+                    
+(* ---- return -------------------------------------------------------- *)
   toplevel_launch >>= fun _ ->
   typecheck false >>= fun () ->
   hide_loading ~id:"learnocaml-exo-loading" () ;

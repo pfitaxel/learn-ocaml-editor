@@ -779,7 +779,8 @@ let onload () =
   end ;
   let compile () = let listeFonction = constructListeQuest (get_id_question id) id in
                let tests = constructFinalSol listeFonction in 
-               match Learnocaml_local_storage.(retrieve (editor_state id) ) with
+               let tests = tests ^ (Test_spec.question_typed id "1") in
+                 match Learnocaml_local_storage.(retrieve (editor_state id) ) with
                |{id;titre;prepare;diff;solution;question;template;test;prelude;mtime}->
                  let mtime=gettimeofday () in
                  let test ={testml=tests;testhaut=test.testhaut} in

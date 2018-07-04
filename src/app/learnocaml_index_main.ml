@@ -299,13 +299,13 @@ let rec editor_tab _ _ () =
             begin
               let aborted, abort_message =
                 let t, u = Lwt.task () in
-                let btn_ok = Tyxml_js.Html5.(button [ pcdata [%i"Ok"] ]) in
+                let btn_ok = Tyxml_js.Html5.(button [ pcdata [%i"OK"] ]) in
                 Manip.Ev.onclick btn_ok ( fun _ ->
                     hide_loading ~id:"learnocaml-main-loading" () ; true) ;
                 
                 let div =
                   Tyxml_js.Html5.(div ~a: [ a_class [ "dialog" ] ]
-                                    [ pcdata [%i"Title,id not unique(s)\n"] ;
+                                    [ pcdata [%i"Identifier and/or title not unique\n"] ;
                                       btn_ok 
                                     ]) in
                 Manip.SetCss.opacity div (Some "0") ;
@@ -322,7 +322,7 @@ true) ; a_class [ "exercise"] ]
 [
       div ~a:[ a_class [ "descr" ] ] [
         h1 [ pcdata [%i"Import exercise"] ];
-        p [pcdata [%i"Import a new exercise from json"]];];
+        p [pcdata [%i"Import a new exercise from a json file"]];];
     ]
 in
     List.rev (format_contents 1 [a ~a:[ a_href ("new_exercise.html#&action=open") ; 

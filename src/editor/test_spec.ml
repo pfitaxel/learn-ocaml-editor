@@ -197,13 +197,13 @@ let parse_type string =
 
 (*parse_type (string : ex: int -> int) ==> (string : prot)*)
 
-let question_typed id id_question =
+let question_typed question id_question = 
   let open Learnocaml_exercise_state in
-  let acc="\n\nlet name"^id_question^" = \"" ^ (get_name_question id id_question) in
-  let acc=acc ^ "\" ;; \nlet prot"^id_question^" = " ^ (parse_type (get_ty id id_question)) in
-  let acc=(match (get_type_question id id_question) with
-    | Suite -> acc ^ " ;;\nlet suite"^id_question^" =" ^ (get_input id id_question) ^ "  ;;\nlet question"^id_question^" =  TestSuite {name"^id_question^"; prot"^id_question^"; suite"^id_question^"}"
-    | Solution -> acc ^ " ;;\nlet suite"^id_question^" =" ^ (get_input id id_question) ^ ";; \n let gen"^id_question^" =" ^ string_of_int (get_extra_alea id id_question) ^  " ;;\nlet question"^id_question^" = TestAgainstSol {name"^id_question^"; prot"^id_question^"; gen"^id_question^"; suite"^id_question^"}"
-    | Spec -> acc ^ ";;\nlet spec"^id_question^" =" ^ (get_output id id_question) ^ " ;; \n let suite"^id_question^" =" ^ (get_input id id_question) ^ ";; \n let gen"^id_question^" =" ^ string_of_int((get_extra_alea id id_question)) ^ ";; \nlet question"^id_question^" = TestAgainstSpec {name"^id_question^"; prot"^id_question^"; gen"^id_question^"; suite"^id_question^"; spec"^id_question^"}") in
+  let acc="\n\nlet name"^id_question^" = \"" ^ question.name in
+  let acc=acc ^ "\" ;; \nlet prot"^id_question^" = " ^ (parse_type question.ty) in
+  let acc=(match question.type_question with
+    | Suite -> acc ^ " ;;\nlet suite"^id_question^" =" ^ question.input ^ "  ;;\nlet question"^id_question^" =  TestSuite {name"^id_question^"; prot"^id_question^"; suite"^id_question^"}"
+    | Solution -> acc ^ " ;;\nlet suite"^id_question^" =" ^ question.input ^ ";; \n let gen"^id_question^" =" ^ (string_of_int question.extra_alea) ^  " ;;\nlet question"^id_question^" = TestAgainstSol {name"^id_question^"; prot"^id_question^"; gen"^id_question^"; suite"^id_question^"}"
+    | Spec -> acc ^ ";;\nlet spec"^id_question^" =" ^ question.output ^ " ;; \n let suite"^id_question^" =" ^ question.input ^ ";; \n let gen"^id_question^" =" ^ string_of_int(question.extra_alea) ^ ";; \nlet question"^id_question^" = TestAgainstSpec {name"^id_question^"; prot"^id_question^"; gen"^id_question^"; suite"^id_question^"; spec"^id_question^"}") in
   acc;;
 

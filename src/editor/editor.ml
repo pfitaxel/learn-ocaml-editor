@@ -783,6 +783,7 @@ let onload () =
   let compile () = (*let listeFonction = constructListeQuest (get_id_question id) id in
                      let tests = constructFinalSol listeFonction in*)
     let tests=testprel in
+    let tests=tests^" \n "^((get_buffer id).input) in
     let tests=
       StringMap.fold (fun qid->fun quest -> fun str ->
           if qid="0" then str

@@ -28,6 +28,7 @@ let get_ty id idQuestion= let test_list = get_test_liste id in StringMap.(find i
 let get_name_question id idQuestion= let test_list = get_test_liste id in StringMap.(find idQuestion test_list).name                                                                       
 let get_type_question id idQuestion= let test_list = get_test_liste id in StringMap.(find idQuestion test_list).type_question
 let get_extra_alea id idQuestion= let test_list = get_test_liste id in StringMap.(find idQuestion test_list).extra_alea
+let get_datalist id idQuestion= let test_list = get_test_liste id in StringMap.(find idQuestion test_list).datalist
 let get_input id idQuestion= let test_list = get_test_liste id in StringMap.(find idQuestion test_list).input
 let get_output id idQuestion= let test_list = get_test_liste id in StringMap.(find idQuestion test_list).output
     

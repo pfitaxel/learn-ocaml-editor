@@ -31,7 +31,8 @@ type question_state =
    type_question : type_question;
    input :string;
    output:string;
-   extra_alea:int;   
+   extra_alea:int;
+   datalist:string;
   }
 
 type test_state = {testml : string;

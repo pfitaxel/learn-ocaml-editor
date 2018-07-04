@@ -90,7 +90,8 @@ let rec save_quest listeQuestions id = match listeQuestions with
     let input = "[]" in
     let output = "[]" in
     let extra_alea = 0 in
-    let question = {name ; ty ; type_question ; input ; output ; extra_alea} in
+    let datalist="" in
+    let question = {name ; ty ; type_question ; input ; output ; extra_alea; datalist} in
     let testhaut =  get_testhaut id in
     let question_id = compute_question_id testhaut in
     let new_testhaut = StringMap.add question_id question testhaut in
@@ -323,7 +324,8 @@ let () =
   | buff -> buff.input in
   let output = "" in
   let extra_alea = 0 in
-  let question = {name; ty; type_question; input; output; extra_alea} in
+  let datalist="" in
+  let question = {name; ty; type_question; input; output; extra_alea;datalist} in
   let testhaut = get_testhaut id in
   let question_id ="0" in
   let testhaut = StringMap.add question_id question testhaut in
@@ -612,16 +614,17 @@ let onload () =
   Ace.set_contents ace contents;
   Ace.set_font_size ace 18;
   let save_buffer_test () =
-  let ty = "" in
-  let type_question = Suite in
-  let input = Ace.get_contents ace_testhaut in
-  let output = "" in
-  let extra_alea = 0 in
-  let question = {name; ty; type_question; input; output; extra_alea} in
-  let testhaut = get_testhaut id in
-  let question_id ="0" in
-  let testhaut = StringMap.add question_id question testhaut in
-  save_testhaut testhaut id in
+    let ty = "" in
+    let type_question = Suite in
+    let input = Ace.get_contents ace_testhaut in
+    let output = "" in
+    let extra_alea = 0 in
+    let datalist ="" in
+    let question = {name; ty; type_question; input; output; extra_alea;datalist} in
+    let testhaut = get_testhaut id in
+    let question_id ="0" in
+    let testhaut = StringMap.add question_id question testhaut in
+    save_testhaut testhaut id in
   let recovering () =
     let solution = Ace.get_contents ace in
     let titre = get_titre id  in

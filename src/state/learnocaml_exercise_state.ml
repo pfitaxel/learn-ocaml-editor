@@ -66,25 +66,26 @@ type question_state =
    input :string;
    output:string;
    extra_alea:int;
-   
+   datalist:string;
   }
 open Json_encoding
 
 let question_state_enc =
   conv
-    (fun {name; ty; type_question; input; output; extra_alea}->
-       (name, ty, type_question, input, output, extra_alea)
+    (fun {name; ty; type_question; input; output; extra_alea; datalist}->
+       (name, ty, type_question, input, output, extra_alea, datalist)
     )
-    (fun (name, ty, type_question, input, output, extra_alea)->
-       {name; ty; type_question; input; output; extra_alea}
+    (fun (name, ty, type_question, input, output, extra_alea, datalist)->
+       {name; ty; type_question; input; output; extra_alea; datalist}
     )
-    (obj6
+    (obj7
        (req "name" string)
        (req "ty" string)
        (req "type_question" ( string_enum ["suite",Suite;"spec",Spec;"solution",Solution] ) )
        (req "input" string)
        (req "output" string)
        (req "extra_alea" int)
+       (req "datalist" string)
     )
 ;;
 

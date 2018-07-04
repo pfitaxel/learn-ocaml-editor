@@ -79,7 +79,7 @@ let display_report exo report =
   Manip.removeClass report_button "success" ;
   Manip.removeClass report_button "failure" ;
   Manip.removeClass report_button "partial" ;
-  let grade = score * 100 / score_maxi in
+  let grade = if (score_maxi=0) then 0 else score * 100 / score_maxi in
   if grade >= 100 then begin
     Manip.addClass report_button "success" ;
     Manip.replaceChildren report_button

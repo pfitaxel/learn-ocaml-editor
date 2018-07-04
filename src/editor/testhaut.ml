@@ -22,7 +22,7 @@ let set_string_translations () =
   "txt_input_spec", [%i"Arguments:<br>"];
   "txt_gen_spec", [%i"Number of generated tests:<br>"];
   "txt_spec_specification", [%i"Specification:<br>"];
-  "txt_suite_input", [%i"Arguments:<br>"];
+  "txt_suite_input", [%i"Arguments and results:<br>"];
   ] in
   List.iter
   (fun (id, text) -> Manip.setInnerHtml (find_component id) text)

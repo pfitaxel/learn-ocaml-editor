@@ -158,7 +158,7 @@ let to_ty str= "[%ty :"^str^" ]";;
 let parse_type string =
   let without_spaces = List.filter (fun c ->c <> ' ') in
   let char_list_ref = ref (List.rev (without_spaces (decomposition string 0))) in
-  if (nbArgs (List.rev !char_list_ref)) < 1 then failwith "titi" ;
+  (*if (nbArgs (List.rev !char_list_ref)) < 1 then failwith "titi" ;*)
   let para_cpt =ref 0 in
   (*reverse char_list before using it *)
   let rec last_arg char_list acc= 

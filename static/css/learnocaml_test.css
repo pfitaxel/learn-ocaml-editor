@@ -1,6 +1,5 @@
 body{
   background: #eee;
-  overflow: hidden;
 }
 #page_title{
   text-align: center;
@@ -11,7 +10,7 @@ body{
 	text-align: center;
 }
 #learnocaml-main-toolbar {
-  position: fixed
+  position: fixed;
   left: 0; top: 0;
   color: #fff;
   z-index: 1004;

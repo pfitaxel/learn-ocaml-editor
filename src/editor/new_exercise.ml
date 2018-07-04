@@ -6,7 +6,7 @@ open Dom_html
 open Learnocaml_common
 open Learnocaml_exercise_state
 module StringMap = Map.Make (String)
-
+    
 let setInnerHtml elt s =    
   elt##.innerHTML := Js.string s
 
@@ -59,9 +59,9 @@ let descr = getElementById_coerce "description" CoerceTo.textarea
 let difficulty = getElementById_coerce "difficulty" CoerceTo.select
 let  solution, question, template, test, previousTitre, previousDiff, prelude, prepare =
   match Learnocaml_local_storage.(retrieve (editor_state previousId)) with
-  | exception Not_found ->  "", "", "", {testml="";testhaut=StringMap.empty}, "",None,"",""
-  | {Learnocaml_exercise_state.id ; solution ; titre ; question ; template ; diff ; test ; 
-     mtime;prelude;prepare } ->  solution, question, template, test, titre, diff, prelude, prepare
+  | exception Not_found ->  "", "", "", {testml="";testhaut=StringMap.empty}, "",0.0,"",""
+  | {Learnocaml_exercise_state.metadata ; solution  ; question ; template ; test ; 
+     mtime;prelude;prepare } ->  solution, question, template, test, metadata.titre, metadata.diff, prelude, prepare
                                  
 let id_error = getElementById "id_error"
 let title_error = getElementById "title_error"
@@ -88,9 +88,7 @@ let _= match title with
     None ->()
   | Some input->input##.value:=Js.string previousTitre
           
-let d=match previousDiff with
-    None-> 0.0
-  |Some f->f
+let d= previousDiff
       
 let _ =match difficulty with
   |None-> ()
@@ -99,12 +97,17 @@ let _ =match difficulty with
 let _ = save##.onclick:= handler (fun _ ->
   let id = toString identifier in
   let titre = toString title in
-  let description = toStringOpt descr in
-  let diff = toFloatOpt difficulty in
+  let description = toString descr in
+  let diff =match toFloatOpt difficulty with
+      None -> 0.0
+    |Some f-> f
+  in
+  let metadata ={id;titre;description;diff} in
   let store () =if (previousId!="") then Learnocaml_local_storage.(delete (editor_state previousId));
     Learnocaml_local_storage.(store (editor_state id))
-      { Learnocaml_exercise_state.id ; solution ; titre ; question ; template ; diff ; test ;  prelude;prepare;
+      { Learnocaml_exercise_state.metadata ; solution  ; question ; template  ; test ;  prelude;prepare;
         mtime = gettimeofday () } in
+  
   let idUnique () =if id = previousId then true else
     match Learnocaml_local_storage.(retrieve (editor_state id)) with
     | exception Not_found -> true
@@ -123,11 +126,10 @@ let _ = save##.onclick:= handler (fun _ ->
   in
   let store2 () =
     let exercise_title = titre in
-    let stars = match diff with None -> failwith "" | Some f -> f in
-    let exercise_stars = stars in
+    let exercise_stars = diff in
     let open Learnocaml_index in
     let exercise_kind = Learnocaml_exercise in
-    let exercise_short_description = description in
+    let exercise_short_description =Some description in
     let exo = {exercise_kind; exercise_stars; exercise_title; exercise_short_description} in
     match Learnocaml_local_storage.(retrieve (index_state "index")) with
     | {Learnocaml_exercise_state.exos; mtime} ->

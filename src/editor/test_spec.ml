@@ -81,7 +81,7 @@ let example_constr_sol =
 let example_constr_spec =
   TestAgainstSpec
     { name = "idempotent";
-      prot = (last_ty [%ty: int] [%ty: int]);
+      prot = (last_ty [%ty: (int)] [%ty: int]);
       gen = 0;
       suite = [!! 0; !! 1; !! 2];
       spec = fun f args ret -> (* ret = apply f args *)

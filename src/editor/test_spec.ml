@@ -199,12 +199,11 @@ let parse_type string =
 
 let question_typed id id_question =
   let open Learnocaml_exercise_state in
-  let acc="\n\nlet name = \"" ^ (get_name_question id id_question) in
-  let acc=acc ^ "\" ;; \nlet prot = " ^ (parse_type (get_ty id id_question)) in
+  let acc="\n\nlet name"^id_question^" = \"" ^ (get_name_question id id_question) in
+  let acc=acc ^ "\" ;; \nlet prot"^id_question^" = " ^ (parse_type (get_ty id id_question)) in
   let acc=(match (get_type_question id id_question) with
-    | Suite -> acc ^ " ;;\nlet suite =" ^ (get_input id id_question) ^ "  ;;\nlet question =  TestSuite {name; prot; suite}"
-    | Solution -> acc ^ " ;;\nlet suite =" ^ (get_input id id_question) ^ ";; \n let gen =" ^ string_of_int (get_extra_alea id id_question) ^  " ;;\nlet question = TestAgainstSol {name; prot; gen; suite}"
-    | Spec -> acc ^ ";;\nlet spec =" ^ (get_output id id_question) ^ " ;; \n let suite =" ^ (get_input id id_question) ^ ";; \n let gen =" ^ string_of_int((get_extra_alea id id_question)) ^ ";; \nlet question = TestAgainstSpec {name; prot; gen; suite; spec}") in
+    | Suite -> acc ^ " ;;\nlet suite"^id_question^" =" ^ (get_input id id_question) ^ "  ;;\nlet question"^id_question^" =  TestSuite {name"^id_question^"; prot"^id_question^"; suite"^id_question^"}"
+    | Solution -> acc ^ " ;;\nlet suite"^id_question^" =" ^ (get_input id id_question) ^ ";; \n let gen"^id_question^" =" ^ string_of_int (get_extra_alea id id_question) ^  " ;;\nlet question"^id_question^" = TestAgainstSol {name"^id_question^"; prot"^id_question^"; gen"^id_question^"; suite"^id_question^"}"
+    | Spec -> acc ^ ";;\nlet spec"^id_question^" =" ^ (get_output id id_question) ^ " ;; \n let suite"^id_question^" =" ^ (get_input id id_question) ^ ";; \n let gen"^id_question^" =" ^ string_of_int((get_extra_alea id id_question)) ^ ";; \nlet question"^id_question^" = TestAgainstSpec {name"^id_question^"; prot"^id_question^"; gen"^id_question^"; suite"^id_question^"; spec"^id_question^"}") in
   acc;;
-(* ne pas oubliez de personnaliser les variables avec "_id_question" pour les différencier pour chaque fonction*)
 

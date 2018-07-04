@@ -331,6 +331,8 @@ let sectionSol fct = match fct with
       			      ^(test_fun typeF)^(testAlea nbAlea)^"\n"
       			      ^(typeFct typeF name)^"\n"
       			      ^jdt^" )"
+let section name report= "Section
+      		               ([ Text \"Function:\" ; Code \""^name^"\" ], "^report^" ); \n" ;;
 
 let rec constructSectionSol listeFonction = match listeFonction with
   |[]->"]"

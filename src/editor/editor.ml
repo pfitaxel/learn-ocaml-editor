@@ -781,9 +781,18 @@ let onload () =
                      let tests = constructFinalSol listeFonction in*)
     let tests=testprel in
     let tests=
-      StringMap.fold (fun qid->fun quest -> fun str -> 
-          str ^ (Test_spec.question_typed quest qid)^" \n") (get_testhaut id) tests
-    in  
+      StringMap.fold (fun qid->fun quest -> fun str ->
+          if qid="0" then str
+          else
+            str ^ (Test_spec.question_typed quest qid)^" \n") (get_testhaut id) tests
+    in 
+    let tests=tests^init^"[ \n " in
+    let tests=
+      StringMap.fold (fun qid->fun quest-> fun str ->
+          if qid="0" then str
+          else
+            str ^ (section quest.name ("test_question question"^qid ) )) (get_testhaut id) tests in
+    let tests=tests^ " ]" in
     match Learnocaml_local_storage.(retrieve (editor_state id) ) with
     |{id;titre;prepare;diff;solution;question;template;test;prelude;mtime}->
         let mtime=gettimeofday () in

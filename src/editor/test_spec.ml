@@ -202,8 +202,8 @@ let question_typed question id_question =
   let acc="\n\nlet name"^id_question^" = \"" ^ question.name in
   let acc=acc ^ "\" ;; \nlet prot"^id_question^" = " ^ (parse_type question.ty) in
   let acc=(match question.type_question with
-    | Suite -> acc ^ " ;;\nlet suite"^id_question^" =" ^ question.input ^ "  ;;\nlet question"^id_question^" =  TestSuite {name"^id_question^"; prot"^id_question^"; suite"^id_question^"}"
-    | Solution -> acc ^ " ;;\nlet suite"^id_question^" =" ^ question.input ^ ";; \n let gen"^id_question^" =" ^ (string_of_int question.extra_alea) ^  " ;;\nlet question"^id_question^" = TestAgainstSol {name"^id_question^"; prot"^id_question^"; gen"^id_question^"; suite"^id_question^"}"
-    | Spec -> acc ^ ";;\nlet spec"^id_question^" =" ^ question.output ^ " ;; \n let suite"^id_question^" =" ^ question.input ^ ";; \n let gen"^id_question^" =" ^ string_of_int(question.extra_alea) ^ ";; \nlet question"^id_question^" = TestAgainstSpec {name"^id_question^"; prot"^id_question^"; gen"^id_question^"; suite"^id_question^"; spec"^id_question^"}") in
+    | Suite -> acc ^ " ;;\nlet suite"^id_question^" =" ^ question.input ^ "  ;;\nlet question"^id_question^" =  TestSuite {name=name"^id_question^"; prot=prot"^id_question^"; suite=suite"^id_question^"}"
+    | Solution -> acc ^ " ;;\nlet suite"^id_question^" =" ^ question.input ^ ";; \n let gen"^id_question^" =" ^ (string_of_int question.extra_alea) ^  " ;;\nlet question"^id_question^" = TestAgainstSol {name=name"^id_question^"; prot=prot"^id_question^"; gen=gen"^id_question^"; suite=suite"^id_question^"}"
+    | Spec -> acc ^ ";;\nlet spec"^id_question^" =" ^ question.output ^ " ;; \n let suite"^id_question^" =" ^ question.input ^ ";; \n let gen"^id_question^" =" ^ string_of_int(question.extra_alea) ^ ";; \nlet question"^id_question^" = TestAgainstSpec {name=name"^id_question^"; prot=prot"^id_question^"; gen=gen"^id_question^"; suite=suite"^id_question^"; spec=spec"^id_question^"}") in
   acc;;
 

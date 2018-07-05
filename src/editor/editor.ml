@@ -66,7 +66,64 @@ let id=arg "id"
 
 (*keep sync with test-spec*)
 let testprel =
-  "\n\nopen Test_lib\nopen Learnocaml_report\n\n(* sampler: (unit -> ('ar -> 'row, 'ar -> 'urow, 'ret) args) *)\n\ntype test_qst_untyped =\n  | TestAgainstSol of\n      { name: string\n      ; ty: string \n      ; gen: int\n      ; suite: string }\n  | TestAgainstSpec of\n      { name: string\n      ; ty: string\n      ; gen: int\n      ; suite: string\n      ; spec : string }\n  | TestSuite of\n      { suite: string\n      ; ty: string\n      ; name: string }\n\ntype outcome =\n  | Correct of string option\n  | Wrong of string option\n\n(* TODO val get_test_qst : test_qst_untyped -> test_qst_typed *)\n\ntype test_qst_typed =\n  | TestAgainstSol :\n      { name: string\n      ; prot: (('ar -> 'row) Ty.ty, 'ar -> 'urow, 'ret) prot\n      ; gen: int\n      ; suite: ('ar -> 'row, 'ar -> 'urow, 'ret) args list } -> test_qst_typed\n  | TestAgainstSpec :\n      { name: string\n      ; prot: (('ar -> 'row) Ty.ty, 'ar -> 'urow, 'ret) prot\n      ; gen: int\n      ; suite: ('ar -> 'row, 'ar -> 'urow, 'ret) args list\n      ; spec : ('ar -> 'row) -> ('ar -> 'row, 'ar -> 'urow, 'ret) args -> 'ret -> outcome } -> test_qst_typed\n  | TestSuite :\n      { name: string\n      ; prot: (('ar -> 'row) Ty.ty, 'ar -> 'urow, 'ret) prot\n      ; suite: (('ar -> 'row, 'ar -> 'urow, 'ret) args * (unit -> 'ret)) list } -> test_qst_typed\n\n(** Notation for TestAgainstSpec *)\nlet (~~) b = if b then Correct None else Wrong None\n(** Notations for TestSuite *)\nlet (==>) a b = (a, fun () -> b)\n(* let (=>) a b = (a, fun () -> Lazy.force b) (* needs module Lazy *) *)\n(** Notations for heterogeneous lists *)\nlet (@:) a l = arg a @@ l\nlet (!!) b = last b\nlet (@:!!) a b = a @: !! b\n(* Homogeneous case, for testing purposes\nlet (@:) a l = a :: l\nlet (!!) b = b :: []\nlet (@:!!) a b = a @: !! b\n*)\n(* TODO missing: nth_arg *)\n\nlet example_constr_sol =\n  TestAgainstSol\n    { name = \"opp\";\n      prot = (last_ty [%ty: (int)] [%ty: int]);\n      gen = 0;\n      suite = [!! 0; !! 1; !! 2; !! ~-1]\n    }\n\nlet example_constr_spec =\n  TestAgainstSpec\n    { name = \"idempotent\";\n      prot = (last_ty [%ty: int] [%ty: int]);\n      gen = 0;\n      suite = [!! 0; !! 1; !! 2];\n      spec = fun f args ret -> (* ret = apply f args *)\n      (* Function f should be idempotent *)\n        ~~ (ret = apply f (!! ret))\n    }\n\nlet example_constr_suite =\n  TestSuite\n    {\n      name = \"xor\";\n      prot = (arg_ty [%ty: bool] (last_ty [%ty: bool] [%ty: bool]));\n      suite = [false @:!! false ==> false;\n               false @:!! true ==> true;\n               true @:!! false ==> true;\n               true @:!! true ==> false]\n    }\n\nlet local_dummy : 'a sampler = fun () -> failwith \"dummy sampler\"\n(* à n'utiliser que si on passe l'argument ~gen:0 (pas d'alea) *)\n\n                                       \nlet test_question (t : test_qst_typed) =\n  match t with\n  | TestAgainstSol t ->\n      test_function_against\n        ~gen:0 ~sampler:local_dummy\n        ~test:test (* could take into account exceptions/sorted lists/etc. *)\n        t.prot\n        (lookup_student (ty_of_prot t.prot) t.name)\n        (lookup_solution (ty_of_prot t.prot) t.name)\n        t.suite\n  | TestAgainstSpec t ->\n      let to_string ty v = Format.asprintf \"%a\" (typed_printer ty) v in\n      let stud = lookup_student (ty_of_prot t.prot) t.name in\n      test_value stud @@ fun uf ->\n     (* no sampler for the moment *)\n      let open Learnocaml_report in\n      List.flatten @@ List.map (fun args ->\n          let code = Format.asprintf \"@[<hv 2>%s,%a@]\" t.name (print t.prot) args in\n          let ret_ty = get_ret_ty (ty_of_prot t.prot) args in\n          Message ([ Text \"Checking spec for\" ; Code code ], Informative) ::\n          let ret = apply uf args in\n          let value = to_string ret_ty ret in\n          let (text, note) = match t.spec uf args ret with\n            | Correct None -> (\"Correct spec\", Success 1)\n            | Correct (Some message) -> (message, Success 1)\n            | Wrong None -> (\"Wrong spec\", Failure)\n            | Wrong (Some message) -> (message, Failure) in\n          [Message ([Text \"Got value\"; Code value; Text (\": \" ^ text)], note)])\n        t.suite\n  | TestSuite t ->\n      test_function\n        ~test:test (* could take into account exceptions/sorted lists/etc. *)\n        t.prot\n        (lookup_student (ty_of_prot t.prot) t.name)\n        t.suite\n\n"
+  "\n\nopen Test_lib\nopen Learnocaml_report\n\n\
+  (* sampler: (unit -> ('ar -> 'row, 'ar -> 'urow, 'ret) args) *)\n\n\
+  type test_qst_untyped =\n  | TestAgainstSol of\n      { name: string\n      ; \
+  ty: string \n      ; gen: int\n      ; suite: string }\n  | TestAgainstSpec of\n      \
+  { name: string\n      ; ty: string\n      ; gen: int\n      ; suite: string\n      ; \
+  spec : string }\n  | TestSuite of\n      { suite: string\n      ; ty: string\n      ; \
+  name: string }\n\ntype outcome =\n  | Correct of string option\n  | Wrong of string option\n\n\
+  (* TODO val get_test_qst : test_qst_untyped -> test_qst_typed *)\n\n\
+  type test_qst_typed =\n  | TestAgainstSol :\n      { name: string\n      ; \
+  prot: (('ar -> 'row) Ty.ty, 'ar -> 'urow, 'ret) prot\n      ; gen: int\n      ; \
+  suite: ('ar -> 'row, 'ar -> 'urow, 'ret) args list } -> test_qst_typed\n  | \
+  TestAgainstSpec :\n      { name: string\n      ; \
+  prot: (('ar -> 'row) Ty.ty, 'ar -> 'urow, 'ret) prot\n      ; gen: int\n      ; \
+  suite: ('ar -> 'row, 'ar -> 'urow, 'ret) args list\n      ; \
+  spec : ('ar -> 'row) -> ('ar -> 'row, 'ar -> 'urow, 'ret) args -> 'ret -> outcome } -> \
+  test_qst_typed\n  | TestSuite :\n      { name: string\n      ; \
+  prot: (('ar -> 'row) Ty.ty, 'ar -> 'urow, 'ret) prot\n      ; \
+  suite: (('ar -> 'row, 'ar -> 'urow, 'ret) args * (unit -> 'ret)) list } -> test_qst_typed\n\n\
+  (** Notation for TestAgainstSpec *)\nlet (~~) b = if b then Correct None else Wrong None\n\
+  (** Notations for TestSuite *)\nlet (==>) a b = (a, fun () -> b)\n(* let (=>) a b = \
+  (a, fun () -> Lazy.force b) (* needs module Lazy *) *)\n\
+  (** Notations for heterogeneous lists *)\nlet (@:) a l = arg a @@ l\nlet (!!) b = \
+  last b\nlet (@:!!) a b = a @: !! b\n(* Homogeneous case, for testing purposes\n\
+  let (@:) a l = a :: l\nlet (!!) b = b :: []\nlet (@:!!) a b = a @: !! b\n*)\n\
+  (* TODO missing: nth_arg *)\n\nlet example_constr_sol =\n  TestAgainstSol\n    \
+  { name = \"opp\";\n      prot = (last_ty [%ty: (int)] [%ty: int]);\n      gen = 0;\n      \
+  suite = [!! 0; !! 1; !! 2; !! ~-1]\n    }\n\nlet example_constr_spec =\n  TestAgainstSpec\n    \
+  { name = \"idempotent\";\n      prot = (last_ty [%ty: int] [%ty: int]);\n      gen = 0;\n      \
+  suite = [!! 0; !! 1; !! 2];\n      spec = fun f args ret -> (* ret = apply f args *)\n      \
+  (* Function f should be idempotent *)\n        ~~ (ret = apply f (!! ret))\n    }\n\n\
+  let example_constr_suite =\n  TestSuite\n    {\n      name = \"xor\";\n      \
+  prot = (arg_ty [%ty: bool] (last_ty [%ty: bool] [%ty: bool]));\n      \
+  suite = [false @:!! false ==> false;\n               false @:!! true ==> true;\n               \
+  true @:!! false ==> true;\n               true @:!! true ==> false]\n    }\n\n\
+  let local_dummy : 'a sampler = fun () -> failwith \"dummy sampler\"\n\
+  (* à n'utiliser que si on passe l'argument ~gen:0 (pas d'alea) *)\
+  \n\n                                       \nlet test_question (t : test_qst_typed) =\n  \
+  match t with\n  | TestAgainstSol t ->\n      test_function_against\n        \
+  ~gen:0 ~sampler:local_dummy\n        ~test:test \
+  (* could take into account exceptions/sorted lists/etc. *)\n        t.prot\n        \
+  (lookup_student (ty_of_prot t.prot) t.name)\n        \
+  (lookup_solution (ty_of_prot t.prot) t.name)\n        t.suite\n  | TestAgainstSpec t ->\n      \
+  let to_string ty v = Format.asprintf \"%a\" (typed_printer ty) v in\n      \
+  let stud = lookup_student (ty_of_prot t.prot) t.name in\n      \
+  test_value stud @@ fun uf ->\n     (* no sampler for the moment *)\n      \
+  let open Learnocaml_report in\n      List.flatten @@ List.map (fun args ->\n          \
+    let code = Format.asprintf \"@[<hv 2>%s,%a@]\" t.name (print t.prot) args in\n          \
+    let ret_ty = get_ret_ty (ty_of_prot t.prot) args in\n          \
+    Message ([ Text \"Checking spec for\" ; Code code ], Informative) ::\n          \
+    let ret = apply uf args in\n          let value = to_string ret_ty ret in\n          \
+    let (text, note) = match t.spec uf args ret with\n            \
+    | Correct None -> (\"Correct spec\", Success 1)\n            | Correct (Some message) -> \
+    (message, Success 1)\n            | Wrong None -> (\"Wrong spec\", Failure)\n            \
+    | Wrong (Some message) -> (message, Failure) in\n          [Message ([Text \"Got value\"; \
+    Code value; Text (\": \" ^ text)], note)])\n        t.suite\n  | TestSuite t ->\n      \
+    test_function\n        ~test:test \
+    (* could take into account exceptions/sorted lists/etc. *)\n        t.prot\n        \
+    (lookup_student (ty_of_prot t.prot) t.name)\n        t.suite\n\n"
 ;;  
 
 (*_________________________Fonctions pour le bouton Generate______________________________________*)

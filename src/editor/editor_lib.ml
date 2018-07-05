@@ -10,9 +10,11 @@ let set_lang () =
 		| Some l -> Ocplib_i18n.set_lang (Js.to_string l)
 		| None -> ()
 
-let get_titre id = Learnocaml_local_storage.(retrieve (editor_state id)).titre
+let get_titre id = Learnocaml_local_storage.(retrieve (editor_state id)).metadata.titre
 
-let get_diff id = Learnocaml_local_storage.(retrieve (editor_state id)).diff
+let get_description id = Learnocaml_local_storage.(retrieve (editor_state id)).metadata.description
+
+let get_diff id = Learnocaml_local_storage.(retrieve (editor_state id)).metadata.diff
 let get_solution id = Learnocaml_local_storage.(retrieve (editor_state id)).solution
 let get_question id = Learnocaml_local_storage.(retrieve (editor_state id)).question
 let get_template id = Learnocaml_local_storage.(retrieve (editor_state id)).template
@@ -28,6 +30,7 @@ let get_ty id idQuestion= let test_list = get_test_liste id in StringMap.(find i
 let get_name_question id idQuestion= let test_list = get_test_liste id in StringMap.(find idQuestion test_list).name                                                                       
 let get_type_question id idQuestion= let test_list = get_test_liste id in StringMap.(find idQuestion test_list).type_question
 let get_extra_alea id idQuestion= let test_list = get_test_liste id in StringMap.(find idQuestion test_list).extra_alea
+let get_datalist id idQuestion= let test_list = get_test_liste id in StringMap.(find idQuestion test_list).datalist
 let get_input id idQuestion= let test_list = get_test_liste id in StringMap.(find idQuestion test_list).input
 let get_output id idQuestion= let test_list = get_test_liste id in StringMap.(find idQuestion test_list).output
     
@@ -40,10 +43,10 @@ let ajout_question testhaut question id =StringMap.add id question testhaut;;
 
 let save_testhaut testhaut id =
   match Learnocaml_local_storage.(retrieve (editor_state id) ) with
-    {id;titre;prepare;diff;solution;question;template;test;prelude;mtime}->
+    {metadata;prepare;solution;question;template;test;prelude;mtime}->
       let mtime=gettimeofday () in
       let test ={testml=test.testml;testhaut} in
-      let nvexo= {id;titre;prepare;diff;solution;question;template;test;prelude;mtime} in
+      let nvexo= {metadata;prepare;solution;question;template;test;prelude;mtime} in
       
   Learnocaml_local_storage.(store (editor_state id)) nvexo ;;
 

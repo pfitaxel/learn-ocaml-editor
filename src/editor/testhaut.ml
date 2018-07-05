@@ -89,6 +89,19 @@ let extraAleaSpec = match getElementById_coerce "spec-gen" CoerceTo.input with
     None -> failwith "unknown element extraAleaSpec"
   | Some s -> s;;
 
+let datalistSol = match getElementById_coerce "sol-datalist" CoerceTo.input with
+  | None -> failwith "unknown element datalistSol"
+  | Some s -> s;;
+
+let datalistSpec = match getElementById_coerce "spec-datalist" CoerceTo.input with
+    None -> failwith "unknown element datalistSpec"
+  | Some s -> s;;
+
+let datalistSuite = match getElementById_coerce "suite-datalist" CoerceTo.input with
+    None -> failwith "unknown element datalistSuite"
+  | Some s -> s;;
+    
+
 let save = getElementById "save";;
 
 let setInnerHtml elt s =    
@@ -138,7 +151,8 @@ let save_suite () =
   let input = Ace.get_contents ace_input_suite in
   let output = "" in
   let extra_alea = 0 in
-  let question = {name; ty; type_question; input; output; extra_alea} in
+  let datalist = Js.to_string datalistSuite##.value in
+  let question = {name; ty; type_question; input; output; extra_alea; datalist} in
   let testhaut =  get_testhaut id in
   let question_id = match arg "questionid" with
     |exception Not_found ->compute_question_id testhaut
@@ -154,7 +168,8 @@ let save_solution () =
   let input = Ace.get_contents ace_input_sol in
   let output = "" in
   let extra_alea = int_of_string (Js.to_string extraAleaSol##.value) in
-  let question = {name; ty; type_question; input; output; extra_alea} in
+  let datalist = Js.to_string datalistSol##.value in
+  let question = {name; ty; type_question; input; output; extra_alea; datalist} in
   let testhaut = get_testhaut id in
   let question_id =  match arg "questionid" with
     |exception Not_found ->compute_question_id testhaut
@@ -171,7 +186,8 @@ let save_spec () =
   let input = Ace.get_contents ace_input_spec in
   let output = Ace.get_contents ace_spec_spec in
   let extra_alea = int_of_string (Js.to_string extraAleaSpec##.value) in
-  let question = {name; ty; type_question; input; output; extra_alea} in
+  let datalist = Js.to_string datalistSpec##.value in
+  let question = {name; ty; type_question; input; output; extra_alea; datalist} in
   let open Editor_lib in
   let testhaut = get_testhaut id in
   let question_id =  match arg "questionid" with
@@ -189,7 +205,7 @@ let _ = match arg "questionid" with
           let name_elt=name in
           let ty_elt=ty in
           match StringMap.find qid testhaut with
-            {name;ty;type_question;input;output;extra_alea} ->
+            {name;ty;type_question;input;output;extra_alea;datalist} ->
              match type_question with
              | Suite ->
                 begin
@@ -197,6 +213,7 @@ let _ = match arg "questionid" with
                   name_elt##.value:=Js.string name;
                   suite##.checked := Js.bool true;
                   ty_elt##.value:=Js.string ty;
+                  datalistSuite##.value:= Js.string datalist;
                   select_tab "suite"
                 end;
              | Spec ->
@@ -207,6 +224,7 @@ let _ = match arg "questionid" with
                   spec##.checked := Js.bool true;
                   ty_elt##.value:=Js.string ty;
                   extraAleaSpec##.value:= Js.string (string_of_int extra_alea);
+                  datalistSpec##.value:= Js.string datalist;
                   select_tab "spec"
                 end;
              | _ ->
@@ -216,6 +234,7 @@ let _ = match arg "questionid" with
                   solution##.checked := Js.bool true;
                   ty_elt##.value:=Js.string ty;
                   extraAleaSol##.value:= Js.string (string_of_int extra_alea);
+                  datalistSol##.value:=Js.string datalist;
                   select_tab "solution"
                 end;;
 

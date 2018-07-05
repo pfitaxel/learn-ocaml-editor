@@ -90,7 +90,8 @@ let rec save_quest listeQuestions id = match listeQuestions with
     let input = "[]" in
     let output = "[]" in
     let extra_alea = 0 in
-    let question = {name ; ty ; type_question ; input ; output ; extra_alea} in
+    let datalist="" in
+    let question = {name ; ty ; type_question ; input ; output ; extra_alea; datalist} in
     let testhaut =  get_testhaut id in
     let question_id = compute_question_id testhaut in
     let new_testhaut = StringMap.add question_id question testhaut in
@@ -323,7 +324,8 @@ let () =
   | buff -> buff.input in
   let output = "" in
   let extra_alea = 0 in
-  let question = {name; ty; type_question; input; output; extra_alea} in
+  let datalist="" in
+  let question = {name; ty; type_question; input; output; extra_alea;datalist} in
   let testhaut = get_testhaut id in
   let question_id ="0" in
   let testhaut = StringMap.add question_id question testhaut in
@@ -359,7 +361,7 @@ let () =
  (*let lib = " module Test_lib = Test_lib.Make(struct\n\
         \  let results = results\n\
         \  let set_progress = set_progress\n\
-        \  module Introspection = Introspection\n\
+0        \  module Introspection = Introspection\n\
               end)" in *)
   
    let typecheck set_class =
@@ -612,16 +614,17 @@ let onload () =
   Ace.set_contents ace contents;
   Ace.set_font_size ace 18;
   let save_buffer_test () =
-  let ty = "" in
-  let type_question = Suite in
-  let input = Ace.get_contents ace_testhaut in
-  let output = "" in
-  let extra_alea = 0 in
-  let question = {name; ty; type_question; input; output; extra_alea} in
-  let testhaut = get_testhaut id in
-  let question_id ="0" in
-  let testhaut = StringMap.add question_id question testhaut in
-  save_testhaut testhaut id in
+    let ty = "" in
+    let type_question = Suite in
+    let input = Ace.get_contents ace_testhaut in
+    let output = "" in
+    let extra_alea = 0 in
+    let datalist ="" in
+    let question = {name; ty; type_question; input; output; extra_alea;datalist} in
+    let testhaut = get_testhaut id in
+    let question_id ="0" in
+    let testhaut = StringMap.add question_id question testhaut in
+    save_testhaut testhaut id in
   let recovering () =
     let solution = Ace.get_contents ace in
     let titre = get_titre id  in
@@ -633,13 +636,12 @@ let onload () =
     let prepare= Ace.get_contents ace_prep in
     let prelude =Ace.get_contents ace_prel in 
     let test ={testml;testhaut} in
-    let  diff =
-      match Learnocaml_local_storage.(retrieve (editor_state id)) with
-      | { Learnocaml_exercise_state.diff } -> diff
-      | exception Not_found -> None in
+    let  diff = get_diff id in
+    let description=get_description id in
+    let metadata ={id;titre;description;diff} in
     Learnocaml_local_storage.(store (editor_state id))
-      { Learnocaml_exercise_state.id ; solution ; titre ; question ; template ;
-        diff ; test ; prepare ; prelude;
+      { Learnocaml_exercise_state.metadata ; solution ; question ; template ;
+         test ; prepare ; prelude;
         mtime = gettimeofday () } in
   recovering_callback:=recovering ;
   let messages = Tyxml_js.Html5.ul [] in
@@ -780,7 +782,7 @@ let onload () =
   let compile () = (*let listeFonction = constructListeQuest (get_id_question id) id in
                      let tests = constructFinalSol listeFonction in*)
     let tests=testprel in
-    let tests=tests^" \n "^((get_buffer id).input) in
+    let tests=tests^" \n "^((get_buffer id).input)^" \n" in
     let tests=
       StringMap.fold (fun qid->fun quest -> fun str ->
           if qid="0" then str
@@ -795,10 +797,10 @@ let onload () =
             str ^ (section quest.name ("test_question question"^qid ) )) (get_testhaut id) tests in
     let tests=tests^ " ]" in
     match Learnocaml_local_storage.(retrieve (editor_state id) ) with
-    |{id;titre;prepare;diff;solution;question;template;test;prelude;mtime}->
+    |{metadata;prepare;solution;question;template;test;prelude;mtime}->
         let mtime=gettimeofday () in
         let test ={testml=tests;testhaut=test.testhaut} in
-        let nvexo= {id;titre;prepare;diff;solution;question;template;test;prelude;mtime} in    
+        let nvexo= {metadata;prepare;solution;question;template;test;prelude;mtime} in    
         Learnocaml_local_storage.(store (editor_state id)) nvexo;
         Ace.set_contents ace_t  (get_testml id);
         Manip.removeChildren (find_component "learnocaml-exo-testhaut-pane");

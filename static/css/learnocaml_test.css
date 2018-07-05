@@ -137,6 +137,16 @@ body{
 	left: 50%; top: 0px; right: 0px; bottom: 0px; position :absolute;
 	text-align:center;
 }
+#learnocaml-tab-solution-datalist{
+	left: 50%;
+	top: 25%;	
+	text-align: center;
+	right: 0px;
+	position: absolute;
+}
+#sol-datalist{
+	width:80%;
+}
 
 #learnocaml-tab-spec-input {
 	left: 0px; top: 10px; right: 50%; bottom: 20%;
@@ -156,7 +166,16 @@ body{
 	position: absolute;
 	text-align:center;
 }
-
+#learnocaml-tab-spec-datalist{
+	position: absolute;
+	left: 50%;
+	text-align: center;
+	right: 0px;
+	top: 25%;
+}
+#spec-datalist{
+	width:80%;
+}
 #learnocaml-tab-spec-spec {
 	left: 125px; top: 80%; right: 125px; bottom: 0px;
 	position: absolute;
@@ -172,7 +191,7 @@ body{
 }
 
 #learnocaml-tab-suite-input{
-  	left: 25%; top: 10px; right: 25%; bottom: 0px;
+  	left: 0%; top: 10px; right: 50%; bottom: 0px;
 	position: absolute;
 	margin: 10px;
 	background : #666;
@@ -180,8 +199,18 @@ body{
 }
 
 #txt_suite_input {
-	left: 25%;	
+	left: 10px;	
 	position: absolute;
+}
+#learnocaml-tab-suite-datalist{
+	position: absolute;
+	left: 50%;
+	text-align: center;
+	right: 0px;
+	top: 0%;
+}
+#suite-datalist{
+	width:80%;
 }
 
 

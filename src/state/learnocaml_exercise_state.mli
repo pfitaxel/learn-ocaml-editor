@@ -31,7 +31,8 @@ type question_state =
    type_question : type_question;
    input :string;
    output:string;
-   extra_alea:int;   
+   extra_alea:int;
+   datalist:string;
   }
 
 type test_state = {testml : string;
@@ -39,17 +40,24 @@ type test_state = {testml : string;
 
 val testhaut_enc : question_state Map.Make (String).t Json_encoding.encoding
     
+type metadata =
+  { id :string;
+    titre :string;
+    description :string;
+    diff :float
+  }
+
+
 type editor_state =
-  { id : string ;
-    titre : string;
-    prepare : string  ;
-    diff : float option;
+  { metadata :metadata;    
+    prepare :string;
     solution : string ;
     question : string ;
     template : string ;
     test : test_state ;
-    prelude : string ;    
+    prelude : string;    
     mtime : float }
+
 
 val editor_state_enc : editor_state Json_encoding.encoding
 open Learnocaml_index

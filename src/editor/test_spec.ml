@@ -219,7 +219,7 @@ let question_typed question id_question =
     |TestAgainstSpec a ->a.name,a.ty,a.suite,a.gen,a.spec,Spec
     |TestSuite a -> a.name,a.ty,a.suite,0,"",Suite
   in
-  let acc="\n\nlet name"^id_question^" = \"" ^ name in
+  let acc="let name"^id_question^" = \"" ^ name in
   let acc=acc ^ "\" ;; \nlet prot"^id_question^" = " ^ (parse_type ty) in
   let acc=(match type_question with
     | Suite -> acc ^ " ;;\nlet suite"^id_question^" =" ^ input ^ "  ;;\nlet question"^id_question^" =  TestSuite {name=name"^id_question^"; prot=prot"^id_question^"; suite=suite"^id_question^"}"

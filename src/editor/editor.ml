@@ -66,7 +66,7 @@ let id=arg "id"
 
 (*keep sync with test-spec*)
 let testprel =
-  "\n\nopen Test_lib\nopen Learnocaml_report\n\n\
+  "open Test_lib\nopen Learnocaml_report\n\n\
   (* sampler: (unit -> ('ar -> 'row, 'ar -> 'urow, 'ret) args) *)\n\n\
   type test_qst_untyped =\n  | TestAgainstSol of\n      { name: string\n      ; \
   ty: string \n      ; gen: int\n      ; suite: string }\n  | TestAgainstSpec of\n      \

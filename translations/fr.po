@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: learn-ocaml ~dev\n"
-"PO-Revision-Date: 2018-07-05 11:58+0200\n"
+"PO-Revision-Date: 2018-07-05 12:10+0200\n"
 "Last-Translator: Louis Gesbert <Louis.gesbert@ocamlpro.com>\n"
 "Language-Team: OCamlPro\n"
 "Language: french\n"
@@ -184,9 +184,9 @@ msgstr "OK"
 msgid "Identifier and/or title not unique\n"
 msgstr "Identificateur et/ou titre non unique(s)\n"
 
-#: src/app/learnocaml_index_main.ml:324,23--40
-msgid "Import exercise"
-msgstr "Importer l'exercice"
+#: src/app/learnocaml_index_main.ml:324,23--43
+msgid "Import an exercise"
+msgstr "Importer un exercice"
 
 #: src/app/learnocaml_index_main.ml:325,21--61
 msgid "Import a new exercise from a json file"

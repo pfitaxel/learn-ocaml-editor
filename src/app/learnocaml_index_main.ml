@@ -321,7 +321,7 @@ let rec editor_tab _ _ () =
 true) ; a_class [ "exercise"] ]
 [
       div ~a:[ a_class [ "descr" ] ] [
-        h1 [ pcdata [%i"Import exercise"] ];
+        h1 [ pcdata [%i"Import an exercise"] ];
         p [pcdata [%i"Import a new exercise from a json file"]];];
     ]
 in

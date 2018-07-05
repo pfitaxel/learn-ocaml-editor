@@ -26,6 +26,7 @@ let get_prepare id = Learnocaml_local_storage.(retrieve (editor_state id)).prepa
 let get_test_liste id = Learnocaml_local_storage.(retrieve (editor_state id)).test.testhaut
 let get_test_string id  = Learnocaml_local_storage.(retrieve (editor_state id)).test.testml                             
 
+
 let get_ty id idQuestion= let test_list = get_test_liste id in
   match StringMap.(find idQuestion test_list) with
     TestAgainstSol a ->a.ty
@@ -64,6 +65,7 @@ let get_spec id idQuestion=  let test_list = get_test_liste id in
    TestAgainstSpec a -> a.spec
   |_ -> failwith ""
                     
+
     
 
 let get_buffer id =  Learnocaml_local_storage.(retrieve (editor_state id)).incipit

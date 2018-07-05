@@ -9,7 +9,6 @@ begin program "new_exercise"
     "learnocaml-app-common"
     "learnocaml-toplevel"
     "jsutils"
-    "jsutils"
     "ppx_metaquot_lib"
     "js_of_ocaml.ppx"
     "ocplib_i18n"
@@ -101,7 +100,7 @@ begin library "test-spec"
     "editor_lib"
   ]
   files = [
-    "test_spec.ml" ( comp += [ "-ppx" %asm_exe( p = "ppx_metaquot") ppx_ocplib_i18n ] )
+    "test_spec.ml" ( comp += [ ppx_js "-ppx" %asm_exe( p = "ppx_metaquot") ppx_ocplib_i18n ] )
   ]
 end
 

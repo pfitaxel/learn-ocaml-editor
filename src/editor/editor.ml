@@ -314,6 +314,7 @@ let () =
   (* ---- testhaut edit ------------------------------------------------*)
   
   
+
   let editor_testhaut = find_component "learnocaml-exo-testhaut-edit" in
   let editor_th =Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div editor_testhaut ) in
   let ace_testhaut = Ocaml_mode.get_editor editor_th in
@@ -596,7 +597,7 @@ let onload () =
       in
   Ace.set_contents ace contents;
   Ace.set_font_size ace 18;
-  
+
   let recovering () =
     let solution = Ace.get_contents ace in
     let titre = get_titre id  in

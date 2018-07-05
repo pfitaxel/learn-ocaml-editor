@@ -55,13 +55,13 @@ let () =
     | Error exn ->
         let msg = match exn with
           | Grading.User_code_error { Toploop_results.msg } ->
-              [%i"Error in your solution:\n"] ^ msg
+              "Error in your solution:\n" ^ msg
           | Grading.Internal_error (step, { Toploop_results.msg }) ->
-              [%i"Internal error "] ^ step ^ "\n" ^ msg
+              "Internal error " ^ step ^ "\n" ^ msg
           | Grading.Invalid_grader ->
-              [%i"Internal error:\nThe grader did not return a report."]
+              "Internal error:\nThe grader did not return a report."
           | exn ->
-              [%i"Unexpected error:\n"] ^ Printexc.to_string exn in
+              "Unexpected error:\n" ^ Printexc.to_string exn in
         let report = Learnocaml_report.[ Message ([ Code msg ], Failure) ] in
         Answer (report, stdout, stderr, outcomes) in
   let json = Json_repr_browser.Json_encoding.construct from_worker_enc ans in

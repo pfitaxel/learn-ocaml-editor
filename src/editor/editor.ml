@@ -86,11 +86,9 @@ let rec save_quest listeQuestions id = match listeQuestions with
   |(nom,nbArgs)::suite ->
     let name = nom in
     let ty= gen_ty nbArgs in
-    let type_question = Solution in
     let input = "[]" in
-    let output = "[]" in
     let extra_alea = 0 in
-    let question = {name ; ty ; type_question ; input ; output ; extra_alea} in
+    let question = TestAgainstSol {name ; ty ; suite=input  ;gen= extra_alea;tester=""} in
     let testhaut =  get_testhaut id in
     let question_id = compute_question_id testhaut in
     let new_testhaut = StringMap.add question_id question testhaut in
@@ -315,29 +313,16 @@ let () =
 
   (* ---- testhaut edit ------------------------------------------------*)
   
-  let name = "" in
-  let ty = "" in
-  let type_question = Suite in
-  let input = match get_buffer id with
-    exception Not_found -> ""
-  | buff -> buff.input in
-  let output = "" in
-  let extra_alea = 0 in
-  let question = {name; ty; type_question; input; output; extra_alea} in
-  let testhaut = get_testhaut id in
-  let question_id ="0" in
-  let testhaut = StringMap.add question_id question testhaut in
-  save_testhaut testhaut id;
+  
   let editor_testhaut = find_component "learnocaml-exo-testhaut-edit" in
   let editor_th =Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div editor_testhaut ) in
   let ace_testhaut = Ocaml_mode.get_editor editor_th in
   let buffer = match get_buffer id with
-  | exception Not_found -> ""
-  | buff -> if (buff.input="")
+  | buff -> if (buff="")
             then [%i"(* Incipit: contains local definitions\n\
             		 that will be reachable when you will create\n\
         			 a new question *)\n"]
-            else buff.input in
+            else buff in
   Ace.set_contents ace_testhaut buffer ;
   Ace.set_font_size ace_testhaut 18;
 
@@ -611,24 +596,14 @@ let onload () =
       in
   Ace.set_contents ace contents;
   Ace.set_font_size ace 18;
-  let save_buffer_test () =
-  let ty = "" in
-  let type_question = Suite in
-  let input = Ace.get_contents ace_testhaut in
-  let output = "" in
-  let extra_alea = 0 in
-  let question = {name; ty; type_question; input; output; extra_alea} in
-  let testhaut = get_testhaut id in
-  let question_id ="0" in
-  let testhaut = StringMap.add question_id question testhaut in
-  save_testhaut testhaut id in
+  
   let recovering () =
     let solution = Ace.get_contents ace in
     let titre = get_titre id  in
+    let incipit= Ace.get_contents ace_testhaut in
     let question = Ace.get_contents ace_quest in
     let template = Ace.get_contents ace_temp in
     let testml = Ace.get_contents ace_t in
-    save_buffer_test ();
     let testhaut= get_testhaut id in
     let prepare= Ace.get_contents ace_prep in
     let prelude =Ace.get_contents ace_prel in 
@@ -637,7 +612,7 @@ let onload () =
     let description=get_description id in
     let metadata ={id;titre;description;diff} in
     Learnocaml_local_storage.(store (editor_state id))
-      { Learnocaml_exercise_state.metadata ; solution ; question ; template ;
+      { Learnocaml_exercise_state.metadata ;incipit; solution ; question ; template ;
          test ; prepare ; prelude;
         mtime = gettimeofday () } in
   recovering_callback:=recovering ;
@@ -779,25 +754,28 @@ let onload () =
   let compile () = (*let listeFonction = constructListeQuest (get_id_question id) id in
                      let tests = constructFinalSol listeFonction in*)
     let tests=testprel in
-    let tests=tests^" \n "^((get_buffer id).input)^" \n" in
+    let tests=tests^" \n "^((get_buffer id))^" \n" in
     let tests=
       StringMap.fold (fun qid->fun quest -> fun str ->
-          if qid="0" then str
-          else
+ 
             str ^ (Test_spec.question_typed quest qid)^" \n") (get_testhaut id) tests
     in 
     let tests=tests^init^"[ \n " in
     let tests=
       StringMap.fold (fun qid->fun quest-> fun str ->
-          if qid="0" then str
-          else
-            str ^ (section quest.name ("test_question question"^qid ) )) (get_testhaut id) tests in
+          let name=match quest with
+              TestAgainstSol a->a.name
+            |TestAgainstSpec a ->a.name
+            |TestSuite a -> a.name
+          in
+          (* refactor what it's up in editor_lib *)    
+            str ^ (section name ("test_question question"^qid ) )) (get_testhaut id) tests in
     let tests=tests^ " ]" in
     match Learnocaml_local_storage.(retrieve (editor_state id) ) with
-    |{metadata;prepare;solution;question;template;test;prelude;mtime}->
+    |{metadata;prepare;incipit;solution;question;template;test;prelude;mtime}->
         let mtime=gettimeofday () in
         let test ={testml=tests;testhaut=test.testhaut} in
-        let nvexo= {metadata;prepare;solution;question;template;test;prelude;mtime} in    
+        let nvexo= {metadata;incipit;prepare;solution;question;template;test;prelude;mtime} in    
         Learnocaml_local_storage.(store (editor_state id)) nvexo;
         Ace.set_contents ace_t  (get_testml id);
         Manip.removeChildren (find_component "learnocaml-exo-testhaut-pane");
@@ -1009,9 +987,9 @@ let onload () =
           Manip.Ev.onclick btn_compile (fun _ ->
               recovering () ;
               compile ();
-              grade (); true) ;
+              let _= grade () in (); true) ;
           let btn_no = Tyxml_js.Html5.(button [ pcdata [%i"Grade without compiling Test"] ]) in
-          Manip.Ev.onclick btn_no (fun _ -> grade () ; true);
+          Manip.Ev.onclick btn_no (fun _ ->let _ = grade () in () ; true);
           let div =
             Tyxml_js.Html5.(div ~a: [ a_class [ "dialog" ] ]
                               [ pcdata [%i"The Grade feature relies on the contents of Test.ml. \

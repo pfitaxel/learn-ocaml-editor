@@ -57,6 +57,7 @@ let identifier = getElementById_coerce "identifier" CoerceTo.input
 let title = getElementById_coerce "title" CoerceTo.input
 let descr = getElementById_coerce "description" CoerceTo.textarea
 let difficulty = getElementById_coerce "difficulty" CoerceTo.select
+let incipit=""
 let  solution, question, template, test, previousTitre, previousDiff, prelude, prepare =
   match Learnocaml_local_storage.(retrieve (editor_state previousId)) with
   | exception Not_found ->  "", "", "", {testml="";testhaut=StringMap.empty}, "",0.0,"",""
@@ -105,7 +106,7 @@ let _ = save##.onclick:= handler (fun _ ->
   let metadata ={id;titre;description;diff} in
   let store () =if (previousId!="") then Learnocaml_local_storage.(delete (editor_state previousId));
     Learnocaml_local_storage.(store (editor_state id))
-      { Learnocaml_exercise_state.metadata ; solution  ; question ; template  ; test ;  prelude;prepare;
+      { Learnocaml_exercise_state.metadata ; solution;incipit  ; question ; template  ; test ;  prelude;prepare;
         mtime = gettimeofday () } in
   
   let idUnique () =if id = previousId then true else

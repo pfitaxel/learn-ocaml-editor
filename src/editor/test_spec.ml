@@ -9,23 +9,27 @@ open Test_lib
 open Learnocaml_report
 
 (* sampler: (unit -> ('ar -> 'row, 'ar -> 'urow, 'ret) args) *)
-
+(*keep in sync with learnocaml_exercise_state.ml *)
 type test_qst_untyped =
   | TestAgainstSol of
       { name: string
       ; ty: string 
       ; gen: int
-      ; suite: string }
+      ; suite: string
+      ;tester: string}
   | TestAgainstSpec of
       { name: string
       ; ty: string
       ; gen: int
       ; suite: string
-      ; spec : string }
+      ; spec : string
+      ;tester: string}
   | TestSuite of
-      { suite: string
-      ; ty: string
-      ; name: string }
+      { name: string;
+        ty: string;
+        suite: string;
+        tester :string}
+;;
 
 type outcome =
   | Correct of string option
@@ -199,11 +203,16 @@ let parse_type string =
 
 let question_typed question id_question = 
   let open Learnocaml_exercise_state in
-  let acc="\n\nlet name"^id_question^" = \"" ^ question.name in
-  let acc=acc ^ "\" ;; \nlet prot"^id_question^" = " ^ (parse_type question.ty) in
-  let acc=(match question.type_question with
-    | Suite -> acc ^ " ;;\nlet suite"^id_question^" =" ^ question.input ^ "  ;;\nlet question"^id_question^" =  TestSuite {name=name"^id_question^"; prot=prot"^id_question^"; suite=suite"^id_question^"}"
-    | Solution -> acc ^ " ;;\nlet suite"^id_question^" =" ^ question.input ^ ";; \n let gen"^id_question^" =" ^ (string_of_int question.extra_alea) ^  " ;;\nlet question"^id_question^" = TestAgainstSol {name=name"^id_question^"; prot=prot"^id_question^"; gen=gen"^id_question^"; suite=suite"^id_question^"}"
-    | Spec -> acc ^ ";;\nlet spec"^id_question^" =" ^ question.output ^ " ;; \n let suite"^id_question^" =" ^ question.input ^ ";; \n let gen"^id_question^" =" ^ string_of_int(question.extra_alea) ^ ";; \nlet question"^id_question^" = TestAgainstSpec {name=name"^id_question^"; prot=prot"^id_question^"; gen=gen"^id_question^"; suite=suite"^id_question^"; spec=spec"^id_question^"}") in
+  let name,ty,input,extra_alea,output,type_question=match question with
+      TestAgainstSol a ->a.name,a.ty,a.suite,a.gen,"",Solution
+    |TestAgainstSpec a ->a.name,a.ty,a.suite,a.gen,a.spec,Spec
+    |TestSuite a -> a.name,a.ty,a.suite,0,"",Suite
+  in
+  let acc="\n\nlet name"^id_question^" = \"" ^ name in
+  let acc=acc ^ "\" ;; \nlet prot"^id_question^" = " ^ (parse_type ty) in
+  let acc=(match type_question with
+    | Suite -> acc ^ " ;;\nlet suite"^id_question^" =" ^ input ^ "  ;;\nlet question"^id_question^" =  TestSuite {name=name"^id_question^"; prot=prot"^id_question^"; suite=suite"^id_question^"}"
+    | Solution -> acc ^ " ;;\nlet suite"^id_question^" =" ^ input ^ ";; \n let gen"^id_question^" =" ^ (string_of_int extra_alea) ^  " ;;\nlet question"^id_question^" = TestAgainstSol {name=name"^id_question^"; prot=prot"^id_question^"; gen=gen"^id_question^"; suite=suite"^id_question^"}"
+    | Spec -> acc ^ ";;\nlet spec"^id_question^" =" ^ output ^ " ;; \n let suite"^id_question^" =" ^ input ^ ";; \n let gen"^id_question^" =" ^ string_of_int(extra_alea) ^ ";; \nlet question"^id_question^" = TestAgainstSpec {name=name"^id_question^"; prot=prot"^id_question^"; gen=gen"^id_question^"; suite=suite"^id_question^"; spec=spec"^id_question^"}") in
   acc;;
 

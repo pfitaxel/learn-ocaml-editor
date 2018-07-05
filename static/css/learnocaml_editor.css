@@ -11,7 +11,15 @@ body {
     right: 0px;
     bottom: 0px;
 }
-
+#learnocaml-main-exercise-list > .trait{
+	display :flex;
+	flex-direction: row;
+	position: relative;
+	z-index: 999;
+	background: linear-gradient(to top, #aaa 0px, #eee 10px, #ddd 100%);
+	color: black;
+	text-decoration: none;
+}
 /* -------------------- toolbar ----------------------------------- */
 #learnocaml-exo-toolbar {
   position: absolute;
@@ -928,6 +936,10 @@ body {
 #down{
 	position: absolute;
 	left: 90px;
+}
+#duplicate{
+	position: absolute;
+	left: 135px;
 }
 #learnocaml-exo-tab-testhaut > .testhaut-edit {
   position: absolute;

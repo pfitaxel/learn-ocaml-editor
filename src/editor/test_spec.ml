@@ -1,3 +1,12 @@
+let set_lang () =
+  match Js.Optdef.to_option (Dom_html.window##.navigator##.language) with
+  | Some l -> Ocplib_i18n.set_lang (Js.to_string l)
+  | None ->
+    match Js.Optdef.to_option (Dom_html.window##.navigator##.userLanguage) with
+    | Some l -> Ocplib_i18n.set_lang (Js.to_string l)
+    | None -> ()
+
+
 module type TYPING = sig
   (** should return a representation of a type from its string serialisation *)
   val ty_of : string -> 'a Ty.ty
@@ -7,6 +16,7 @@ module Make(Test_lib : Test_lib.S) (Typing : TYPING) = struct
 
 open Test_lib
 open Learnocaml_report
+
 
 (* sampler: (unit -> ('ar -> 'row, 'ar -> 'urow, 'ret) args) *)
 
@@ -207,3 +217,4 @@ let question_typed question id_question =
     | Spec -> acc ^ ";;\nlet spec"^id_question^" =" ^ question.output ^ " ;; \n let suite"^id_question^" =" ^ question.input ^ ";; \n let gen"^id_question^" =" ^ string_of_int(question.extra_alea) ^ ";; \nlet question"^id_question^" = TestAgainstSpec {name=name"^id_question^"; prot=prot"^id_question^"; gen=gen"^id_question^"; suite=suite"^id_question^"; spec=spec"^id_question^"}") in
   acc;;
 
+let _ = set_lang ()

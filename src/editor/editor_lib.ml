@@ -26,16 +26,50 @@ let get_prepare id = Learnocaml_local_storage.(retrieve (editor_state id)).prepa
 let get_test_liste id = Learnocaml_local_storage.(retrieve (editor_state id)).test.testhaut
 let get_test_string id  = Learnocaml_local_storage.(retrieve (editor_state id)).test.testml                             
 
-let get_ty id idQuestion= let test_list = get_test_liste id in StringMap.(find idQuestion test_list).ty
-let get_name_question id idQuestion= let test_list = get_test_liste id in StringMap.(find idQuestion test_list).name                                                                       
-let get_type_question id idQuestion= let test_list = get_test_liste id in StringMap.(find idQuestion test_list).type_question
-let get_extra_alea id idQuestion= let test_list = get_test_liste id in StringMap.(find idQuestion test_list).extra_alea
-let get_datalist id idQuestion= let test_list = get_test_liste id in StringMap.(find idQuestion test_list).datalist
-let get_input id idQuestion= let test_list = get_test_liste id in StringMap.(find idQuestion test_list).input
-let get_output id idQuestion= let test_list = get_test_liste id in StringMap.(find idQuestion test_list).output
+
+let get_ty id idQuestion= let test_list = get_test_liste id in
+  match StringMap.(find idQuestion test_list) with
+    TestAgainstSol a ->a.ty
+  | TestAgainstSpec a -> a.ty
+  |TestSuite a -> a.ty
+                    
+let get_name_question id idQuestion= let test_list = get_test_liste id in
+  match StringMap.(find idQuestion test_list) with
+    TestAgainstSol a ->a.name
+  | TestAgainstSpec a -> a.name
+  |TestSuite a -> a.name
+                    
+let get_type_question id idQuestion=
+   let test_list = get_test_liste id in
+  match StringMap.(find idQuestion test_list) with
+    TestAgainstSol _ ->Solution
+  | TestAgainstSpec _ -> Spec
+  |TestSuite _ -> Suite 
+
+let get_extra_alea id idQuestion=  let test_list = get_test_liste id in
+  match StringMap.(find idQuestion test_list) with
+    TestAgainstSol a ->a.gen
+  | TestAgainstSpec a -> a.gen
+  |_ -> failwith " ?"
+                    
+let get_input id idQuestion=
+  let test_list = get_test_liste id in
+  match StringMap.(find idQuestion test_list) with
+    TestAgainstSol a ->a.suite
+  | TestAgainstSpec a -> a.suite
+  |TestSuite a -> a.suite
+                    
+                                                                    
+let get_spec id idQuestion=  let test_list = get_test_liste id in
+  match StringMap.(find idQuestion test_list) with  
+   TestAgainstSpec a -> a.spec
+  |_ -> failwith ""
+                    
+
     
 
-let get_buffer id = StringMap.find "0" (get_testhaut id)
+let get_buffer id =  Learnocaml_local_storage.(retrieve (editor_state id)).incipit
+
 
 let ajout_question testhaut question id =StringMap.add id question testhaut;; 
 
@@ -50,10 +84,10 @@ let compute_question_id test_haut =
 
 let save_testhaut testhaut id =
   match Learnocaml_local_storage.(retrieve (editor_state id) ) with
-    {metadata;prepare;solution;question;template;test;prelude;mtime}->
+    {metadata;incipit;prepare;solution;question;template;test;prelude;mtime}->
       let mtime=gettimeofday () in
       let test ={testml=test.testml;testhaut} in
-      let nvexo= {metadata;prepare;solution;question;template;test;prelude;mtime} in
+      let nvexo= {metadata;incipit;prepare;solution;question;template;test;prelude;mtime} in
       
   Learnocaml_local_storage.(store (editor_state id)) nvexo ;;
 
@@ -131,17 +165,12 @@ let  rec testhaut_init content_div id =
       let open Tyxml_js.Html5 in
             
           StringMap.fold 
-            (fun question_id {name;
-                              ty ;
-                              datalist ;
-                              type_question ;
-                              input;
-                              output;
-                              extra_alea
-                 } acc ->  
-              match question_id with
-                "0" -> acc
-              | _ -> 
+            (fun question_id quest acc ->  
+               let name,ty=match quest with
+                  TestAgainstSol a ->a.name,a.ty
+                 |TestAgainstSpec a -> a.name,a.ty
+                 |TestSuite a ->a.name,a.ty
+               in
                  div ~a:[a_id ("toolbar"); a_class ["button"]] [
               (div ~a:[a_id ("button_delete")] [
                   let button =button ~a:[a_id question_id]  [img ~src:("icons/icon_cleanup_dark.svg") ~alt:"" () ; pcdata "" ]in 

@@ -55,7 +55,9 @@ type index_state=
   }
 let index_state_enc = conv (fun {exos;mtime}->(exos,mtime) ) (fun (exos,mtime)->{exos;mtime}) (obj2 (req "exercises" (map_enc exercise_enc)) (dft "mtime" float 0.))
 ;;
+type type_question= Suite | Solution | Spec ;;
 
+(* previous version of storing questions may be useful  
 
 type type_question= Suite | Solution | Spec ;;
 
@@ -68,6 +70,7 @@ type question_state =
    extra_alea:int;
    datalist:string;
   }
+  
 open Json_encoding
 
 let question_state_enc =
@@ -88,20 +91,123 @@ let question_state_enc =
        (req "datalist" string)
     )
 ;;
+*)
 
+type test_qst_untyped =
+  | TestAgainstSol of
+      { name: string
+      ; ty: string 
+      ; gen: int
+      ; suite: string
+      ;tester: string}
+  | TestAgainstSpec of
+      { name: string
+      ; ty: string
+      ; gen: int
+      ; suite: string
+      ; spec : string
+      ;tester: string}
+  | TestSuite of
+      { name: string;
+        ty: string;
+        suite: string;
+        tester :string}
+;;
+type a_sol=
+  { name: string
+  ; ty: string 
+  ; gen: int
+  ; suite: string
+  ;tester: string}
+let test_against_sol_enc =
+  conv
+    (fun {name; ty; gen; suite; tester}->
+       (name, ty, gen, suite, tester)
+    )
+    (fun (name, ty, gen, suite, tester)->
+       {name; ty; gen; suite; tester}
+    )
+    (obj5
+       (req "name" string)
+       (req "ty" string)
+       (req "gen" int )
+       (req "suite" string)
+       (req "tester" string)
+    )
+;;
+type a_spec=
+  { name: string
+  ; ty: string
+  ; gen: int
+  ; suite: string
+  ; spec : string
+  ;tester: string}
+let test_against_spec_enc =
+  conv
+    (fun {name; ty; gen; suite;spec; tester}->
+       (name, ty, gen, suite,spec, tester)
+    )
+    (fun (name, ty, gen, suite, spec,tester)->
+       {name; ty; gen; suite; spec;tester}
+    )
+    (obj6
+       (req "name" string)
+       (req "ty" string)
+       (req "gen" int )
+       (req "suite" string)
+       (req "spec" string)
+       (req "tester" string)
+    )    
+;;
+type suite=
+  { name: string
+      ; ty: string
+      ; suite: string
+      ;tester: string}
+      
+let test_suite_enc =
+  conv
+    (fun {name; ty; suite; tester}->
+       (name, ty,  suite, tester)
+    )
+    (fun (name, ty, suite, tester)->
+       {name; ty;  suite; tester}
+    )
+    (obj4
+       (req "name" string)
+       (req "ty" string)
+       (req "suite" string)
+       (req "tester" string)
+    )
+;;
 
+let test_qst_untyped_enc =union [
+    case
+      test_against_sol_enc
+      (function TestAgainstSol {name; ty; gen; suite; tester}-> Some {name; ty; gen; suite; tester} | _ -> None)
+      (fun {name; ty; gen; suite; tester} ->TestAgainstSol {name; ty; gen; suite; tester});
+    case
+      test_against_spec_enc
+      (function TestAgainstSpec {name; ty; gen; suite;spec; tester} -> Some {name; ty; gen; suite;spec; tester} | _ -> None)
+      (fun {name; ty; gen; suite;spec; tester} ->TestAgainstSpec {name; ty; gen; suite;spec; tester} );
+    case
+      test_suite_enc
+      (function TestSuite {name; ty;suite; tester} -> Some {name; ty;suite; tester}  | _ -> None)
+      (fun {name; ty;suite; tester}  ->TestSuite {name; ty;suite; tester} );
+  ]
+;;
 type test_state = {testml : string;
-                   testhaut : question_state Map.Make (String).t}
+                   testhaut : test_qst_untyped Map.Make (String).t}
 
 
-let testhaut_enc= map_enc question_state_enc
+let testhaut_enc= map_enc test_qst_untyped_enc
                  
 let test_state_enc =conv
     (fun {testml;testhaut}->(testml,testhaut))
     ( fun (testml,testhaut)->{testml;testhaut})
     (obj2
        (req "testml" string)
-       (req "testhaut" (map_enc question_state_enc) )
+       (req "testhaut" (testhaut_enc) )
     )
 ;;
 type metadata =
@@ -129,7 +235,8 @@ type editor_state =
     question : string ;
     template : string ;
     test : test_state ;
-    prelude : string;    
+    prelude : string;
+    incipit :string ;
     mtime : float }
 
 open Json_encoding
@@ -137,11 +244,11 @@ open Json_encoding
 let editor_state_enc =
   
   conv
-    (fun {metadata ; prepare;solution ; question ;template ; test;prelude ; mtime } ->
-       (metadata , prepare, solution , question , template , test, prelude , mtime))
-    (fun (metadata , prepare, solution , question , template , test, prelude , mtime) ->
-       {metadata; prepare; solution ; question ;template ; test; prelude ; mtime })
-    (obj8
+    (fun {metadata ; prepare;solution ; question ;template ; test;prelude ;incipit;mtime } ->
+       (metadata , prepare, solution , question , template , test, prelude ,incipit, mtime))
+    (fun (metadata , prepare, solution , question , template , test, prelude ,incipit, mtime) ->
+       {metadata; prepare; solution ; question ;template ; test; prelude ;incipit ; mtime })
+    (obj9
        (req "metadata" metadata_enc)
        (req "prepare" string)
        (req "solution" string)
@@ -149,4 +256,5 @@ let editor_state_enc =
        (req "template" string)
        (req "test" test_state_enc )
        (req "prelude" string)
+       (req "incipit" string)
        (dft "mtime" float 0.))

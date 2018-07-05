@@ -1,3 +1,12 @@
+let set_lang () =
+  match Js.Optdef.to_option (Dom_html.window##.navigator##.language) with
+  | Some l -> Ocplib_i18n.set_lang (Js.to_string l)
+  | None ->
+    match Js.Optdef.to_option (Dom_html.window##.navigator##.userLanguage) with
+    | Some l -> Ocplib_i18n.set_lang (Js.to_string l)
+    | None -> ()
+
+
 module type TYPING = sig
   (** should return a representation of a type from its string serialisation *)
   val ty_of : string -> 'a Ty.ty
@@ -8,27 +17,29 @@ module Make(Test_lib : Test_lib.S) (Typing : TYPING) = struct
 open Test_lib
 open Learnocaml_report
 
-(* sampler: (unit -> ('ar -> 'row, 'ar -> 'urow, 'ret) args) *)
 
+(* sampler: (unit -> ('ar -> 'row, 'ar -> 'urow, 'ret) args) *)
+(*keep in sync with learnocaml_exercise_state.ml *)
 type test_qst_untyped =
   | TestAgainstSol of
       { name: string
       ; ty: string
-      ; tester: string
       ; gen: int
-      ; suite: string }
+      ; suite: string
+      ; tester: string}
   | TestAgainstSpec of
       { name: string
       ; ty: string
-      ; tester: string
       ; gen: int
       ; suite: string
-      ; spec : string }
+      ; spec : string
+      ; tester: string}
   | TestSuite of
-      { suite: string
-      ; ty: string
-      ; tester: string
-      ; name: string }
+      { name: string;
+        ty: string;
+        suite: string;
+        tester :string}
+;;
 
 type outcome =
   | Correct of string option
@@ -203,23 +214,17 @@ let parse_type string =
 
 let question_typed question id_question = 
   let open Learnocaml_exercise_state in
-  let acc="\n\nlet name"^id_question^" = \"" ^ question.name in
-  let acc=acc ^ "\" ;; \nlet prot"^id_question^" = " ^ (parse_type question.ty) in
-  let acc=acc ^ "\n let tester"^id_question^" = " ^ "Some "^question.datalist in
-  let acc=(match question.type_question with
-           | Suite -> let acc= acc ^ " ;;\nlet suite"^id_question^" =" ^ question.input in
-                      let acc= acc^ "  ;;\nlet question"^id_question^
-                                 " =  TestSuite {name=name"^id_question^"; prot=prot"^id_question^"; tester=tester"^id_question^"; suite=suite"^id_question^"}"
-                      in acc
-           | Solution -> let acc=acc ^ " ;;\nlet suite"^id_question^" =" ^ question.input in
-                         let acc = acc ^ ";;\n let gen"^id_question^" =" ^ (string_of_int question.extra_alea) in
-                         let acc = acc ^ " ;;\nlet question"^id_question^
-                                     " = TestAgainstSol {name=name"^id_question^"; prot=prot"^id_question^"; tester=tester"^id_question^"; gen=gen"^id_question^"; suite=suite"^id_question^"}" in
-                         acc
-           | Spec -> let acc=acc ^ ";;\nlet spec"^id_question^" =" ^ question.output in
-                     let acc=acc ^ " ;; \n let suite"^id_question^" =" ^ question.input in
-                     let acc=acc ^ ";; \n let gen"^id_question^" =" ^ string_of_int(question.extra_alea) in
-                     let acc=acc ^ ";; \nlet question"^id_question^
-                               " = TestAgainstSpec {name=name"^id_question^"; prot=prot"^id_question^"; tester=tester"^id_question^"; gen=gen"^id_question^"; suite=suite"^id_question^"; spec=spec"^id_question^"}" in
-          acc) in
+  let name,ty,input,extra_alea,output,type_question=match question with
+      TestAgainstSol a ->a.name,a.ty,a.suite,a.gen,"",Solution
+    |TestAgainstSpec a ->a.name,a.ty,a.suite,a.gen,a.spec,Spec
+    |TestSuite a -> a.name,a.ty,a.suite,0,"",Suite
+  in
+  let acc="\n\nlet name"^id_question^" = \"" ^ name in
+  let acc=acc ^ "\" ;; \nlet prot"^id_question^" = " ^ (parse_type ty) in
+  let acc=(match type_question with
+    | Suite -> acc ^ " ;;\nlet suite"^id_question^" =" ^ input ^ "  ;;\nlet question"^id_question^" =  TestSuite {name=name"^id_question^"; prot=prot"^id_question^"; suite=suite"^id_question^"}"
+    | Solution -> acc ^ " ;;\nlet suite"^id_question^" =" ^ input ^ ";; \n let gen"^id_question^" =" ^ (string_of_int extra_alea) ^  " ;;\nlet question"^id_question^" = TestAgainstSol {name=name"^id_question^"; prot=prot"^id_question^"; gen=gen"^id_question^"; suite=suite"^id_question^"}"
+    | Spec -> acc ^ ";;\nlet spec"^id_question^" =" ^ output ^ " ;; \n let suite"^id_question^" =" ^ input ^ ";; \n let gen"^id_question^" =" ^ string_of_int(extra_alea) ^ ";; \nlet question"^id_question^" = TestAgainstSpec {name=name"^id_question^"; prot=prot"^id_question^"; gen=gen"^id_question^"; suite=suite"^id_question^"; spec=spec"^id_question^"}") in
   acc;;
+
+let _ = set_lang ()

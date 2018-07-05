@@ -147,12 +147,9 @@ let _ = Ace.set_contents ace_input_suite ("[]");
 let save_suite () =
   let name = Js.to_string name##.value in
   let ty = Js.to_string ty##.value in
-  let type_question = Suite in
   let input = Ace.get_contents ace_input_suite in
-  let output = "" in
-  let extra_alea = 0 in
   let datalist = Js.to_string datalistSuite##.value in
-  let question = {name; ty; type_question; input; output; extra_alea; datalist} in
+  let question = TestSuite {name; ty; suite= input;tester=datalist} in
   let testhaut =  get_testhaut id in
   let question_id = match arg "questionid" with
     |exception Not_found ->compute_question_id testhaut
@@ -164,12 +161,10 @@ let save_suite () =
 let save_solution () =
   let name = Js.to_string name##.value in
   let ty = Js.to_string ty##.value in
-  let type_question = Solution in
   let input = Ace.get_contents ace_input_sol in
-  let output = "" in
   let extra_alea = int_of_string (Js.to_string extraAleaSol##.value) in
   let datalist = Js.to_string datalistSol##.value in
-  let question = {name; ty; type_question; input; output; extra_alea; datalist} in
+  let question = TestAgainstSol {name; ty; suite=input; gen= extra_alea;tester=datalist} in
   let testhaut = get_testhaut id in
   let question_id =  match arg "questionid" with
     |exception Not_found ->compute_question_id testhaut
@@ -182,12 +177,11 @@ let save_spec () =
   let open Learnocaml_exercise_state in
   let name = Js.to_string name##.value in
   let ty = Js.to_string ty##.value in
-  let type_question = Spec in
   let input = Ace.get_contents ace_input_spec in
   let output = Ace.get_contents ace_spec_spec in
   let extra_alea = int_of_string (Js.to_string extraAleaSpec##.value) in
   let datalist = Js.to_string datalistSpec##.value in
-  let question = {name; ty; type_question; input; output; extra_alea; datalist} in
+  let question = TestAgainstSpec {name; ty; suite=input;spec= output;gen= extra_alea;tester=datalist} in
   let open Editor_lib in
   let testhaut = get_testhaut id in
   let question_id =  match arg "questionid" with
@@ -202,39 +196,44 @@ let _ = match arg "questionid" with
     exception Not_found -> select_tab "suite"; suite##.checked := Js.bool true
   | qid ->let testhaut=get_testhaut id in
 
-          let name_elt=name in
-          let ty_elt=ty in
+      let name_elt=name in
+      let ty_elt=ty in
+      let suite_elt=suite in
+      let spec_elt=spec in
           match StringMap.find qid testhaut with
-            {name;ty;type_question;input;output;extra_alea;datalist} ->
-             match type_question with
-             | Suite ->
+
+            
+            
+             | TestSuite {name;ty;suite;tester} ->
                 begin
-                  Ace.set_contents ace_input_suite input;
+                  Ace.set_contents ace_input_suite suite;
                   name_elt##.value:=Js.string name;
-                  suite##.checked := Js.bool true;
+                  suite_elt##.checked := Js.bool true;
                   ty_elt##.value:=Js.string ty;
-                  datalistSuite##.value:= Js.string datalist;
+                  datalistSuite##.value:= Js.string tester;
                   select_tab "suite"
                 end;
-             | Spec ->
+             | TestAgainstSpec {name;ty;gen;tester;suite;spec} ->
                 begin
-                  Ace.set_contents ace_input_spec input;
-                  Ace.set_contents ace_spec_spec output;
+                  Ace.set_contents ace_input_spec suite;
+                  Ace.set_contents ace_spec_spec spec;
                   name_elt##.value:=Js.string name;
-                  spec##.checked := Js.bool true;
+                  spec_elt##.checked := Js.bool true;
                   ty_elt##.value:=Js.string ty;
-                  extraAleaSpec##.value:= Js.string (string_of_int extra_alea);
-                  datalistSpec##.value:= Js.string datalist;
+                  extraAleaSpec##.value:= Js.string (string_of_int gen);
+                  datalistSpec##.value:= Js.string tester;
                   select_tab "spec"
                 end;
-             | _ ->
+             | TestAgainstSol {name;ty;gen;tester;suite} ->
                 begin
-                  Ace.set_contents ace_input_sol input;
+                  Ace.set_contents ace_input_sol suite;
                   name_elt##.value:=Js.string name;
                   solution##.checked := Js.bool true;
                   ty_elt##.value:=Js.string ty;
-                  extraAleaSol##.value:= Js.string (string_of_int extra_alea);
-                  datalistSol##.value:=Js.string datalist;
+
+                  extraAleaSol##.value:= Js.string (string_of_int gen);
+                  datalistSol##.value:=Js.string tester;
+
                   select_tab "solution"
                 end;;
 
@@ -315,7 +314,7 @@ let _ = save##.onclick:= handler (fun _ ->
 (* Back button *)
 let back = getElementById "back"
 let _ = back##.onclick := handler (fun _ ->
-    close_frame ();
+    let _=close_frame () in ();
     Js._true)
 
 let _ = set_lang ()

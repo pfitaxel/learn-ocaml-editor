@@ -796,7 +796,7 @@ let onload () =
                compile () ; true) ;
            let div =
              Tyxml_js.Html5.(div ~a: [ a_class [ "dialog" ] ]
-                          [ pcdata [%i"Are you sure you want to overwrite the content of Test.ml?\n"] ;
+                          [ pcdata [%i"Are you sure you want to overwrite the contents of Test.ml?\n"] ;
                             btn_yes ;
                             pcdata " " ;
                             btn_no; ]) in

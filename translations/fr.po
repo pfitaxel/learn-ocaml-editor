@@ -727,3 +727,12 @@ msgid ""
 msgstr ""
 "La fonctionnalité de notation automatique s'appuie sur le contenu de Test."
 "ml. Voulez-vous compiler les tests de haut niveau et écraser Test.ml?\n"
+
+#~ msgid "Code quality and forbidden patterns"
+#~ msgstr "Qualité du code et traits de programmation interdits"
+
+#~ msgid "Forbid undesirable code patterns"
+#~ msgstr "Interdire des traits de programmation indésirables"
+
+#~ msgid "Forbid imperative features"
+#~ msgstr "Interdire des traits de programmation impérative"

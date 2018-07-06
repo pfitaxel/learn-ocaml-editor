@@ -281,14 +281,17 @@ let  rec testhaut_init content_div id =
               acc)
             contents acc
     in
-    List.rev (format_contents  (*([Tyxml_js.Html5.a ~a:[ Tyxml_js.Html5.a_class ["trait"]] [
-        Tyxml_js.Html5.div ~a:[ Tyxml_js.Html5.a_class [ "imperative" ]] [
-            Tyxml_js.Html5.h1 [Tyxml_js.Html5.pcdata "Imperative code"];
-            Tyxml_js.Html5.input ~a:[Tyxml_js.Html5.a_input_type `Checkbox] ();];
-        Tyxml_js.Html5.div ~a:[ Tyxml_js.Html5.a_class [ "clean" ]] [
-            Tyxml_js.Html5.h1 [Tyxml_js.Html5.pcdata "Clean code"];
-            Tyxml_js.Html5.input ~a:[Tyxml_js.Html5.a_input_type `Checkbox] ()];]]@*)
-                                  ([Tyxml_js.Html5.a ~a:[ Tyxml_js.Html5.a_onclick 
+    List.rev (format_contents (* ([Tyxml_js.Html5.a ~a:[ Tyxml_js.Html5.a_class ["patterns"]] [
+    	Tyxml_js.Html.h1 [ Tyxml_js.Html5.pcdata [%i"Code quality and forbidden patterns"] ];
+        Tyxml_js.Html5.div ~a:[ Tyxml_js.Html5.a_class [ "quality" ] ] [
+            Tyxml_js.Html5.p [ Tyxml_js.Html5.pcdata [%i"Forbid undesirable code patterns"] ];
+            let quality_box = Tyxml_js.Html5.input ~a:[ Tyxml_js.Html5.a_input_type `Checkbox ] () in
+            Manip.Ev.onchange quality_box (fun _ -> let _ = ""; true); ];
+        Tyxml_js.Html5.div ~a:[ Tyxml_js.Html5.a_class [ "imperative" ] ] [
+            Tyxml_js.Html5.p [ Tyxml_js.Html5.pcdata [%i"Forbid imperative features"] ];
+            let imperative_box = Tyxml_js.Html5.input ~a:[ Tyxml_js.Html5.a_input_type `Checkbox ] () in
+            Manip.Ev.onchange imperative_box (fun _ -> let _ = ""; true); ] ]) @ *)
+       ([Tyxml_js.Html5.a ~a:[ Tyxml_js.Html5.a_onclick
        (fun _ ->
          let elt = find_div "learnocaml-exo-loading" in
          Manip.(addClass elt "loading-layer") ;
@@ -302,7 +305,7 @@ let  rec testhaut_init content_div id =
              Tyxml_js.Html.h1 [ Tyxml_js.Html5.pcdata [%i"New question"] ];
              Tyxml_js.Html5.p [Tyxml_js.Html5.pcdata [%i"Create a new question"]];
            ];
-                ]]) index) in 
+       ]]) index) in 
   let list_div =
    Tyxml_js.Html5.(div ~a: [Tyxml_js.Html5.a_id "learnocaml-main-exercise-list" ])
       (format_question_list index) in

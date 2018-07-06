@@ -202,9 +202,14 @@ let execute_phrase top ?timeout content =
     warnings ;
   Lwt.return result
 
+             
 let execute top =
   Learnocaml_toplevel_input.execute top.input
 
+let execute_test top =
+  Learnocaml_toplevel_output.get_blocks top.output
+
+                                        
 let go_backward top =
   Learnocaml_toplevel_input.go_backward top.input
 
@@ -223,7 +228,7 @@ let set_checking_environment top =
 let execute_phrase top ?timeout content =
   protect_execution top @@ fun () ->
   execute_phrase top ?timeout content
-
+                 
 let load top ?(print_outcome = true) ?timeout ?message content =
   let phrase = Learnocaml_toplevel_output.phrase () in
   protect_execution top @@ fun () ->

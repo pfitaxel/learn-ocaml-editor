@@ -255,8 +255,7 @@ let question_typed question id_question =
   let acc=(match type_question with
            | Suite -> let acc = acc ^ ";;\nlet suite"^id_question^" =" ^ input in
                       let acc = acc ^ ";;\nlet tester"^id_question^" ="^ tester in
-                      let acc = acc ^ ";;\nlet sampler"^id_question^" ="^ sampler in
-                      acc ^ ";;\nlet question"^id_question^" =  TestSuite {name=name"^id_question^"; prot=prot"^id_question^"; tester=tester"^id_question^"sampler=sampler"^id_question^"; suite=suite"^id_question^"}"
+                      acc ^ ";;\nlet question"^id_question^" =  TestSuite {name=name"^id_question^"; prot=prot"^id_question^"; tester=tester"^id_question^"; suite=suite"^id_question^"}"
            | Solution -> let acc = acc ^ ";;\nlet suite"^id_question^" =" ^ input in
                          let acc = acc ^ ";; \n let gen"^id_question^" =" ^ (string_of_int extra_alea) in
                          let acc = acc ^ ";; \n let tester"^id_question^" =" ^tester in
@@ -266,7 +265,8 @@ let question_typed question id_question =
                      let acc = acc ^ ";; \n let suite"^id_question^" =" ^ input in
                      let acc = acc ^ ";; \n let gen"^id_question^" =" ^ string_of_int(extra_alea) in
                      let acc = acc ^ ";; \n let tester"^id_question^" =" ^ tester in
-                     acc ^ ";; \nlet question"^id_question^" = TestAgainstSpec {name=name"^id_question^"; prot=prot"^id_question^"; tester=tester"^id_question^"; gen=gen"^id_question^"; suite=suite"^id_question^"; spec=spec"^id_question^"}") in
+                      let acc = acc ^ ";;\nlet sampler"^id_question^" ="^ sampler in
+                     acc ^ ";; \nlet question"^id_question^" = TestAgainstSpec {name=name"^id_question^"; prot=prot"^id_question^"; tester=tester"^id_question^"; sampler=sampler"^id_question^"; gen=gen"^id_question^"; suite=suite"^id_question^"; spec=spec"^id_question^"}") in
   acc;;
 
 let _ = set_lang ()

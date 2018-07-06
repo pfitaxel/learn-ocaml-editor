@@ -471,6 +471,86 @@ let rec gen_ty nbArgs =  match nbArgs with
   |0 -> "..."
   |_ -> "... -> "^(gen_ty (nbArgs-1)) ;;
 
+(*_________________Deuxième version pour Generate_____________________________*)
+(*on  récupère des "val f : int -> int -> int = <fun>"*)
+let rec get_equal listeChar = match listeChar with
+  |[]->[]
+  |'='::l -> []
+  |ch::tail -> ch :: (get_equal tail) ;;
+
+let rec get_val listeChar = match listeChar with
+  |[]->[]
+  |'v'::'a'::'l'::tail -> get_equal tail
+  |ch::suite -> get_val suite ;;
+
+let rec get_next_val listeChar = match listeChar with
+  |[]->[]
+  |'v'::'a'::'l'::tail -> tail
+  |ch::suite -> get_next_val suite ;;
+
+let rec get_all_val listeChar listeRes = match listeChar with
+  |[] -> listeRes
+  |_ -> if ((get_val listeChar)<>[])
+        then (get_all_val (get_next_val listeChar) ((get_val listeChar)::listeRes))
+        else (listeRes)
+
+let rec get_type_of_fct listeChar b= match listeChar with
+  |[] -> []
+  |':'::tail -> get_type_of_fct tail true
+  |ch::tail -> if b then (ch::(get_type_of_fct tail b)) else (get_type_of_fct tail b) ;;
+
+
+let rec get_nom listeChar nom = match listeChar with
+  |[]->nom
+  |' '::suite-> get_nom suite nom
+  |ch::' '::suite -> if (ch<>' ') then nom@[ch] else get_nom suite nom
+  |ch::suite -> get_nom suite (nom@[ch]) ;;
+
+let rec get_questions listeChar name_and_type= match listeChar with
+  |[]->name_and_type
+  |liste::suite -> get_questions suite name_and_type@[(concatenation (get_nom liste []),concatenation (get_type_of_fct liste false))]
+
+(*////////////*)
+
+let third (a,b,c) = c;;
+let first (a,b,c) = a ;;
+let second (a,b,c) = b ;;
+
+let maj_mono val_next_mono = match val_next_mono with
+  |'i'::'n'::'t'::[]->'c'::'h'::'a'::'r'::[]
+  |'c'::'h'::'a'::'r'::[]->'b'::'o'::'o'::'l'::[]
+  |'b'::'o'::'o'::'l'::[] -> 's'::'t'::'r'::'i'::'n'::'g'::[]
+  |'s'::'t'::'r'::'i'::'n'::'g'::[] -> 'i'::'n'::'t'::[]
+  |_ -> failwith "erreur type monomorphe"
+                                                       
+(*met à jour la liste des couples puis revoie cette liste et le type monomorphe qui doit être utiliser*)                                                       
+let rec get_association listeCouple elt listeCouple2 val_next_mono = match listeCouple with
+  |[]->((elt,maj_mono val_next_mono)::listeCouple2,maj_mono val_next_mono,true)
+  |(poly,mono) :: tail -> if (poly = elt) then (listeCouple2,mono,false) else (get_association tail elt listeCouple2 val_next_mono)
+
+                                                                          
+(*remplace les 'a,'b,... par int||char||...*)                                                                          
+let rec polymorph_detector_aux listeType listeCouple val_next_mono= match listeType with
+  |[]->[]
+  |'\''::ch::tail ->let v = (get_association listeCouple ch listeCouple val_next_mono) in
+                    if (third v)
+                    then (second v)@( polymorph_detector_aux tail (first v) (second v))
+                    else (second v)@( polymorph_detector_aux tail (first v) (val_next_mono))
+  |ch::tail -> ch::(polymorph_detector_aux tail listeCouple val_next_mono)
+
+
+                     
+let rec decompositionSol str n = if str="" then [] else
+  (if (n+1= String.length str) then [(str.[n])]
+  else ( (str.[n])::(decompositionSol str (n+1)) ));;
+                     
+(*prend en entrée listeChar qui est une liste de couple de deux listes de char*)
+let rec polymorph_detector listeChar = match listeChar with
+  |[]-> []
+  |(listeNom,listeType)::tail -> (listeNom,concatenation (polymorph_detector_aux (decompositionSol listeType 0) [] ('c'::'h'::'a'::'r'::[])))::(listeNom,concatenation (polymorph_detector_aux (decompositionSol listeType 0) [] ('i'::'n'::'t'::[])))::(polymorph_detector tail)
+
+(*redondance (polymorph_detector (get_questions (get_all_val values []) [])) ;;*)
+                                                       
 (*_________________________Fonctions pour generer le template_____________________________________*)                             
 
 let failchar = [' ';'f';'a';'i';'l';'w';'i';'t';'h';' ';'"';'T';'O';'D';'O';'"';'\n'] ;;
@@ -478,10 +558,6 @@ let failchar = [' ';'f';'a';'i';'l';'w';'i';'t';'h';' ';'"';'T';'O';'D';'O';'"';
 let tail l = match l with
   |[]->[]
   |e::l->l ;;
-
-let rec decompositionSol str n = 
-  if (n+1= String.length str) then [(str.[n])]
-  else ( (str.[n])::(decompositionSol str (n+1)) );;
 
 let rec commentaire listech cpt = match listech with
   |[]->[]
@@ -548,3 +624,20 @@ let rec genTemplate chaine = if chaine="" then "" else
 	                       concatenation (genLet (decompositionSol chaine 0));;
 
 let _ = set_lang ()
+
+
+(*__________________________________________________*)
+
+
+let wait milli =
+  let sec = milli /. 1000. in
+  let tm1 = Unix.gettimeofday () in
+  while Unix.gettimeofday () -. tm1 < sec do () done
+
+
+                 
+open Learnocaml_toplevel
+open Learnocaml_toplevel_output 
+let get_answer top =
+   Learnocaml_toplevel.execute_test top
+

@@ -61,7 +61,6 @@ module StringMap = Map.Make (String)
                          
 let recovering_callback = ref (fun ()->())
 
-
 let id=arg "id"
 
 (*keep sync with test-spec*)
@@ -194,12 +193,26 @@ let rec save_quest listeQuestions id = match listeQuestions with
     let ty= gen_ty nbArgs in
     let input = "[]" in
     let extra_alea = 0 in
-    let question = TestAgainstSol {name ; ty ; suite=input  ;gen= extra_alea;tester="";sampler=""} in
+    let question = TestAgainstSol {name ; ty ; suite=input ; gen= extra_alea ; tester="" ; sampler=""} in
     let testhaut =  get_testhaut id in
     let question_id = compute_question_id testhaut in
     let new_testhaut = StringMap.add question_id question testhaut in
     let () = save_testhaut new_testhaut id in
     save_quest suite id;;
+
+let rec save_questions listeQuestions id = match listeQuestions with
+  |[]->()
+  |(nom,string_type)::suite ->
+    let name = nom in
+    let ty = string_type in
+    let input = "[]" in
+    let extra_alea = 0 in
+    let question = TestAgainstSol {name ; ty ; suite=input ; gen=extra_alea ; tester="" ; sampler=""} in
+    let testhaut =  get_testhaut id in
+    let question_id = compute_question_id testhaut in
+    let new_testhaut = StringMap.add question_id question testhaut in
+    let () = save_testhaut new_testhaut id in
+    save_questions suite id;;
 (*-------------------------------------------------------------------------*)
 let id = arg "id";; 
 let grade_black =ref (fun ()->());;
@@ -479,7 +492,14 @@ let () =
       ~icon: "typecheck" [%i"Check"] @@ fun () ->
     typecheck true
   end ;
-
+  (*------test pour recup type fct------------------------------------------*)
+    (*begin toplevel_button
+      ~group: toplevel_buttons_group
+      ~icon: "run" [%i"typetest"] @@ fun () ->
+                                     
+    Ace.set_contents ace_t (get_answer top);
+    Lwt.return ()
+    end ;*)
 
   (* ---- template pane --------------------------------------------------- *)
   let editor_template = find_component "learnocaml-exo-template-pane" in
@@ -840,15 +860,28 @@ let onload () =
     Ace.focus ace_t ;
     Lwt.return () in *)
   let _ = testhaut_init (find_component "learnocaml-exo-testhaut-pane") id in ();
+                                                                          
   begin testhaut_button
       ~group: toplevel_buttons_group
       ~icon: "sync" [%i"Generate"] @@ fun () ->
     let sol = genTemplate (Ace.get_contents ace) in
-    if (sol<>"") then    
-        (let listeChars = supprRec (' '::(decompositionSol sol 0)) in
-        save_quest (genQuestions (get_fct listeChars []) []) id ;
-        Manip.removeChildren (find_component "learnocaml-exo-testhaut-pane");
-        testhaut_init (find_component "learnocaml-exo-testhaut-pane") id )
+    if (sol<>"") then begin
+        (* let listeChars = supprRec (' '::(decompositionSol sol 0)) in *)
+      (* save_quest (genQuestions (get_fct listeChars []) []) id ; *)
+    disabling_button_group toplevel_buttons_group (fun () -> Learnocaml_toplevel.reset top) >>= fun () ->
+    Learnocaml_toplevel.execute_phrase top (Ace.get_contents ace) >>= fun ok ->
+    if ok then
+    let res_aux = decompositionSol (get_answer top) 0 in
+    (*Avec prise en compte des types polymorphes :*)
+    let res = redondance (polymorph_detector (get_questions (get_all_val res_aux []) [])) in
+    (*let rec fct_test liste = match liste with |[]->""|(a,b)::suite->a^b^(fct_test suite) in
+    (Ace.set_contents ace_temp (fct_test res));*)
+    save_questions res id;
+    
+     Manip.removeChildren (find_component "learnocaml-exo-testhaut-pane");
+      (testhaut_init (find_component "learnocaml-exo-testhaut-pane") id)
+    else (select_tab "toplevel" ; Lwt.return ())
+      end
     else Lwt.return ();
   end ;                             
   begin testhaut_button
@@ -1174,6 +1207,7 @@ let onload () =
   (* ---- return -------------------------------------------------------- *)
   toplevel_launch >>= fun _ ->
   typecheck false >>= fun () ->
+
   hide_loading ~id:"learnocaml-exo-loading" () ;
   let () = Lwt.async @@ fun () ->
      let _ = Dom_html.window##setInterval (Js.wrap_callback (fun () -> onload ())) 200.0; in

@@ -120,7 +120,7 @@ let execute ({ history ; textbox ; execute } as input) =
   textbox##.value := Js.string (Learnocaml_toplevel_history.current history) ;
   resize input ;
   execute code
-
+          
 let go_backward ({ history ; textbox } as input) =
   Learnocaml_toplevel_history.update history (Js.to_string textbox##.value) ;
   Learnocaml_toplevel_history.go_backward history ;

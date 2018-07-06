@@ -340,3 +340,15 @@ let oldify output =
 
 let format_ocaml_code code =
   pretty_html (fst (prettify_ocaml code))
+
+let get_blocks output=
+  let type_string = output.blocks in
+  let rec last_block liste = match liste with
+    |[]-> ""
+    (*|(Html (s,_)) :: suite-> s^"html"^(last_block suite)
+    |(Code (s,_,_,_)) :: suite-> s^"code"^(last_block suite)*)
+    |(Answer (s,_,_,_)) :: suite-> s^(last_block suite)
+    (*|(Warning (s,_,_))::suite -> string_of_int s*)
+    |(Phrase (_,s))::suite -> (last_block (!s))^(last_block suite)
+    |b::suite->(last_block suite) in
+  last_block type_string

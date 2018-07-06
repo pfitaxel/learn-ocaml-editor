@@ -758,22 +758,23 @@ let onload () =
       ~group: toplevel_buttons_group
       ~icon: "sync" [%i"Generate"] @@ fun () ->
     let sol = genTemplate (Ace.get_contents ace) in
-    if (sol<>"") then    
-      let listeChars = supprRec (' '::(decompositionSol sol 0)) in
-      save_quest (genQuestions (get_fct listeChars []) []) id ;
-
-      (*
-    disabling_button_group toplevel_buttons_group (fun () -> Learnocaml_toplevel.reset top);
-      Learnocaml_toplevel.execute_phrase top (Ace.get_contents ace) ; 
+    if (sol<>"") then begin
+        (* let listeChars = supprRec (' '::(decompositionSol sol 0)) in *)
+      (* save_quest (genQuestions (get_fct listeChars []) []) id ; *)
+    disabling_button_group toplevel_buttons_group (fun () -> Learnocaml_toplevel.reset top) >>= fun () ->
+    Learnocaml_toplevel.execute_phrase top (Ace.get_contents ace) >>= fun ok ->
+    if ok then
     let res_aux = decompositionSol (get_answer top) 0 in
     (*Avec prise en compte des types polymorphes :*)
     let res = redondance (polymorph_detector (get_questions (get_all_val res_aux []) [])) in
     (*let rec fct_test liste = match liste with |[]->""|(a,b)::suite->a^b^(fct_test suite) in
     (Ace.set_contents ace_temp (fct_test res));*)
-     save_questions res id;
-       *)                                                    
-      Manip.removeChildren (find_component "learnocaml-exo-testhaut-pane");
-      testhaut_init (find_component "learnocaml-exo-testhaut-pane") id 
+    save_questions res id;
+    
+     Manip.removeChildren (find_component "learnocaml-exo-testhaut-pane");
+      (testhaut_init (find_component "learnocaml-exo-testhaut-pane") id)
+    else (select_tab "toplevel" ; Lwt.return ())
+      end
     else Lwt.return ();
   end ;                             
   begin testhaut_button

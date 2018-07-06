@@ -63,7 +63,9 @@ let recovering_callback = ref (fun ()->())
 
 let id=arg "id"
 
-
+(*keep sync with test-spec*)
+let testprel ="open Test_lib\nopen Learnocaml_report\n\n\n(* sampler: (unit -> ('ar -> 'row, 'ar -> 'urow, 'ret) args) *)\n(*keep in sync with learnocaml_exercise_state.ml *)\ntype test_qst_untyped =\n  | TestAgainstSol of\n      { name: string\n      ; ty: string\n      ; gen: int\n      ; suite: string\n      ; tester: string\n      ; sampler: string}\n  | TestAgainstSpec of\n      { name: string\n      ; ty: string\n      ; gen: int\n      ; suite: string\n      ; spec : string\n      ; tester: string\n      ; sampler: string}\n  | TestSuite of\n      { name: string;\n        ty: string;\n        suite: string;\n        tester : string}\n;;\n\ntype outcome =\n  | Correct of string option\n  | Wrong of string option\n\n(* TODO val get_test_qst : test_qst_untyped -> test_qst_typed *)\n\ntype test_qst_typed =\n  | TestAgainstSol :\n      { name: string\n      ; prot: (('ar -> 'row) Ty.ty, 'ar -> 'urow, 'ret) prot\n      ; tester: 'ret tester option\n      ; sampler:(unit -> ('ar -> 'row, 'ar -> 'urow, 'ret) args) option\n      ; gen: int\n      ; suite: ('ar -> 'row, 'ar -> 'urow, 'ret) args list } -> test_qst_typed\n  | TestAgainstSpec :\n      { name: string\n      ; prot: (('ar -> 'row) Ty.ty, 'ar -> 'urow, 'ret) prot\n      ; tester: 'ret tester option  (* 'a tester option (base) mais probleme de type : 'a tester incompatible avec 'ret tester*)\n      ; sampler: (unit -> ('ar -> 'row, 'ar -> 'urow, 'ret) args) option\n      ; gen: int\n      ; suite: ('ar -> 'row, 'ar -> 'urow, 'ret) args list\n      ; spec : ('ar -> 'row) -> ('ar -> 'row, 'ar -> 'urow, 'ret) args -> 'ret -> outcome } -> test_qst_typed\n  | TestSuite :\n      { name: string\n      ; prot: (('ar -> 'row) Ty.ty, 'ar -> 'urow, 'ret) prot\n      ; tester: 'ret tester option\n      ; suite: (('ar -> 'row, 'ar -> 'urow, 'ret) args * (unit -> 'ret)) list } -> test_qst_typed\n\n(** Notation for TestAgainstSpec *)\nlet (~~) b = if b then Correct None else Wrong None\n(** Notations for TestSuite *)\nlet (==>) a b = (a, fun () -> b)\n(* let (=>) a b = (a, fun () -> Lazy.force b) (* needs module Lazy *) *)\n(** Notations for heterogeneous lists *)\nlet (@:) a l = arg a @@ l\nlet (!!) b = last b\nlet (@:!!) a b = a @: !! b\n\nlet local_dummy : 'a sampler = fun () -> failwith \"dummy sampler\"\n(* à n'utiliser que si on passe l'argument ~gen:0 (pas d'alea) *)\n                                               \nlet test_question (t : test_qst_typed) =\n  match t with\n  | TestAgainstSol t ->\n      let tester = match t.tester with\n        | None -> test\n        | Some s -> s in\n      if t.gen=0 then \n        (test_function_against\n           ~gen:t.gen ~sampler:local_dummy\n           ~test:tester (* could take into account exceptions/sorted lists/etc. *)\n           t.prot\n           (lookup_student (ty_of_prot t.prot) t.name)\n           (lookup_solution (ty_of_prot t.prot) t.name)\n           t.suite)\n      else\n        (match t.sampler with\n         | None -> (test_function_against\n                      ~gen:t.gen\n                      ~test:tester (* could take into account exceptions/sorted lists/etc. *)\n                      t.prot\n                      (lookup_student (ty_of_prot t.prot) t.name)\n                      (lookup_solution (ty_of_prot t.prot) t.name)\n                      t.suite)\n         | Some s -> (test_function_against\n                        ~gen:t.gen ~sampler:s\n                        ~test:tester (* could take into account exceptions/sorted lists/etc. *)\n                        t.prot\n                        (lookup_student (ty_of_prot t.prot) t.name)\n                        (lookup_solution (ty_of_prot t.prot) t.name)\n                        t.suite))\n  | TestAgainstSpec t ->\n      let to_string ty v = Format.asprintf \"%a\" (typed_printer ty) v in\n      let stud = lookup_student (ty_of_prot t.prot) t.name in\n      test_value stud @@ fun uf ->\n     (* no sampler for the moment *)\n      let open Learnocaml_report in\n      List.flatten @@ List.map (fun args ->\n          let code = Format.asprintf \"@[<hv 2>%s,%a@]\" t.name (print t.prot) args in\n          let ret_ty = get_ret_ty (ty_of_prot t.prot) args in\n          Message ([ Text \"Checking spec for\" ; Code code ], Informative) ::\n          let ret = apply uf args in\n          let value = to_string ret_ty ret in\n          let (text, note) = match t.spec uf args ret with\n            | Correct None -> (\"Correct spec\", Success 1)\n            | Correct (Some message) -> (message, Success 1)\n            | Wrong None -> (\"Wrong spec\", Failure)\n            | Wrong (Some message) -> (message, Failure) in\n          [Message ([Text \"Got value\"; Code value; Text (\": \" ^ text)], note)])\n        t.suite\n  | TestSuite t ->\n      let test = match t.tester with\n        | None -> test\n        | Some s -> s in\n      test_function\n        ~test:test (* could take into account exceptions/sorted lists/etc. *)\n        t.prot\n        (lookup_student (ty_of_prot t.prot) t.name)\n        t.suite"
+;;  
 
 (*_________________________Fonctions pour le bouton Generate______________________________________*)
 
@@ -82,26 +84,23 @@ let rec save_quest listeQuestions id = match listeQuestions with
   |(nom,nbArgs)::suite ->
     let name = nom in
     let ty= gen_ty nbArgs in
-    let type_question = Solution in
     let input = "[]" in
-    let output = "[]" in
     let extra_alea = 0 in
-    let question = {name ; ty ; type_question ; input ; output ; extra_alea} in
+    let question = TestAgainstSol {name ; ty ; suite=input ; gen= extra_alea ; tester="" ; sampler=""} in
     let testhaut =  get_testhaut id in
     let question_id = compute_question_id testhaut in
     let new_testhaut = StringMap.add question_id question testhaut in
     let () = save_testhaut new_testhaut id in
     save_quest suite id;;
+
 let rec save_questions listeQuestions id = match listeQuestions with
   |[]->()
   |(nom,string_type)::suite ->
     let name = nom in
     let ty = string_type in
-    let type_question = Solution in
     let input = "[]" in
-    let output = "[]" in
     let extra_alea = 0 in
-    let question = {name ; ty ; type_question ; input ; output ; extra_alea} in
+    let question = TestAgainstSol {name ; ty ; suite=input ; gen=extra_alea ; tester="" ; sampler=""} in
     let testhaut =  get_testhaut id in
     let question_id = compute_question_id testhaut in
     let new_testhaut = StringMap.add question_id question testhaut in
@@ -326,29 +325,15 @@ let () =
 
   (* ---- testhaut edit ------------------------------------------------*)
   
-  let name = "" in
-  let ty = "" in
-  let type_question = Suite in
-  let input = match get_buffer id with
-    exception Not_found -> ""
-  | buff -> buff.input in
-  let output = "" in
-  let extra_alea = 0 in
-  let question = {name; ty; type_question; input; output; extra_alea} in
-  let testhaut = get_testhaut id in
-  let question_id ="0" in
-  let testhaut = StringMap.add question_id question testhaut in
-  save_testhaut testhaut id;
   let editor_testhaut = find_component "learnocaml-exo-testhaut-edit" in
   let editor_th =Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div editor_testhaut ) in
   let ace_testhaut = Ocaml_mode.get_editor editor_th in
   let buffer = match get_buffer id with
-  | exception Not_found -> ""
-  | buff -> if (buff.input="")
+  | buff -> if (buff="")
             then [%i"(* Incipit: contains local definitions\n\
             		 that will be reachable when you will create\n\
         			 a new question *)\n"]
-            else buff.input in
+            else buff in
   Ace.set_contents ace_testhaut buffer ;
   Ace.set_font_size ace_testhaut 18;
 
@@ -370,7 +355,7 @@ let () =
  (*let lib = " module Test_lib = Test_lib.Make(struct\n\
         \  let results = results\n\
         \  let set_progress = set_progress\n\
-        \  module Introspection = Introspection\n\
+0        \  module Introspection = Introspection\n\
               end)" in *)
   
    let typecheck set_class =
@@ -629,35 +614,24 @@ let onload () =
       in
   Ace.set_contents ace contents;
   Ace.set_font_size ace 18;
-  let save_buffer_test () =
-  let ty = "" in
-  let type_question = Suite in
-  let input = Ace.get_contents ace_testhaut in
-  let output = "" in
-  let extra_alea = 0 in
-  let question = {name; ty; type_question; input; output; extra_alea} in
-  let testhaut = get_testhaut id in
-  let question_id ="0" in
-  let testhaut = StringMap.add question_id question testhaut in
-  save_testhaut testhaut id in
+
   let recovering () =
     let solution = Ace.get_contents ace in
     let titre = get_titre id  in
+    let incipit= Ace.get_contents ace_testhaut in
     let question = Ace.get_contents ace_quest in
     let template = Ace.get_contents ace_temp in
     let testml = Ace.get_contents ace_t in
-    save_buffer_test ();
     let testhaut= get_testhaut id in
     let prepare= Ace.get_contents ace_prep in
     let prelude =Ace.get_contents ace_prel in 
     let test ={testml;testhaut} in
-    let  diff =
-      match Learnocaml_local_storage.(retrieve (editor_state id)) with
-      | { Learnocaml_exercise_state.diff } -> diff
-      | exception Not_found -> None in
+    let  diff = get_diff id in
+    let description=get_description id in
+    let metadata ={id;titre;description;diff} in
     Learnocaml_local_storage.(store (editor_state id))
-      { Learnocaml_exercise_state.id ; solution ; titre ; question ; template ;
-        diff ; test ; prepare ; prelude;
+      { Learnocaml_exercise_state.metadata ;incipit; solution ; question ; template ;
+         test ; prepare ; prelude;
         mtime = gettimeofday () } in
   recovering_callback:=recovering ;
   let messages = Tyxml_js.Html5.ul [] in
@@ -807,19 +781,37 @@ let onload () =
       ~icon: "typecheck" [%i"Check"] @@ fun () ->
     Lwt.return ()
   end ;
-  let compile () = let listeFonction = constructListeQuest (get_id_question id) id in
-               let tests = constructFinalSol listeFonction in 
-               (*let tests = tests ^ (Test_spec.question_typed id "1") in*)
-                 match Learnocaml_local_storage.(retrieve (editor_state id) ) with
-               |{id;titre;prepare;diff;solution;question;template;test;prelude;mtime}->
-                 let mtime=gettimeofday () in
-                 let test ={testml=tests;testhaut=test.testhaut} in
-                 let nvexo= {id;titre;prepare;diff;solution;question;template;test;prelude;mtime} in    
-                 Learnocaml_local_storage.(store (editor_state id)) nvexo;
-                 Ace.set_contents ace_t  (get_testml id);
-                 Manip.removeChildren (find_component "learnocaml-exo-testhaut-pane");
-                 testhaut_init (find_component "learnocaml-exo-testhaut-pane") id ;
-                 select_tab "test" in
+
+  let compile () = (*let listeFonction = constructListeQuest (get_id_question id) id in
+                     let tests = constructFinalSol listeFonction in*)
+    let tests=testprel in
+    let tests=tests^" \n "^((get_buffer id))^" \n" in
+    let tests=
+      StringMap.fold (fun qid->fun quest -> fun str ->
+ 
+            str ^ (Test_spec.question_typed quest qid)^" \n") (get_testhaut id) tests
+    in 
+    let tests=tests^init^"[ \n " in
+    let tests=
+      StringMap.fold (fun qid->fun quest-> fun str ->
+          let name=match quest with
+              TestAgainstSol a->a.name
+             |TestAgainstSpec a ->a.name
+             |TestSuite a -> a.name
+          in
+          (* refactor what it's up in editor_lib *)    
+            str ^ (section name ("test_question question"^qid ) )) (get_testhaut id) tests in
+    let tests=tests^ " ]" in
+    match Learnocaml_local_storage.(retrieve (editor_state id) ) with
+    |{metadata;prepare;incipit;solution;question;template;test;prelude;mtime}->
+        let mtime=gettimeofday () in
+        let test ={testml=tests;testhaut=test.testhaut} in
+        let nvexo= {metadata;incipit;prepare;solution;question;template;test;prelude;mtime} in    
+        Learnocaml_local_storage.(store (editor_state id)) nvexo;
+        Ace.set_contents ace_t  (get_testml id);
+        Manip.removeChildren (find_component "learnocaml-exo-testhaut-pane");
+        let _ =testhaut_init (find_component "learnocaml-exo-testhaut-pane") id in () ;
+        select_tab "test" in
   begin testhaut_button
       ~group: toplevel_buttons_group
       ~icon: "run" [%i"Compile"] @@ fun () ->
@@ -834,7 +826,7 @@ let onload () =
                compile () ; true) ;
            let div =
              Tyxml_js.Html5.(div ~a: [ a_class [ "dialog" ] ]
-                          [ pcdata [%i"Are you sure you want to overwrite the content of Test.ml?\n"] ;
+                          [ pcdata [%i"Are you sure you want to overwrite the contents of Test.ml?\n"] ;
                             btn_yes ;
                             pcdata " " ;
                             btn_no; ]) in
@@ -1026,9 +1018,9 @@ let onload () =
           Manip.Ev.onclick btn_compile (fun _ ->
               recovering () ;
               compile ();
-              grade (); true) ;
+              let _= grade () in (); true) ;
           let btn_no = Tyxml_js.Html5.(button [ pcdata [%i"Grade without compiling Test"] ]) in
-          Manip.Ev.onclick btn_no (fun _ -> grade () ; true);
+          Manip.Ev.onclick btn_no (fun _ ->let _ = grade () in () ; true);
           let div =
             Tyxml_js.Html5.(div ~a: [ a_class [ "dialog" ] ]
                               [ pcdata [%i"The Grade feature relies on the contents of Test.ml. \

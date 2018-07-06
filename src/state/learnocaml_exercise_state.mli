@@ -25,31 +25,53 @@ val exercise_state_enc : exercise_state Json_encoding.encoding
 
 type type_question= Suite | Solution | Spec ;;
 
-type question_state =
-  {name :string;
-   ty :string;
-   type_question : type_question;
-   input :string;
-   output:string;
-   extra_alea:int;   
-  }
+type test_qst_untyped =
+  | TestAgainstSol of
+      { name: string
+      ; ty: string 
+      ; gen: int
+      ; suite: string
+      ; tester: string
+      ; sampler: string}
+  | TestAgainstSpec of
+      { name: string
+      ; ty: string
+      ; gen: int
+      ; suite: string
+      ; spec : string
+      ; tester: string
+      ; sampler: string}
+  | TestSuite of
+      { name: string;
+        ty: string;
+        suite: string;
+        tester :string}
+;;
 
 type test_state = {testml : string;
-                   testhaut : question_state Map.Make (String).t}
+                   testhaut : test_qst_untyped Map.Make (String).t}
 
-val testhaut_enc : question_state Map.Make (String).t Json_encoding.encoding
+val testhaut_enc : test_qst_untyped Map.Make (String).t Json_encoding.encoding
     
+type metadata =
+  { id :string;
+    titre :string;
+    description :string;
+    diff :float
+  }
+
+
 type editor_state =
-  { id : string ;
-    titre : string;
-    prepare : string  ;
-    diff : float option;
+  { metadata :metadata;    
+    prepare :string;
     solution : string ;
     question : string ;
     template : string ;
     test : test_state ;
-    prelude : string ;    
+    prelude : string;
+    incipit:string;
     mtime : float }
+
 
 val editor_state_enc : editor_state Json_encoding.encoding
 open Learnocaml_index

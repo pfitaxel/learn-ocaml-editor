@@ -48,7 +48,7 @@
     	<button id="save" type="submit" class="button">Save</button>
       </div>
       <!--<div id="learnocaml-test-toolbar" class="buttons"></div>-->
-    </div>
+    </div style="margin: 0 5%;">
     <div id="page_title">
       <h1 id="txt_test">Test</h1>
     </div>
@@ -85,6 +85,23 @@
 	  <input type="number" name="gen" id="sol-gen" value="0" step="1" min="0" max="20">
 	  </input>
 	</div>
+	<div id="learnocaml-tab-solution-datalist">
+	  <label id="txt_datalist_sol" for="sol-datalist">Tester:<br></label>
+	  <input list="datalist" id="sol-datalist" name="sol-datalist" />
+	  <datalist id="datalist">
+	    <option value="test_ignore">
+	    <option value="test">
+	    <option value="test_eq ...">
+	    <option value="test_eq_ok ...">
+	    <option value="test_eq_exn ...">
+	    <option value="test_canon ...">
+	    <option value="test_canon_ok ...">
+	    <option value="test_canon_error ...">
+	</div>
+	<div id="learnocaml-tab-solution-sampler">
+	  <label id="txt_sampler_sol" for="sol-sampler">Sampler:<br></label>
+	  <input type="text" value="" id="sol-sampler"></input>
+	</div>
       </div>
       
       <div id="learnocaml-tab-spec">
@@ -96,6 +113,23 @@
 	  <input type="number" name="gen" id="spec-gen" value="0" step="1" min="0" max="20">
 	  </input>
 	</div>
+	<div id="learnocaml-tab-spec-datalist">
+	  <label id="txt_datalist_spec" for="spec-datalist">Tester:<br></label>
+	  <input list="datalist" id="spec-datalist" name="spec-datalist" />
+	  <datalist id="datalist">
+	    <option value="test_ignore">
+	    <option value="test">
+	    <option value="test_eq ...">
+	    <option value="test_eq_ok ...">
+	    <option value="test_eq_exn ...">
+	    <option value="test_canon ...">
+	    <option value="test_canon_ok ...">
+	    <option value="test_canon_error ...">
+	</div>
+	<div id="learnocaml-tab-spec-sampler">
+	  <label id="txt_sampler_spec" for="spec-sampler">Sampler:<br></label>
+	  <input type="text" value="" id="spec-sampler"></input>
+	</div>
 	<a id="txt_spec_specification">Specification:<br></a>
 	<div id="learnocaml-tab-spec-spec">
 	</div>
@@ -104,6 +138,19 @@
       <div id="learnocaml-tab-suite">
 	<a id="txt_suite_input">Arguments and results:<br></a>
 	<div id="learnocaml-tab-suite-input">
+	</div>
+	<div id="learnocaml-tab-suite-datalist">
+	  <label id="txt_datalist_suite" for="suite-datalist">Tester:<br></label>
+	  <input list="datalist" id="suite-datalist" name="suite-datalist" />
+	  <datalist id="datalist">
+	    <option value="test_ignore">
+	    <option value="test">
+	    <option value="test_eq ...">
+	    <option value="test_eq_ok ...">
+	    <option value="test_eq_exn ...">
+	    <option value="test_canon ...">
+	    <option value="test_canon_ok ...">
+	    <option value="test_canon_error ...">
 	</div>
       </div>
     </div>

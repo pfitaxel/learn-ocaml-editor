@@ -10,9 +10,11 @@ let set_lang () =
 		| Some l -> Ocplib_i18n.set_lang (Js.to_string l)
 		| None -> ()
 
-let get_titre id = Learnocaml_local_storage.(retrieve (editor_state id)).titre
+let get_titre id = Learnocaml_local_storage.(retrieve (editor_state id)).metadata.titre
 
-let get_diff id = Learnocaml_local_storage.(retrieve (editor_state id)).diff
+let get_description id = Learnocaml_local_storage.(retrieve (editor_state id)).metadata.description
+
+let get_diff id = Learnocaml_local_storage.(retrieve (editor_state id)).metadata.diff
 let get_solution id = Learnocaml_local_storage.(retrieve (editor_state id)).solution
 let get_question id = Learnocaml_local_storage.(retrieve (editor_state id)).question
 let get_template id = Learnocaml_local_storage.(retrieve (editor_state id)).template
@@ -24,26 +26,68 @@ let get_prepare id = Learnocaml_local_storage.(retrieve (editor_state id)).prepa
 let get_test_liste id = Learnocaml_local_storage.(retrieve (editor_state id)).test.testhaut
 let get_test_string id  = Learnocaml_local_storage.(retrieve (editor_state id)).test.testml                             
 
-let get_ty id idQuestion= let test_list = get_test_liste id in StringMap.(find idQuestion test_list).ty
-let get_name_question id idQuestion= let test_list = get_test_liste id in StringMap.(find idQuestion test_list).name                                                                       
-let get_type_question id idQuestion= let test_list = get_test_liste id in StringMap.(find idQuestion test_list).type_question
-let get_extra_alea id idQuestion= let test_list = get_test_liste id in StringMap.(find idQuestion test_list).extra_alea
-let get_input id idQuestion= let test_list = get_test_liste id in StringMap.(find idQuestion test_list).input
-let get_output id idQuestion= let test_list = get_test_liste id in StringMap.(find idQuestion test_list).output
+
+let get_ty id idQuestion= let test_list = get_test_liste id in
+  match StringMap.(find idQuestion test_list) with
+    TestAgainstSol a ->a.ty
+  | TestAgainstSpec a -> a.ty
+  |TestSuite a -> a.ty
+                    
+let get_name_question id idQuestion= let test_list = get_test_liste id in
+  match StringMap.(find idQuestion test_list) with
+    TestAgainstSol a ->a.name
+  | TestAgainstSpec a -> a.name
+  |TestSuite a -> a.name
+                    
+let get_type_question id idQuestion=
+   let test_list = get_test_liste id in
+  match StringMap.(find idQuestion test_list) with
+    TestAgainstSol _ ->Solution
+  | TestAgainstSpec _ -> Spec
+  |TestSuite _ -> Suite 
+
+let get_extra_alea id idQuestion=  let test_list = get_test_liste id in
+  match StringMap.(find idQuestion test_list) with
+    TestAgainstSol a ->a.gen
+  | TestAgainstSpec a -> a.gen
+  |_ -> failwith " ?"
+                    
+let get_input id idQuestion=
+  let test_list = get_test_liste id in
+  match StringMap.(find idQuestion test_list) with
+    TestAgainstSol a ->a.suite
+  | TestAgainstSpec a -> a.suite
+  |TestSuite a -> a.suite
+                    
+                                                                    
+let get_spec id idQuestion=  let test_list = get_test_liste id in
+  match StringMap.(find idQuestion test_list) with  
+   TestAgainstSpec a -> a.spec
+  |_ -> failwith ""
+                    
+
     
 
-let get_buffer id = StringMap.find "0" (get_testhaut id)
+let get_buffer id =  Learnocaml_local_storage.(retrieve (editor_state id)).incipit
+
 
 let ajout_question testhaut question id =StringMap.add id question testhaut;; 
 
-
+let compute_question_id test_haut =
+  let key_list =List.map (fun (a,b)->int_of_string a) (StringMap.bindings test_haut) in
+  let mi coulvois =
+    let rec aux c n=match c with
+        []->n
+      |x::l->if x<>n then aux l n else aux coulvois (n+1)
+    in aux coulvois 1
+  in string_of_int (mi key_list);;
 
 let save_testhaut testhaut id =
   match Learnocaml_local_storage.(retrieve (editor_state id) ) with
-    {id;titre;prepare;diff;solution;question;template;test;prelude;mtime}->
+    {metadata;incipit;prepare;solution;question;template;test;prelude;mtime}->
       let mtime=gettimeofday () in
       let test ={testml=test.testml;testhaut} in
-      let nvexo= {id;titre;prepare;diff;solution;question;template;test;prelude;mtime} in
+      let nvexo= {metadata;incipit;prepare;solution;question;template;test;prelude;mtime} in
       
   Learnocaml_local_storage.(store (editor_state id)) nvexo ;;
 
@@ -59,7 +103,6 @@ let fetch_test_index id=
     in
   try Lwt.return (Json_repr_browser.Json_encoding.destruct testhaut_enc json) with exn ->
     Lwt.fail (failwith "" )
-
 let testhaut_iframe = Dom_html.createIframe Dom_html.document ;;
 let iframe_tyxml=Tyxml_js.Of_dom.of_iFrame testhaut_iframe ;;
 open Lwt.Infix
@@ -122,16 +165,12 @@ let  rec testhaut_init content_div id =
       let open Tyxml_js.Html5 in
             
           StringMap.fold 
-            (fun question_id {name;
-                               ty ;
-                               type_question ;
-                               input;
-                               output;
-                               extra_alea
-                                } acc ->  
-              match question_id with
-                "0" -> acc
-              | _ -> 
+            (fun question_id quest acc ->  
+               let name,ty=match quest with
+                  TestAgainstSol a ->a.name,a.ty
+                 |TestAgainstSpec a -> a.name,a.ty
+                 |TestSuite a ->a.name,a.ty
+               in
                  div ~a:[a_id ("toolbar"); a_class ["button"]] [
               (div ~a:[a_id ("button_delete")] [
                   let button =button ~a:[a_id question_id]  [img ~src:("icons/icon_cleanup_dark.svg") ~alt:"" () ; pcdata "" ]in 
@@ -208,7 +247,22 @@ let  rec testhaut_init content_div id =
                           end;
                          true) ;
                      buttonDown;
-            ] ) ]  
+                  ]);
+                  (div ~a:[a_id ("duplicate")] [
+                       let buttonDuplicate =button ~a:[a_id question_id] [img ~src:("icons/icon_list_dark.svg") ~alt:"" (); pcdata "" ] in
+                       Manip.Ev.onclick buttonDuplicate
+                         (fun _ ->
+                           begin
+                             let testhaut = get_testhaut id in
+                             let question = StringMap.find question_id testhaut in
+                             let qid = compute_question_id testhaut in
+                             let testhaut = StringMap.add qid question testhaut in
+                             save_testhaut testhaut id;
+                             Manip.removeChildren content_div;
+                             let _ = testhaut_init content_div id in ()
+                           end; true);
+                       buttonDuplicate;
+                  ]) ]  
                  ::  a ~a:[ a_onclick (fun _ ->
                   
                   let elt = find_div "learnocaml-exo-loading" in
@@ -227,23 +281,31 @@ let  rec testhaut_init content_div id =
               acc)
             contents acc
     in
-  
-  
-     
-    List.rev (format_contents  [Tyxml_js.Html5.a ~a:[ Tyxml_js.Html5.a_onclick 
-         (fun _ ->
-           let elt = find_div "learnocaml-exo-loading" in
-            Manip.(addClass elt "loading-layer") ;
-            Manip.(removeClass elt "loaded") ;
-            Manip.(addClass elt "loading") ;
-            Manip.replaceChildren elt [iframe_tyxml]  ;
-            testhaut_iframe##.src:=Js.string ("test.html#id="^id^"&action=open");       
-            true); 
-        Tyxml_js.Html5.a_class [ "exercise" ] ] [
-      Tyxml_js.Html5.div ~a:[ Tyxml_js.Html5.a_class [ "descr" ] ] [
-        Tyxml_js.Html.h1 [ Tyxml_js.Html5.pcdata [%i"New question"] ];
-        Tyxml_js.Html5.p [Tyxml_js.Html5.pcdata [%i"Create a new question"]];];
-      ]] index) in 
+    List.rev (format_contents (* ([Tyxml_js.Html5.a ~a:[ Tyxml_js.Html5.a_class ["patterns"]] [
+    	Tyxml_js.Html.h1 [ Tyxml_js.Html5.pcdata [%i"Code quality and forbidden patterns"] ];
+        Tyxml_js.Html5.div ~a:[ Tyxml_js.Html5.a_class [ "quality" ] ] [
+            Tyxml_js.Html5.p [ Tyxml_js.Html5.pcdata [%i"Forbid undesirable code patterns"] ];
+            let quality_box = Tyxml_js.Html5.input ~a:[ Tyxml_js.Html5.a_input_type `Checkbox ] () in
+            Manip.Ev.onchange quality_box (fun _ -> let _ = ""; true); ];
+        Tyxml_js.Html5.div ~a:[ Tyxml_js.Html5.a_class [ "imperative" ] ] [
+            Tyxml_js.Html5.p [ Tyxml_js.Html5.pcdata [%i"Forbid imperative features"] ];
+            let imperative_box = Tyxml_js.Html5.input ~a:[ Tyxml_js.Html5.a_input_type `Checkbox ] () in
+            Manip.Ev.onchange imperative_box (fun _ -> let _ = ""; true); ] ]) @ *)
+       ([Tyxml_js.Html5.a ~a:[ Tyxml_js.Html5.a_onclick
+       (fun _ ->
+         let elt = find_div "learnocaml-exo-loading" in
+         Manip.(addClass elt "loading-layer") ;
+         Manip.(removeClass elt "loaded") ;
+         Manip.(addClass elt "loading") ;
+         Manip.replaceChildren elt [iframe_tyxml]  ;
+         testhaut_iframe##.src:=Js.string ("test.html#id="^id^"&action=open");       
+         true); 
+      Tyxml_js.Html5.a_class [ "exercise" ] ] [
+         Tyxml_js.Html5.div ~a:[ Tyxml_js.Html5.a_class [ "descr" ] ] [
+             Tyxml_js.Html.h1 [ Tyxml_js.Html5.pcdata [%i"New question"] ];
+             Tyxml_js.Html5.p [Tyxml_js.Html5.pcdata [%i"Create a new question"]];
+           ];
+       ]]) index) in 
   let list_div =
    Tyxml_js.Html5.(div ~a: [Tyxml_js.Html5.a_id "learnocaml-main-exercise-list" ])
       (format_question_list index) in
@@ -331,6 +393,8 @@ let sectionSol fct = match fct with
       			      ^(test_fun typeF)^(testAlea nbAlea)^"\n"
       			      ^(typeFct typeF name)^"\n"
       			      ^jdt^" )"
+let section name report= "Section
+      		               ([ Text \"Function:\" ; Code \""^name^"\" ], "^report^" ); \n" ;;
 
 let rec constructSectionSol listeFonction = match listeFonction with
   |[]->"]"

@@ -268,33 +268,33 @@ let rec editor_tab _ _ () =
               |{Learnocaml_exercise_state.exos ;mtime}-> exos
             in
             let open Learnocaml_index in
-            match StringMap.find_first_opt (fun key->(StringMap.find key exos).exercise_title=save_file.titre) exos with
+            match StringMap.find_first_opt (fun key->(StringMap.find key exos).exercise_title=save_file.metadata.titre) exos with
               None->true
             | _ -> false      
           in
           let idUnique () =
-            match Learnocaml_local_storage.(retrieve (editor_state save_file.id)) with
+            match Learnocaml_local_storage.(retrieve (editor_state save_file.metadata.id)) with
             | exception Not_found -> true
             | _ -> false
           in
           let store2 () =
-            let exercise_title = save_file.titre in
-            let stars = match save_file.diff with None -> failwith "" | Some f -> f in
-            let exercise_stars = stars in
+            let exercise_title = save_file.metadata.titre in
+            
+            let exercise_stars = save_file.metadata.diff in
             let open Learnocaml_index in
             let exercise_kind = Learnocaml_exercise in
-            let exercise_short_description = None in
+            let exercise_short_description = Some save_file.metadata.description in
             let exo = {exercise_kind; exercise_stars; exercise_title; exercise_short_description} in
     match Learnocaml_local_storage.(retrieve (index_state "index")) with
     | {Learnocaml_exercise_state.exos; mtime} ->
         let anciensexos =  exos in
-        let exos = StringMap.add save_file.id exo anciensexos in
+        let exos = StringMap.add save_file.metadata.id exo anciensexos in
         let index = {Learnocaml_exercise_state.exos; mtime = gettimeofday ()} in
         Learnocaml_local_storage.(store (index_state "index")) index;
   in
           let messages = Tyxml_js.Html5.ul [] in
           if idUnique () && titleUnique () then
-            (Learnocaml_local_storage.(store (editor_state save_file.id ) save_file);store2 ();Dom_html.window##.location##reload;Lwt.return_unit)
+            (Learnocaml_local_storage.(store (editor_state save_file.metadata.id ) save_file);store2 ();Dom_html.window##.location##reload;Lwt.return_unit)
           else
             begin
               let aborted, abort_message =
@@ -321,7 +321,7 @@ let rec editor_tab _ _ () =
 true) ; a_class [ "exercise"] ]
 [
       div ~a:[ a_class [ "descr" ] ] [
-        h1 [ pcdata [%i"Import exercise"] ];
+        h1 [ pcdata [%i"Import an exercise"] ];
         p [pcdata [%i"Import a new exercise from a json file"]];];
     ]
 in

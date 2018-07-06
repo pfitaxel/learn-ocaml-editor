@@ -286,6 +286,7 @@ module type S = sig
 
   val ty_of_prot :
     (('p -> 'a) Ty.ty, 'p -> 'c, 'r) prot -> ('p -> 'a) Ty.ty
+  val to_ty : string -> 'a Ty.ty       
   val get_ret_ty :
     ('p -> 'a) Ty.ty -> ('p -> 'a, 'p -> 'c, 'r) args -> 'r Ty.ty
   val print :

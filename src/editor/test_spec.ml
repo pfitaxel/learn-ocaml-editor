@@ -195,9 +195,8 @@ let rec to_string_aux char_list =match char_list with
     []-> ""
   |c::l -> (string_of_char c) ^( to_string_aux l)
 ;;
-  
-let to_ty str= "[%ty :"^str^" ]";;
 
+let to_ty str= "[%ty :"^str^" ]";;
 let parse_type string =
   let without_spaces = List.filter (fun c ->c <> ' ') in
   let char_list_ref = ref (List.rev (without_spaces (decomposition string 0))) in

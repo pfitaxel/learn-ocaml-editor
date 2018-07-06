@@ -84,6 +84,14 @@ let suite = match getElementById_coerce "suite" CoerceTo.input with
     None -> failwith ""
   |Some s-> s;;
 
+let samplerSol = match getElementById_coerce "sol-sampler" CoerceTo.input with
+  | None -> failwith "unknown element sampler sol"
+  | Some s -> s;;
+                
+let samplerSpec = match getElementById_coerce "spec-sampler" CoerceTo.input with
+  | None -> failwith "unknown element sampler spec"
+  | Some s -> s;;
+                
 let extraAleaSol =match getElementById_coerce "sol-gen" CoerceTo.input with
     None -> failwith "unknown element extraAleaSol"
   | Some s -> s;;
@@ -167,7 +175,8 @@ let save_solution () =
   let input = Ace.get_contents ace_input_sol in
   let extra_alea = int_of_string (Js.to_string extraAleaSol##.value) in
   let datalist = Js.to_string datalistSol##.value in
-  let question = TestAgainstSol {name; ty; suite=input; gen= extra_alea;tester=datalist} in
+  let sampler= Js.to_string samplerSol##.value in
+  let question = TestAgainstSol {name; ty; suite=input; gen= extra_alea;tester=datalist;sampler} in
   let testhaut = get_testhaut id in
   let question_id =  match arg "questionid" with
     |exception Not_found ->compute_question_id testhaut
@@ -184,7 +193,8 @@ let save_spec () =
   let output = Ace.get_contents ace_spec_spec in
   let extra_alea = int_of_string (Js.to_string extraAleaSpec##.value) in
   let datalist = Js.to_string datalistSpec##.value in
-  let question = TestAgainstSpec {name; ty; suite=input;spec= output;gen= extra_alea;tester=datalist} in
+  let sampler = Js.to_string samplerSpec##.value in
+  let question = TestAgainstSpec {name; ty; suite=input;spec= output;gen= extra_alea;tester=datalist;sampler} in
   let open Editor_lib in
   let testhaut = get_testhaut id in
   let question_id =  match arg "questionid" with
@@ -204,9 +214,6 @@ let _ = match arg "questionid" with
       let suite_elt=suite in
       let spec_elt=spec in
           match StringMap.find qid testhaut with
-
-            
-            
              | TestSuite {name;ty;suite;tester} ->
                 begin
                   Ace.set_contents ace_input_suite suite;
@@ -216,7 +223,7 @@ let _ = match arg "questionid" with
                   datalistSuite##.value:= Js.string tester;
                   select_tab "suite"
                 end;
-             | TestAgainstSpec {name;ty;gen;tester;suite;spec} ->
+             | TestAgainstSpec {name;ty;gen;tester;sampler;suite;spec} ->
                 begin
                   Ace.set_contents ace_input_spec suite;
                   Ace.set_contents ace_spec_spec spec;
@@ -225,18 +232,18 @@ let _ = match arg "questionid" with
                   ty_elt##.value:=Js.string ty;
                   extraAleaSpec##.value:= Js.string (string_of_int gen);
                   datalistSpec##.value:= Js.string tester;
+                  samplerSpec##.value:= Js.string sampler;
                   select_tab "spec"
                 end;
-             | TestAgainstSol {name;ty;gen;tester;suite} ->
+             | TestAgainstSol {name;ty;gen;tester;sampler;suite} ->
                 begin
                   Ace.set_contents ace_input_sol suite;
                   name_elt##.value:=Js.string name;
                   solution##.checked := Js.bool true;
                   ty_elt##.value:=Js.string ty;
-
                   extraAleaSol##.value:= Js.string (string_of_int gen);
                   datalistSol##.value:=Js.string tester;
-
+                  samplerSol##.value:=Js.string sampler;
                   select_tab "solution"
                 end;;
 

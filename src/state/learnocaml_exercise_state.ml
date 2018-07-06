@@ -99,14 +99,16 @@ type test_qst_untyped =
       ; ty: string 
       ; gen: int
       ; suite: string
-      ;tester: string}
+      ; tester: string
+      ; sampler : string}
   | TestAgainstSpec of
       { name: string
       ; ty: string
       ; gen: int
       ; suite: string
       ; spec : string
-      ;tester: string}
+      ; tester: string
+      ; sampler: string}
   | TestSuite of
       { name: string;
         ty: string;
@@ -118,21 +120,23 @@ type a_sol=
   ; ty: string 
   ; gen: int
   ; suite: string
-  ;tester: string}
+  ; tester: string
+  ; sampler : string}
 let test_against_sol_enc =
   conv
-    (fun {name; ty; gen; suite; tester}->
-       (name, ty, gen, suite, tester)
+    (fun {name; ty; gen; suite; tester; sampler}->
+       (name, ty, gen, suite, tester, sampler)
     )
-    (fun (name, ty, gen, suite, tester)->
-       {name; ty; gen; suite; tester}
+    (fun (name, ty, gen, suite, tester, sampler)->
+       {name; ty; gen; suite; tester; sampler}
     )
-    (obj5
+    (obj6
        (req "name" string)
        (req "ty" string)
        (req "gen" int )
        (req "suite" string)
        (req "tester" string)
+       (req "sampler" string)
     )
 ;;
 type a_spec=
@@ -141,22 +145,24 @@ type a_spec=
   ; gen: int
   ; suite: string
   ; spec : string
-  ;tester: string}
+  ; tester: string
+  ; sampler : string}
 let test_against_spec_enc =
   conv
-    (fun {name; ty; gen; suite;spec; tester}->
-       (name, ty, gen, suite,spec, tester)
+    (fun {name; ty; gen; suite;spec; tester; sampler}->
+       (name, ty, gen, suite,spec, tester, sampler)
     )
-    (fun (name, ty, gen, suite, spec,tester)->
-       {name; ty; gen; suite; spec;tester}
+    (fun (name, ty, gen, suite, spec,tester, sampler)->
+       {name; ty; gen; suite; spec;tester; sampler}
     )
-    (obj6
+    (obj7
        (req "name" string)
        (req "ty" string)
        (req "gen" int )
        (req "suite" string)
        (req "spec" string)
        (req "tester" string)
+       (req "sampler" string)
     )    
 ;;
 type suite=
@@ -184,12 +190,12 @@ let test_suite_enc =
 let test_qst_untyped_enc =union [
     case
       test_against_sol_enc
-      (function TestAgainstSol {name; ty; gen; suite; tester}-> Some {name; ty; gen; suite; tester} | _ -> None)
-      (fun {name; ty; gen; suite; tester} ->TestAgainstSol {name; ty; gen; suite; tester});
+      (function TestAgainstSol {name; ty; gen; suite; tester; sampler}-> Some {name; ty; gen; suite; tester; sampler} | _ -> None)
+      (fun {name; ty; gen; suite; tester; sampler} ->TestAgainstSol {name; ty; gen; suite; tester; sampler});
     case
       test_against_spec_enc
-      (function TestAgainstSpec {name; ty; gen; suite;spec; tester} -> Some {name; ty; gen; suite;spec; tester} | _ -> None)
-      (fun {name; ty; gen; suite;spec; tester} ->TestAgainstSpec {name; ty; gen; suite;spec; tester} );
+      (function TestAgainstSpec {name; ty; gen; suite;spec; tester; sampler} -> Some {name; ty; gen; suite;spec; tester; sampler} | _ -> None)
+      (fun {name; ty; gen; suite;spec; tester; sampler} ->TestAgainstSpec {name; ty; gen; suite;spec; tester; sampler} );
     case
       test_suite_enc
       (function TestSuite {name; ty;suite; tester} -> Some {name; ty;suite; tester}  | _ -> None)

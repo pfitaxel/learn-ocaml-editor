@@ -148,6 +148,17 @@ body{
 	width:80%;
 }
 
+#learnocaml-tab-solution-sampler{
+	position: absolute;
+	top: 50%;
+	right: 0px;
+	left: 50%;
+	text-align: center;
+}
+#sol-sampler{
+	width:80%;
+}
+
 #learnocaml-tab-spec-input {
 	left: 0px; top: 10px; right: 50%; bottom: 20%;
 	position: absolute;
@@ -174,6 +185,16 @@ body{
 	top: 25%;
 }
 #spec-datalist{
+	width:80%;
+}
+#learnocaml-tab-spec-sampler{
+	position: absolute;
+	top: 50%;
+	right: 0px;
+	left: 50%;
+	text-align: center;
+}
+#spec-sampler{
 	width:80%;
 }
 #learnocaml-tab-spec-spec {

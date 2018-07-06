@@ -31,14 +31,16 @@ type test_qst_untyped =
       ; ty: string 
       ; gen: int
       ; suite: string
-      ;tester: string}
+      ; tester: string
+      ; sampler: string}
   | TestAgainstSpec of
       { name: string
       ; ty: string
       ; gen: int
       ; suite: string
       ; spec : string
-      ;tester: string}
+      ; tester: string
+      ; sampler: string}
   | TestSuite of
       { name: string;
         ty: string;

@@ -297,7 +297,7 @@ msgstr ""
 "Sauvegardez sur le serveur avec le bouton <img src=\"icons/icon_sync_white."
 "svg\" class=\"icon\" alt=\"Sync\">."
 
-#: src/app/learnocaml_index_main.ml:906,42--48 src/editor/testhaut.ml:13,13--19
+#: src/app/learnocaml_index_main.ml:906,42--48 src/editor/testhaut.ml:14,13--19
 #: src/editor/new_exercise.ml:21,13--19
 #: src/app/learnocaml_exercise_main.ml:312,23--29
 #: src/editor/editor.ml:777,23--29
@@ -371,60 +371,66 @@ msgstr "Nouvelle question"
 msgid "Create a new question"
 msgstr "Créer une nouvelle question"
 
-#: src/editor/testhaut.ml:14,17--23 src/editor/editor.ml:309,39--45
+#: src/editor/testhaut.ml:13,15--23 src/editor/new_exercise.ml:20,15--23
+#: src/editor/editor.ml:753,61--69 src/editor/editor.ml:1068,58--66
+#: src/editor/editor.ml:1171,62--70
+msgid "Cancel"
+msgstr "Annuler"
+
+#: src/editor/testhaut.ml:15,17--23 src/editor/editor.ml:309,39--45
 msgid "Test"
 msgstr "Test"
 
-#: src/editor/testhaut.ml:15,17--34
+#: src/editor/testhaut.ml:16,17--34
 msgid "Function name: "
 msgstr "Nom de la fonction: "
 
-#: src/editor/testhaut.ml:16,15--23
+#: src/editor/testhaut.ml:17,15--23
 msgid "Type: "
 msgstr "Type: "
 
-#: src/editor/testhaut.ml:17,16--26 src/editor/editor.ml:302,37--47
+#: src/editor/testhaut.ml:18,16--26 src/editor/editor.ml:302,37--47
 msgid "Solution"
 msgstr "Solution"
 
-#: src/editor/testhaut.ml:18,17--32
+#: src/editor/testhaut.ml:19,17--32
 msgid "Specification"
 msgstr "Spécification"
 
-#: src/editor/testhaut.ml:19,18--31
+#: src/editor/testhaut.ml:20,18--31
 msgid "Tests suite"
 msgstr "Série de tests"
 
-#: src/editor/testhaut.ml:20,22--38 src/editor/testhaut.ml:24,23--39
+#: src/editor/testhaut.ml:21,22--38 src/editor/testhaut.ml:25,23--39
 msgid "Arguments:<br>"
 msgstr "Arguments:<br>"
 
-#: src/editor/testhaut.ml:21,20--52 src/editor/testhaut.ml:25,21--53
+#: src/editor/testhaut.ml:22,20--52 src/editor/testhaut.ml:26,21--53
 msgid "Number of generated tests:<br>"
 msgstr "Nombre de tests générés:<br>"
 
-#: src/editor/testhaut.ml:22,25--38 src/editor/testhaut.ml:26,26--39
-#: src/editor/testhaut.ml:30,27--40
+#: src/editor/testhaut.ml:23,25--38 src/editor/testhaut.ml:27,26--39
+#: src/editor/testhaut.ml:31,27--40
 msgid "Tester:<br>"
 msgstr "Testeur:<br>"
 
-#: src/editor/testhaut.ml:23,24--38 src/editor/testhaut.ml:27,25--39
+#: src/editor/testhaut.ml:24,24--38 src/editor/testhaut.ml:28,25--39
 msgid "Sampler:<br>"
 msgstr "Échantillonneur:<br>"
 
-#: src/editor/testhaut.ml:28,31--51
+#: src/editor/testhaut.ml:29,31--51
 msgid "Specification:<br>"
 msgstr "Spécification:<br>"
 
-#: src/editor/testhaut.ml:29,24--52
+#: src/editor/testhaut.ml:30,24--52
 msgid "Arguments and results:<br>"
 msgstr "Arguments et résultats:<br>"
 
-#: src/editor/testhaut.ml:298,33--72 src/editor/testhaut.ml:308,33--72
+#: src/editor/testhaut.ml:299,33--72 src/editor/testhaut.ml:309,33--72
 msgid "Incorrect name: a name can't be empty"
 msgstr "Nom incorrect: un nom ne peut pas être vide"
 
-#: src/editor/testhaut.ml:299,33--72 src/editor/testhaut.ml:304,33--72
+#: src/editor/testhaut.ml:300,33--72 src/editor/testhaut.ml:305,33--72
 msgid "Incorrect type: a type can't be empty"
 msgstr "Type incorrect: un type ne peut pas être vide"
 
@@ -443,11 +449,6 @@ msgstr "Description de l'exercice:<br>"
 #: src/editor/new_exercise.ml:19,17--40
 msgid "Difficulty level:<br>"
 msgstr "Niveau de difficulté:<br>"
-
-#: src/editor/new_exercise.ml:20,15--23 src/editor/editor.ml:753,61--69
-#: src/editor/editor.ml:1068,58--66 src/editor/editor.ml:1171,62--70
-msgid "Cancel"
-msgstr "Annuler"
 
 #: src/editor/new_exercise.ml:148,31--220
 #: src/editor/new_exercise.ml:156,31--220

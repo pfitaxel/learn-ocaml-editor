@@ -33,7 +33,7 @@ body {
 #learnocaml-main-exercise-list > .patterns > .quality{
 	left:10px;
 	position: absolute;
-	width : 300px;
+	width : 100%;
 }
 #learnocaml-main-exercise-list > .patterns > .quality > p{
 	left :40px;
@@ -47,7 +47,7 @@ body {
 #learnocaml-main-exercise-list > .patterns > .imperative{
 	left:10px;
 	position: absolute;
-	width: 300px;
+	width: 100%;
 	top: 20px;
 }
 #learnocaml-main-exercise-list > .patterns > .imperative > p{

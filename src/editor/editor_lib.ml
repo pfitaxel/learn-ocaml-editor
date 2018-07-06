@@ -311,11 +311,6 @@ let  rec testhaut_init content_div id =
   
   Lwt.return_unit;;
 
-   
-
-
-
-
 
 (* ---------- Fonctions pour generer le test ---------- *)
 

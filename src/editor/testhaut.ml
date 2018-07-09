@@ -13,7 +13,6 @@ let () =
   let translations = [
     "cancel", [%i"Cancel"];
     "save", [%i"Save"];
-    "txt_test", [%i"Test"];
     "txt_name", [%i"Function name: "];
     "txt_ty", [%i"Type: "];
     "txt_sol", [%i"Solution"];

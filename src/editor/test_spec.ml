@@ -6,6 +6,7 @@ let set_lang () =
     | Some l -> Ocplib_i18n.set_lang (Js.to_string l)
     | None -> ()
 
+let () = set_lang ()
 
 module type TYPING = sig
   (** should return a representation of a type from its string serialisation *)
@@ -282,9 +283,8 @@ let question_typed question id_question =
                      acc ^ ";; \nlet question"^id_question^" = TestAgainstSpec {name=name"^id_question^"; prot=prot"^id_question^"; tester=tester"^id_question^"; sampler=sampler"^id_question^"; gen=gen"^id_question^"; suite=suite"^id_question^"; spec=spec"^id_question^"}") in
   acc;;
 
-let _ = set_lang ()
-
 (*
+
 let ty_of_abstract_type_from_student_module_1 module_name type_name
  (a : 'a Ty.ty) : 'a Ty.ty =
   let ty_id =
@@ -297,8 +297,6 @@ let ty_of_abstract_type_from_student_module_2 module_name type_name (a : 'a Ty.t
   Ty.repr (Ast_helper.Typ.constr ty_id [Ty.obj a; Ty.obj b]);;
 
 
-
-
   type (_, _, _) prot =
     | Last_ty : 'a Ty.ty * 'r Ty.ty -> (('a -> 'r) Ty.ty, 'a -> unit, 'r) prot
     | Arg_ty : 'a Ty.ty * (('b -> 'c) Ty.ty, 'b -> 'd, 'r) prot -> (('a -> 'b -> 'c) Ty.ty, 'a -> 'b -> 'd, 'r) prot
@@ -308,11 +306,12 @@ let rec to_core_type_list: type p a c r. ((p -> a) Ty.ty, p -> c, r) prot ->  Pa
     | Last_ty (a, b) -> [Ty.obj a ;Ty.obj b]
     | Arg_ty (x, Last_ty (l, r)) -> [Ty.obj x ;Ty.obj l;Ty.obj r]
     | Arg_ty (x, Arg_ty (y, r)) -> (Ty.obj x) :: (to_core_type_list (Arg_ty (y, r)))
-                               
+
 
 let ty_of_abstract_type_from_student_module module_name type_name (a : 'a Ty.ty)
     (prot :  ('arrow, 'uarrow, 'ret) prot) : 'a Ty.ty =
   let ty_id =
     Location.mknoloc (Longident.(Ldot (Ldot (Lident "Code", module_name), type_name))) in
   Ty.repr (Ast_helper.Typ.constr ty_id ( (Ty.obj a)::(to_core_type_list prot)) );;
+
 *)

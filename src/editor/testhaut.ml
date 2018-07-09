@@ -42,6 +42,9 @@ let set_lang () =
     | Some l -> Ocplib_i18n.set_lang (Js.to_string l)
     | None -> ()
 
+let () = set_lang ()
+let () = set_string_translations ()
+
 
 let init_tabs, select_tab =
   let names = [ "solution"; "spec"; "suite" ] in
@@ -329,6 +332,3 @@ let cancel = getElementById "cancel"
 let _ = cancel##.onclick := handler (fun _ ->
     let _ = close_frame () in ();
     Js._true)
-
-let _ = set_lang ()
-let _ = set_string_translations ()

@@ -196,7 +196,7 @@ let rec to_string_aux char_list =match char_list with
   |c::l -> (string_of_char c) ^( to_string_aux l)
 ;;
 
-let to_ty str= "[%ty :"^str^" ]";;
+let to_ty str= "(to_ty \""^str^"\" )";;
 let parse_type string =
   let char_list_ref = ref (List.rev (decomposition string 0)) in
   let para_cpt =ref 0 in

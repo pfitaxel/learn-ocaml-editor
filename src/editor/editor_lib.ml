@@ -10,6 +10,8 @@ let set_lang () =
 		| Some l -> Ocplib_i18n.set_lang (Js.to_string l)
 		| None -> ()
 
+let () = set_lang ()
+
 let get_titre id = Learnocaml_local_storage.(retrieve (editor_state id)).metadata.titre
 
 let get_description id = Learnocaml_local_storage.(retrieve (editor_state id)).metadata.description
@@ -64,14 +66,12 @@ let get_spec id idQuestion=  let test_list = get_test_liste id in
   match StringMap.(find idQuestion test_list) with  
    TestAgainstSpec a -> a.spec
   |_ -> failwith ""
-                    
-
-    
-
-let get_buffer id =  Learnocaml_local_storage.(retrieve (editor_state id)).incipit
 
 
-let ajout_question testhaut question id =StringMap.add id question testhaut;; 
+let get_buffer id = Learnocaml_local_storage.(retrieve (editor_state id)).incipit
+
+
+let ajout_question testhaut question id = StringMap.add id question testhaut;; 
 
 let compute_question_id test_haut =
   let key_list =List.map (fun (a,b)->int_of_string a) (StringMap.bindings test_haut) in
@@ -618,8 +618,6 @@ let rec genLet listech =
 let rec genTemplate chaine = if chaine="" then "" else
 	                       concatenation (genLet (decompositionSol chaine 0));;
 
-let _ = set_lang ()
-
 
 (*__________________________________________________*)
 
@@ -635,4 +633,3 @@ open Learnocaml_toplevel
 open Learnocaml_toplevel_output 
 let get_answer top =
    Learnocaml_toplevel.execute_test top
-

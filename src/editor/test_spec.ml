@@ -6,6 +6,7 @@ let set_lang () =
     | Some l -> Ocplib_i18n.set_lang (Js.to_string l)
     | None -> ()
 
+let () = set_lang ()
 
 module type TYPING = sig
   (** should return a representation of a type from its string serialisation *)
@@ -196,12 +197,11 @@ let rec to_string_aux char_list =match char_list with
   |c::l -> (string_of_char c) ^( to_string_aux l)
 ;;
 
-let to_ty str= "[%ty :"^str^" ]";;
+let to_ty str= "(to_ty \""^str^"\" )";;
 let parse_type string =
-  let without_spaces = List.filter (fun c ->c <> ' ') in
-  let char_list_ref = ref (List.rev (without_spaces (decomposition string 0))) in
-  (*if (nbArgs (List.rev !char_list_ref)) < 1 then failwith "titi" ;*)
+  let char_list_ref = ref (List.rev (decomposition string 0)) in
   let para_cpt =ref 0 in
+  let esp_cpt= ref 0 in
   (*reverse char_list before using it *)
   let rec last_arg char_list acc= 
     match char_list with
@@ -216,10 +216,24 @@ let parse_type string =
             '-'::l2 -> char_list_ref:=l2;acc
           |_ -> failwith "toto"
         else
-          last_arg l ( elt::acc )
+          begin
+            if !esp_cpt=0 && elt=' ' then
+              begin
+                esp_cpt:=1;
+                last_arg l ( elt::acc )
+              end
+            else
+              begin
+                if elt<>' ' then
+                  begin
+                    esp_cpt:=0;
+                    last_arg l (elt::acc)
+                  end
+                else
+                  last_arg l (acc)
+              end
+          end              
   in
-
-  
   let init_acc () =
     let arg1=last_arg (!char_list_ref ) [] in                               
     let arg2=last_arg (!char_list_ref)  [] in
@@ -256,8 +270,7 @@ let question_typed question id_question =
            | Spec -> "\nlet question"^id_question^" = TestAgainstSpec {name=\""^name^"\"; prot="^(parse_type ty)^"; tester="^tester^"; sampler="^sampler^"; gen="^(string_of_int extra_alea)^"; suite="^input^"; spec="^output^"}") in
   acc;;
 
-let _ = set_lang ()
-
+(*
 
 let ty_of_abstract_type_from_student_module_1 module_name type_name
  (a : 'a Ty.ty) : 'a Ty.ty =
@@ -271,8 +284,6 @@ let ty_of_abstract_type_from_student_module_2 module_name type_name (a : 'a Ty.t
   Ty.repr (Ast_helper.Typ.constr ty_id [Ty.obj a; Ty.obj b]);;
 
 
-
-
   type (_, _, _) prot =
     | Last_ty : 'a Ty.ty * 'r Ty.ty -> (('a -> 'r) Ty.ty, 'a -> unit, 'r) prot
     | Arg_ty : 'a Ty.ty * (('b -> 'c) Ty.ty, 'b -> 'd, 'r) prot -> (('a -> 'b -> 'c) Ty.ty, 'a -> 'b -> 'd, 'r) prot
@@ -282,7 +293,7 @@ let rec to_core_type_list: type p a c r. ((p -> a) Ty.ty, p -> c, r) prot ->  Pa
     | Last_ty (a, b) -> [Ty.obj a ;Ty.obj b]
     | Arg_ty (x, Last_ty (l, r)) -> [Ty.obj x ;Ty.obj l;Ty.obj r]
     | Arg_ty (x, Arg_ty (y, r)) -> (Ty.obj x) :: (to_core_type_list (Arg_ty (y, r)))
-                               
+
 
 let ty_of_abstract_type_from_student_module module_name type_name (a : 'a Ty.ty)
     (prot :  ('arrow, 'uarrow, 'ret) prot) : 'a Ty.ty =
@@ -290,4 +301,4 @@ let ty_of_abstract_type_from_student_module module_name type_name (a : 'a Ty.ty)
     Location.mknoloc (Longident.(Ldot (Ldot (Lident "Code", module_name), type_name))) in
   Ty.repr (Ast_helper.Typ.constr ty_id ( (Ty.obj a)::(to_core_type_list prot)) );;
 
-
+*)

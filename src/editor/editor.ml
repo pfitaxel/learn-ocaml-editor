@@ -130,27 +130,28 @@ let compute_question_id test_haut =
   in string_of_int (mi key_list) ;;
 
     (*chacun des couples est sauvegardé dans le local storage*)
+(*
 let rec save_quest listeQuestions id = match listeQuestions with
   |[]->()
   |(nom,nbArgs)::suite ->
     let name = nom in
     let ty= gen_ty nbArgs in
     let input = "[]" in
-    let extra_alea = 0 in
+    let extra_alea = 10 in
     let question = TestAgainstSol {name ; ty ; suite=input ; gen= extra_alea ; tester="" ; sampler=""} in
     let testhaut =  get_testhaut id in
     let question_id = compute_question_id testhaut in
     let new_testhaut = StringMap.add question_id question testhaut in
     let () = save_testhaut new_testhaut id in
     save_quest suite id;;
-
+*)
 let rec save_questions listeQuestions id = match listeQuestions with
   |[]->()
   |(nom,string_type)::suite ->
     let name = nom in
     let ty = string_type in
     let input = "[]" in
-    let extra_alea = 0 in
+    let extra_alea = 10 in
     let question = TestAgainstSol {name ; ty ; suite=input ; gen=extra_alea ; tester="" ; sampler=""} in
     let testhaut =  get_testhaut id in
     let question_id = compute_question_id testhaut in

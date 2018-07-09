@@ -4,6 +4,7 @@ open Learnocaml_common
 
 let () = Translate.set_lang ()
 
+
 let get_titre id = Learnocaml_local_storage.(retrieve (editor_state id)).metadata.titre
 
 let get_description id = Learnocaml_local_storage.(retrieve (editor_state id)).metadata.description
@@ -16,7 +17,8 @@ let get_testml id = Learnocaml_local_storage.(retrieve (editor_state id)).test.t
 let get_testhaut id = Learnocaml_local_storage.(retrieve (editor_state id)).test.testhaut
 let get_prelude id = Learnocaml_local_storage.(retrieve (editor_state id)).prelude
 let get_prepare id = Learnocaml_local_storage.(retrieve (editor_state id)).prepare
-                       
+let get_imperative id =  Learnocaml_local_storage.(retrieve (editor_state id)).checkbox.imperative
+let get_undesirable id = Learnocaml_local_storage.(retrieve (editor_state id)).checkbox.undesirable
 let get_test_liste id = Learnocaml_local_storage.(retrieve (editor_state id)).test.testhaut
 let get_test_string id  = Learnocaml_local_storage.(retrieve (editor_state id)).test.testml                             
 
@@ -76,10 +78,10 @@ let compute_question_id test_haut =
 
 let save_testhaut testhaut id =
   match Learnocaml_local_storage.(retrieve (editor_state id) ) with
-    {metadata;incipit;prepare;solution;question;template;test;prelude;mtime}->
+    {metadata;incipit;prepare;solution;question;template;test;prelude;checkbox;mtime}->
       let mtime=gettimeofday () in
       let test ={testml=test.testml;testhaut} in
-      let nvexo= {metadata;incipit;prepare;solution;question;template;test;prelude;mtime} in
+      let nvexo= {metadata;incipit;prepare;solution;question;template;test;prelude;checkbox;mtime} in
       
   Learnocaml_local_storage.(store (editor_state id)) nvexo ;;
 
@@ -146,9 +148,28 @@ let show_load id contents =
       div ~a: [ a_class [ "messages" ] ] contents
     ]
 ;;
+
 let _=testhaut_iframe##.width :=Js.string "100%";;
 let _=testhaut_iframe##.height:=Js.string "100%";;  
 let _= Manip.SetCss.opacity iframe_tyxml (Some "1");;
+let recovering_callback = ref (fun ()->())
+
+let checkbox_handler = (fun _ -> !recovering_callback () ;true);;
+
+
+let checkbox_creator string cas id =
+  let  open Tyxml_js.Html5 in
+  let chk= input ~a:[ a_id string; a_input_type `Checkbox;
+                      a_onclick checkbox_handler] () in
+  let checked=
+    match cas with
+      0 -> (get_imperative id)
+    | _ -> (get_undesirable id)
+  in
+  let dom_chk = Tyxml_js.To_dom.of_input chk in
+  dom_chk##.checked:= Js.bool checked;
+  Tyxml_js.Of_dom.of_input dom_chk ;; 
+
 
 let  rec testhaut_init content_div id =          
     fetch_test_index id >>= fun index ->  
@@ -273,15 +294,17 @@ let  rec testhaut_init content_div id =
               acc)
             contents acc
     in
-    List.rev (format_contents  ([Tyxml_js.Html5.a ~a:[ Tyxml_js.Html5.a_class ["patterns"]] [
-            Tyxml_js.Html.h1 [ Tyxml_js.Html5.pcdata [%i"Code quality and forbidden patterns"] ];
-        Tyxml_js.Html5.div ~a:[ Tyxml_js.Html5.a_class [ "quality" ] ] [
-            Tyxml_js.Html5.p [ Tyxml_js.Html5.pcdata [%i"Forbid undesirable code patterns"] ];
-            Tyxml_js.Html5.input ~a:[ Tyxml_js.Html5.a_id "quality_box"; Tyxml_js.Html5.a_input_type `Checkbox ] ();];
-        Tyxml_js.Html5.div ~a:[ Tyxml_js.Html5.a_class [ "imperative" ] ] [
-            Tyxml_js.Html5.p [ Tyxml_js.Html5.pcdata [%i"Forbid imperative features"] ];
-            Tyxml_js.Html5.input ~a:[ Tyxml_js.Html5.a_id "imperative_box"; Tyxml_js.Html5.a_input_type `Checkbox ] ()];]] @ 
-       [Tyxml_js.Html5.a ~a:[ Tyxml_js.Html5.a_onclick
+   let open Tyxml_js.Html5 in
+    List.rev (format_contents  ([a ~a:[ a_class ["patterns"]] [
+        h1 [ pcdata [%i"Code quality and forbidden patterns"] ];
+        div ~a:[ a_class [ "quality" ] ] [
+          p [ pcdata [%i"Forbid undesirable code patterns"] ];
+          checkbox_creator "quality_box" 1 id ;];
+        div ~a:[a_class [ "imperative" ] ] [
+          p [ pcdata [%i"Forbid imperative features"] ];
+          checkbox_creator "imperative_box" 0 id
+        ];]] @ 
+       [a ~a:[ a_onclick
        (fun _ ->
          let elt = find_div "learnocaml-exo-loading" in
          Manip.(addClass elt "loading-layer") ;
@@ -481,6 +504,16 @@ let rec get_all_val listeChar listeRes = match listeChar with
         then (get_all_val (get_next_val listeChar) ((get_val listeChar)::listeRes))
         else (listeRes)
 
+let rec get_only_fct listeChar listeFinale= match listeChar with
+  | [] -> listeFinale
+  | 'v'::'a'::'l'::suite -> listeFinale@(isFct suite ['v';'a';'l'])
+  | ch::suite -> get_only_fct suite listeFinale
+and isFct listeChar listeAux = match listeChar with
+  | [] -> []
+  | 'v'::'a'::'l'::suite -> isFct suite ['v';'a';'l']
+  | '<'::'f'::'u'::'n'::'>'::suite ->  get_only_fct suite (listeAux@['<';'f';'u';'n';'>'])
+  | ch::suite -> isFct suite (listeAux@[ch])
+               
 let rec get_type_of_fct listeChar b= match listeChar with
   |[] -> []
   |':'::tail -> get_type_of_fct tail true
@@ -515,14 +548,24 @@ let rec get_association listeCouple elt listeCouple2 val_next_mono = match liste
   |[]->((elt,maj_mono val_next_mono)::listeCouple2,maj_mono val_next_mono,true)
   |(poly,mono) :: tail -> if (poly = elt) then (listeCouple2,mono,false) else (get_association tail elt listeCouple2 val_next_mono)
 
-                                                                          
+let getC listeChar =
+  let rec before listeChar = match listeChar with
+  | [] -> []
+  | ' '::suite -> []
+  | ch::suite -> ch:: (before suite)
+  and after listeChar = match listeChar with
+    | [] -> []
+    | ' '::suite -> suite
+    | ch::suite -> after suite in
+  (before listeChar, after listeChar);;
 (*remplace les 'a,'b,... par int||char||...*)                                                                          
-let rec polymorph_detector_aux listeType listeCouple val_next_mono= match listeType with
+let rec polymorph_detector_aux listeType listeCouple val_next_mono = match listeType with
   |[]->[]
-  |'\''::ch::tail ->let v = (get_association listeCouple ch listeCouple val_next_mono) in
-                    if (third v)
-                    then (second v)@( polymorph_detector_aux tail (first v) (second v))
-                    else (second v)@( polymorph_detector_aux tail (first v) (val_next_mono))
+  | '\''::suite -> let ch,tail = getC suite in
+                   let v =(get_association listeCouple ch listeCouple val_next_mono) in
+                   if (third v)
+                   then (second v)@( polymorph_detector_aux tail (first v) (second v))
+                   else (second v)@( polymorph_detector_aux tail (first v) (val_next_mono))
   |ch::tail -> ch::(polymorph_detector_aux tail listeCouple val_next_mono)
 
 

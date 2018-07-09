@@ -189,7 +189,7 @@ let rec to_string_aux char_list =match char_list with
   |c::l -> (string_of_char c) ^( to_string_aux l)
 ;;
 
-let to_ty str= "[%ty :"^str^" ]";;
+let to_ty str= "(to_ty \""^str^"\" )";;
 let parse_type string =
   let char_list_ref = ref (List.rev (decomposition string 0)) in
   let para_cpt =ref 0 in
@@ -256,23 +256,10 @@ let question_typed question id_question =
   let sampler = match sampler with
     | "" -> "None"
     | s -> "Some (fun () -> last ("^s^"()))" in
-  let acc="\n\nlet name"^id_question^" = \"" ^ name in
-  let acc=acc ^ "\" ;; \nlet prot"^id_question^" = " ^ (parse_type ty) in
   let acc=(match type_question with
-           | Suite -> let acc = acc ^ ";;\nlet suite"^id_question^" =" ^ input in
-                      let acc = acc ^ ";;\nlet tester"^id_question^" ="^ tester in
-                      acc ^ ";;\nlet question"^id_question^" =  TestSuite {name=name"^id_question^"; prot=prot"^id_question^"; tester=tester"^id_question^"; suite=suite"^id_question^"}"
-           | Solution -> let acc = acc ^ ";;\nlet suite"^id_question^" =" ^ input in
-                         let acc = acc ^ ";; \n let gen"^id_question^" =" ^ (string_of_int extra_alea) in
-                         let acc = acc ^ ";; \n let tester"^id_question^" =" ^tester in
-                         let acc = acc ^ ";;\nlet sampler"^id_question^" ="^ sampler in
-                         acc ^ ";;\nlet question"^id_question^" = TestAgainstSol {name=name"^id_question^"; prot=prot"^id_question^"; tester=tester"^id_question^"; sampler=sampler"^id_question^"; gen=gen"^id_question^"; suite=suite"^id_question^"}"
-           | Spec -> let acc = acc ^ ";;\nlet spec"^id_question^" =" ^ output in
-                     let acc = acc ^ ";; \n let suite"^id_question^" =" ^ input in
-                     let acc = acc ^ ";; \n let gen"^id_question^" =" ^ string_of_int(extra_alea) in
-                     let acc = acc ^ ";; \n let tester"^id_question^" =" ^ tester in
-                      let acc = acc ^ ";;\nlet sampler"^id_question^" ="^ sampler in
-                     acc ^ ";; \nlet question"^id_question^" = TestAgainstSpec {name=name"^id_question^"; prot=prot"^id_question^"; tester=tester"^id_question^"; sampler=sampler"^id_question^"; gen=gen"^id_question^"; suite=suite"^id_question^"; spec=spec"^id_question^"}") in
+           | Suite -> "\nlet question"^id_question^" =  TestSuite {name=\""^name^"\"; prot="^(parse_type ty)^"; tester="^tester^"; suite="^input^"}"
+           | Solution -> "\nlet question"^id_question^" = TestAgainstSol {name=\""^name^"\"; prot="^(parse_type ty)^"; tester="^tester^"; sampler="^sampler^"; gen="^(string_of_int extra_alea)^"; suite="^input^"}"
+           | Spec -> "\nlet question"^id_question^" = TestAgainstSpec {name=\""^name^"\"; prot="^(parse_type ty)^"; tester="^tester^"; sampler="^sampler^"; gen="^(string_of_int extra_alea)^"; suite="^input^"; spec="^output^"}") in
   acc;;
 
 (*

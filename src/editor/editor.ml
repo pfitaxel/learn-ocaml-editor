@@ -167,13 +167,10 @@ let init_tabs, select_tab =
   let current = ref "question" in
   let select_tab name =
     set_arg "tab" name ;
-   
     if (name = "testhaut") then
       !grade_red ()
-
     else
       !grade_black ();
-
     Manip.removeClass
       (find_component ("learnocaml-exo-button-" ^ !current))
       "front-tab" ;
@@ -196,7 +193,7 @@ let init_tabs, select_tab =
         let requested = arg "tab" in
         if List.mem requested names then requested else "question"
       with Not_found -> "question"
-    end ;
+               end ;
     List.iter
       (fun name ->
          Manip.removeClass
@@ -684,8 +681,6 @@ let onload () =
     let res_aux = decompositionSol (get_answer top) 0 in
     (*Avec prise en compte des types polymorphes :*)
     let res = redondance (polymorph_detector (get_questions (get_all_val (get_only_fct  res_aux []) []) [] )) in
-    (*let rec fct_test liste = match liste with |[]->""|(a,b)::suite->a^b^(fct_test suite) in
-    (Ace.set_contents ace_temp (fct_test res));*)
     save_questions res id;
     
      Manip.removeChildren (find_component "learnocaml-exo-testhaut-pane");
@@ -699,6 +694,14 @@ let onload () =
       ~icon: "typecheck" [%i"Check"] @@ fun () ->
     Lwt.return ()
   end ;
+  begin testhaut_button
+          ~group: toplevel_buttons_group
+          ~icon: "cleanup" [%i "Delete All"] @@ fun () ->
+    save_testhaut StringMap.empty id;
+    Manip.removeChildren (find_component "learnocaml-exo-testhaut-pane");
+    testhaut_init (find_component "learnocaml-exo-testhaut-pane") id;
+    Lwt.return ()
+  end;
   
 
   
@@ -724,7 +727,7 @@ in
     let prepare= Ace.get_contents ace_prep in
     let prelude =Ace.get_contents ace_prel in 
     let test ={testml;testhaut} in
-    let  diff = get_diff id in
+    let diff = get_diff id in
     let description=get_description id in
     let metadata ={id;titre;description;diff} in
     let checkbox = {imperative= Js.to_bool imperative##.checked ; undesirable=Js.to_bool quality##.checked} in
@@ -1128,11 +1131,11 @@ recovering_callback:=recovering ;
       grade ()
   end ;
   grade_black:= (fun ()->
-    let button_grade = getElementById "grade_id" in
-    button_grade##.style##.background := (Js.string "#222") );
+    Manip.removeClass (find_component "grade_id") "special_grade");
   grade_red:= (fun ()->
-    let button_grade = getElementById "grade_id" in
-    button_grade##.style##.background := (Js.string "#aaa") );                  
+    Manip.addClass (find_component "grade_id") "special_grade" );
+  if arg "tab" = "testhaut" then
+    !grade_red ();
   (* ---- return -------------------------------------------------------- *)
   toplevel_launch >>= fun _ ->
   typecheck false >>= fun () ->

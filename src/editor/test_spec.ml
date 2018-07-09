@@ -198,10 +198,9 @@ let rec to_string_aux char_list =match char_list with
 
 let to_ty str= "[%ty :"^str^" ]";;
 let parse_type string =
-  let without_spaces = List.filter (fun c ->c <> ' ') in
-  let char_list_ref = ref (List.rev (without_spaces (decomposition string 0))) in
-  (*if (nbArgs (List.rev !char_list_ref)) < 1 then failwith "titi" ;*)
+  let char_list_ref = ref (List.rev (decomposition string 0)) in
   let para_cpt =ref 0 in
+  let esp_cpt= ref 0 in
   (*reverse char_list before using it *)
   let rec last_arg char_list acc= 
     match char_list with
@@ -216,10 +215,24 @@ let parse_type string =
             '-'::l2 -> char_list_ref:=l2;acc
           |_ -> failwith "toto"
         else
-          last_arg l ( elt::acc )
+          begin
+            if !esp_cpt=0 && elt=' ' then
+              begin
+                esp_cpt:=1;
+                last_arg l ( elt::acc )
+              end
+            else
+              begin
+                if elt<>' ' then
+                  begin
+                    esp_cpt:=0;
+                    last_arg l (elt::acc)
+                  end
+                else
+                  last_arg l (acc)
+              end
+          end              
   in
-
-  
   let init_acc () =
     let arg1=last_arg (!char_list_ref ) [] in                               
     let arg2=last_arg (!char_list_ref)  [] in
@@ -271,7 +284,7 @@ let question_typed question id_question =
 
 let _ = set_lang ()
 
-
+(*
 let ty_of_abstract_type_from_student_module_1 module_name type_name
  (a : 'a Ty.ty) : 'a Ty.ty =
   let ty_id =
@@ -302,5 +315,4 @@ let ty_of_abstract_type_from_student_module module_name type_name (a : 'a Ty.ty)
   let ty_id =
     Location.mknoloc (Longident.(Ldot (Ldot (Lident "Code", module_name), type_name))) in
   Ty.repr (Ast_helper.Typ.constr ty_id ( (Ty.obj a)::(to_core_type_list prot)) );;
-
-
+*)

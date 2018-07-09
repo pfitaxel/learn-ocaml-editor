@@ -32,6 +32,9 @@ let set_lang () =
     | Some l -> Ocplib_i18n.set_lang (Js.to_string l)
     | None -> ()
 
+let () = set_lang ()
+let () = set_string_translations ()
+
 let transResultOption = function
   |None -> false
   |Some s-> true;;
@@ -203,6 +206,3 @@ let _ = save##.onclick:= handler (fun _ ->
     end
   ; Js._true
 )
-
-let () = set_lang ()
-let () = set_string_translations ()

@@ -533,14 +533,24 @@ let rec get_association listeCouple elt listeCouple2 val_next_mono = match liste
   |[]->((elt,maj_mono val_next_mono)::listeCouple2,maj_mono val_next_mono,true)
   |(poly,mono) :: tail -> if (poly = elt) then (listeCouple2,mono,false) else (get_association tail elt listeCouple2 val_next_mono)
 
-                                                                          
+let getC listeChar =
+  let rec before listeChar = match listeChar with
+  | [] -> []
+  | ' '::suite -> []
+  | ch::suite -> ch:: (before suite)
+  and after listeChar = match listeChar with
+    | [] -> []
+    | ' '::suite -> suite
+    | ch::suite -> after suite in
+  (before listeChar, after listeChar);;
 (*remplace les 'a,'b,... par int||char||...*)                                                                          
-let rec polymorph_detector_aux listeType listeCouple val_next_mono= match listeType with
+let rec polymorph_detector_aux listeType listeCouple val_next_mono = match listeType with
   |[]->[]
-  |'\''::ch::tail ->let v = (get_association listeCouple ch listeCouple val_next_mono) in
-                    if (third v)
-                    then (second v)@( polymorph_detector_aux tail (first v) (second v))
-                    else (second v)@( polymorph_detector_aux tail (first v) (val_next_mono))
+  | '\''::suite -> let ch,tail = getC suite in
+                   let v =(get_association listeCouple ch listeCouple val_next_mono) in
+                   if (third v)
+                   then (second v)@( polymorph_detector_aux tail (first v) (second v))
+                   else (second v)@( polymorph_detector_aux tail (first v) (val_next_mono))
   |ch::tail -> ch::(polymorph_detector_aux tail listeCouple val_next_mono)
 
 

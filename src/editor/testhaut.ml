@@ -10,6 +10,7 @@ module StringMap = Map.Make (String)
 
 let set_string_translations () =
   let translations = [
+  "cancel", [%i"Cancel"];
   "save", [%i"Save"];
   "txt_test", [%i"Test"];
   "txt_name", [%i"Function name: "];
@@ -323,10 +324,10 @@ let _ = save##.onclick:= handler (fun _ ->
    Js._true
 )
 
-(* Back button *)
-let back = getElementById "back"
-let _ = back##.onclick := handler (fun _ ->
-    let _=close_frame () in ();
+(* Cancel button *)
+let cancel = getElementById "cancel"
+let _ = cancel##.onclick := handler (fun _ ->
+    let _ = close_frame () in ();
     Js._true)
 
 let _ = set_lang ()

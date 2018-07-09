@@ -1,16 +1,8 @@
 open Learnocaml_exercise_state
-module StringMap=Map.Make(String)
+module StringMap = Map.Make(String)
 open Learnocaml_common
 
-let set_lang () =
-	match Js.Optdef.to_option (Dom_html.window##.navigator##.language) with
-	| Some l -> Ocplib_i18n.set_lang (Js.to_string l)
-	| None ->
-		match Js.Optdef.to_option (Dom_html.window##.navigator##.userLanguage) with
-		| Some l -> Ocplib_i18n.set_lang (Js.to_string l)
-		| None -> ()
-
-let () = set_lang ()
+let () = Translate.set_lang ()
 
 
 let get_titre id = Learnocaml_local_storage.(retrieve (editor_state id)).metadata.titre

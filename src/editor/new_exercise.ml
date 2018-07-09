@@ -10,30 +10,18 @@ module StringMap = Map.Make (String)
 let setInnerHtml elt s =    
   elt##.innerHTML := Js.string s
 
-let set_string_translations () =
+
+let () = Translate.set_lang ()
+let () =
   let translations = [
-  "txt_new_exo", [%i"New exercise"];
-  "txt_id", [%i"Unique identifier:<br>"];
-  "txt_title", [%i"Title (unique too):<br>"];
-  "txt_descr", [%i"Description of the exercise:<br>"];
-  "txt_diff", [%i"Difficulty level:<br>"];
-  "cancel", [%i"Cancel"];
-  "save", [%i"Save"];
-  ] in
-  List.iter
-  (fun (id, text) -> Manip.setInnerHtml (find_component id) text)
-  translations
-
-let set_lang () =
-  match Js.Optdef.to_option (Dom_html.window##.navigator##.language) with
-  | Some l -> Ocplib_i18n.set_lang (Js.to_string l)
-  | None ->
-    match Js.Optdef.to_option (Dom_html.window##.navigator##.userLanguage) with
-    | Some l -> Ocplib_i18n.set_lang (Js.to_string l)
-    | None -> ()
-
-let () = set_lang ()
-let () = set_string_translations ()
+    "txt_new_exo", [%i"New exercise"];
+    "txt_id", [%i"Unique identifier:<br>"];
+    "txt_title", [%i"Title (unique too):<br>"];
+    "txt_descr", [%i"Description of the exercise:<br>"];
+    "txt_diff", [%i"Difficulty level:<br>"];
+    "cancel", [%i"Cancel"];
+    "save", [%i"Save"];
+  ] in Translate.set_string_translations translations
 
 let transResultOption = function
   |None -> false

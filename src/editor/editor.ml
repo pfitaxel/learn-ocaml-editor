@@ -60,7 +60,7 @@ let auto_save_interval = 120.0 ;; (* in seconds*)
 module StringMap = Map.Make (String)
                          
 
-let id=arg "id"
+let id = arg "id"
 
 (*keep sync with test-spec*)
 let testprel ="open Test_lib\nopen Learnocaml_report\n\n\n(* sampler: (unit -> ('ar -> 'row, 'ar -> 'urow, 'ret) args) *)\n(*keep in sync with learnocaml_exercise_state.ml *)\ntype test_qst_untyped =\n  | TestAgainstSol of\n      { name: string\n      ; ty: string\n      ; gen: int\n      ; suite: string\n      ; tester: string\n      ; sampler: string}\n  | TestAgainstSpec of\n      { name: string\n      ; ty: string\n      ; gen: int\n      ; suite: string\n      ; spec : string\n      ; tester: string\n      ; sampler: string}\n  | TestSuite of\n      { name: string;\n        ty: string;\n        suite: string;\n        tester : string}\n;;\n\ntype outcome =\n  | Correct of string option\n  | Wrong of string option\n\n(* TODO val get_test_qst : test_qst_untyped -> test_qst_typed *)\n\ntype test_qst_typed =\n  | TestAgainstSol :\n      { name: string\n      ; prot: (('ar -> 'row) Ty.ty, 'ar -> 'urow, 'ret) prot\n      ; tester: 'ret tester option\n      ; sampler:(unit -> ('ar -> 'row, 'ar -> 'urow, 'ret) args) option\n      ; gen: int\n      ; suite: ('ar -> 'row, 'ar -> 'urow, 'ret) args list } -> test_qst_typed\n  | TestAgainstSpec :\n      { name: string\n      ; prot: (('ar -> 'row) Ty.ty, 'ar -> 'urow, 'ret) prot\n      ; tester: 'ret tester option  (* 'a tester option (base) mais probleme de type : 'a tester incompatible avec 'ret tester*)\n      ; sampler: (unit -> ('ar -> 'row, 'ar -> 'urow, 'ret) args) option\n      ; gen: int\n      ; suite: ('ar -> 'row, 'ar -> 'urow, 'ret) args list\n      ; spec : ('ar -> 'row) -> ('ar -> 'row, 'ar -> 'urow, 'ret) args -> 'ret -> outcome } -> test_qst_typed\n  | TestSuite :\n      { name: string\n      ; prot: (('ar -> 'row) Ty.ty, 'ar -> 'urow, 'ret) prot\n      ; tester: 'ret tester option\n      ; suite: (('ar -> 'row, 'ar -> 'urow, 'ret) args * (unit -> 'ret)) list } -> test_qst_typed\n\n(** Notation for TestAgainstSpec *)\nlet (~~) b = if b then Correct None else Wrong None\n(** Notations for TestSuite *)\nlet (==>) a b = (a, fun () -> b)\n(* let (=>) a b = (a, fun () -> Lazy.force b) (* needs module Lazy *) *)\n(** Notations for heterogeneous lists *)\nlet (@:) a l = arg a @@ l\nlet (!!) b = last b\nlet (@:!!) a b = a @: !! b\n\nlet local_dummy : 'a sampler = fun () -> failwith \"dummy sampler\"\n(* à n'utiliser que si on passe l'argument ~gen:0 (pas d'alea) *)\n                                               \nlet test_question (t : test_qst_typed) =\n  match t with\n  | TestAgainstSol t ->\n      let tester = match t.tester with\n        | None -> test\n        | Some s -> s in\n      if t.gen=0 then \n        (test_function_against\n           ~gen:t.gen ~sampler:local_dummy\n           ~test:tester (* could take into account exceptions/sorted lists/etc. *)\n           t.prot\n           (lookup_student (ty_of_prot t.prot) t.name)\n           (lookup_solution (ty_of_prot t.prot) t.name)\n           t.suite)\n      else\n        (match t.sampler with\n         | None -> (test_function_against\n                      ~gen:t.gen\n                      ~test:tester (* could take into account exceptions/sorted lists/etc. *)\n                      t.prot\n                      (lookup_student (ty_of_prot t.prot) t.name)\n                      (lookup_solution (ty_of_prot t.prot) t.name)\n                      t.suite)\n         | Some s -> (test_function_against\n                        ~gen:t.gen ~sampler:s\n                        ~test:tester (* could take into account exceptions/sorted lists/etc. *)\n                        t.prot\n                        (lookup_student (ty_of_prot t.prot) t.name)\n                        (lookup_solution (ty_of_prot t.prot) t.name)\n                        t.suite))\n  | TestAgainstSpec t ->\n      let to_string ty v = Format.asprintf \"%a\" (typed_printer ty) v in\n      let stud = lookup_student (ty_of_prot t.prot) t.name in\n      test_value stud @@ fun uf ->\n     (* no sampler for the moment *)\n      let open Learnocaml_report in\n      List.flatten @@ List.map (fun args ->\n          let code = Format.asprintf \"@[<hv 2>%s,%a@]\" t.name (print t.prot) args in\n          let ret_ty = get_ret_ty (ty_of_prot t.prot) args in\n          Message ([ Text \"Checking spec for\" ; Code code ], Informative) ::\n          let ret = apply uf args in\n          let value = to_string ret_ty ret in\n          let (text, note) = match t.spec uf args ret with\n            | Correct None -> (\"Correct spec\", Success 1)\n            | Correct (Some message) -> (message, Success 1)\n            | Wrong None -> (\"Wrong spec\", Failure)\n            | Wrong (Some message) -> (message, Failure) in\n          [Message ([Text \"Got value\"; Code value; Text (\": \" ^ text)], note)])\n        t.suite\n  | TestSuite t ->\n      let test = match t.tester with\n        | None -> test\n        | Some s -> s in\n      test_function\n        ~test:test (* could take into account exceptions/sorted lists/etc. *)\n        t.prot\n        (lookup_student (ty_of_prot t.prot) t.name)\n        t.suite\n"
@@ -236,8 +236,15 @@ let display_report exo report =
   Manip.setInnerHtml report_container
     (Format.asprintf "%a" Learnocaml_report.(output_html_of_report ~bare: true) report) ;
   grade
-    
-let set_string_translations () =
+
+let () =
+  Lwt.async_exception_hook := begin function
+    | Failure message -> fatal message
+    | Server_caller.Cannot_fetch message -> fatal message
+    | exn -> fatal (Printexc.to_string exn)
+  end ;
+  Lwt.async @@ fun () ->
+  Translate.set_lang ();
   let translations = [
   "txt_preparing", [%i"Preparing the environment"];
   "learnocaml-exo-button-editor", [%i"Solution"];
@@ -252,12 +259,7 @@ let set_string_translations () =
   "learnocaml-exo-editor-pane", [%i"Editor"];
   "txt_grade_report", [%i"Click the Grade! button to test your solution"];
   "learnocaml-exo-test-pane", [%i"Editor"];
-  ] in
-  List.iter
-  (fun (id, text) -> Manip.setInnerHtml (find_component id) text)
-  translations
-
-let set_string_translations_titles () =
+  ] in Translate.set_string_translations translations;
   let translations = [
   "learnocaml-exo-button-editor", [%i"Type here the solution of the exercise"];
   "learnocaml-exo-button-template", [%i"Type here or generate the template the student will complete or correct"];
@@ -266,29 +268,7 @@ let set_string_translations_titles () =
   "learnocaml-exo-button-question", [%i"Type here the wording of the exercise in Markdown"];
   "learnocaml-exo-button-test", [%i"Type here the tests code"];
   "learnocaml-exo-button-testhaut", [%i"Generate here the tests code"];
-  ] in
-  List.iter
-  (fun (id, text) -> Manip.setTitle (find_component id) text)
-  translations
-
-let set_lang () =
-	match Js.Optdef.to_option (Dom_html.window##.navigator##.language) with
-	| Some l -> Ocplib_i18n.set_lang (Js.to_string l)
-	| None ->
-		match Js.Optdef.to_option (Dom_html.window##.navigator##.userLanguage) with
-		| Some l -> Ocplib_i18n.set_lang (Js.to_string l)
-		| None -> ()
-
-let () =
-  Lwt.async_exception_hook := begin function
-    | Failure message -> fatal message
-    | Server_caller.Cannot_fetch message -> fatal message
-    | exn -> fatal (Printexc.to_string exn)
-  end ;
-  Lwt.async @@ fun () ->
-  set_lang ();
-  set_string_translations ();
-  set_string_translations_titles ();
+  ] in Translate.set_title_translations translations;
   Learnocaml_local_storage.init () ;
                
   (* ---- launch everything --------------------------------------------- *)

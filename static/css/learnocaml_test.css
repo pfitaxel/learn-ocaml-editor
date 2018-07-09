@@ -1,12 +1,6 @@
 body{
   background: #eee;
 }
-#page_title{
-  text-align: center;
-  font-size: 25px;
-  line-height: 50px; 
-	width: 50%;
-}
 #txt_txt{
   text-align: center;
 }

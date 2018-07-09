@@ -1,12 +1,4 @@
-let set_lang () =
-  match Js.Optdef.to_option (Dom_html.window##.navigator##.language) with
-  | Some l -> Ocplib_i18n.set_lang (Js.to_string l)
-  | None ->
-    match Js.Optdef.to_option (Dom_html.window##.navigator##.userLanguage) with
-    | Some l -> Ocplib_i18n.set_lang (Js.to_string l)
-    | None -> ()
-
-let () = set_lang ()
+let () = Translate.set_lang ()
 
 module type TYPING = sig
   (** should return a representation of a type from its string serialisation *)

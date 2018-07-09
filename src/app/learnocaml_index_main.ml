@@ -856,7 +856,14 @@ let sync () =
   set_state_from_save_file save_file ;
   Server_caller.upload_save_file ~token save_file
 
-let set_string_translations () =
+let () =
+  Lwt.async_exception_hook := begin function
+    | Failure message -> fatal message
+    | Server_caller.Cannot_fetch message -> fatal message
+    | exn -> fatal (Printexc.to_string exn)
+  end ;
+  (match Js_utils.get_lang() with Some l -> Ocplib_i18n.set_lang l | None -> ());
+  Lwt.async @@ fun () ->
   let translations = [
     "txt_welcome",
     [%i"Welcome to <emph>LearnOCaml</emph> by OCamlPro."];
@@ -880,21 +887,7 @@ let set_string_translations () =
     "txt_sync_doc",
     [%i"Save online using the <img src=\"icons/icon_sync_white.svg\" \
         class=\"icon\" alt=\"sync\"> button above."];
-  ] in
-  List.iter
-    (fun (id, text) ->
-       Manip.setInnerHtml (find_component id) text)
-    translations
-
-let () =
-  Lwt.async_exception_hook := begin function
-    | Failure message -> fatal message
-    | Server_caller.Cannot_fetch message -> fatal message
-    | exn -> fatal (Printexc.to_string exn)
-  end ;
-  (match Js_utils.get_lang() with Some l -> Ocplib_i18n.set_lang l | None -> ());
-  Lwt.async @@ fun () ->
-  set_string_translations ();
+  ] in Translate.set_string_translations translations;
   Learnocaml_local_storage.init () ;
   let sync_button_state = button_state () in
   disable_button sync_button_state ;

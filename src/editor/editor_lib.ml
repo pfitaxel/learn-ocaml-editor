@@ -512,6 +512,16 @@ let rec get_all_val listeChar listeRes = match listeChar with
         then (get_all_val (get_next_val listeChar) ((get_val listeChar)::listeRes))
         else (listeRes)
 
+let rec get_only_fct listeChar listeFinale= match listeChar with
+  | [] -> listeFinale
+  | 'v'::'a'::'l'::suite -> listeFinale@(isFct suite ['v';'a';'l'])
+  | ch::suite -> get_only_fct suite listeFinale
+and isFct listeChar listeAux = match listeChar with
+  | [] -> []
+  | 'v'::'a'::'l'::suite -> isFct suite ['v';'a';'l']
+  | '<'::'f'::'u'::'n'::'>'::suite ->  get_only_fct suite (listeAux@['<';'f';'u';'n';'>'])
+  | ch::suite -> isFct suite (listeAux@[ch])
+               
 let rec get_type_of_fct listeChar b= match listeChar with
   |[] -> []
   |':'::tail -> get_type_of_fct tail true

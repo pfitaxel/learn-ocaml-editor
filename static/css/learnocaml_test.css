@@ -5,6 +5,7 @@ body{
   text-align: center;
   font-size: 25px;
   line-height: 50px; 
+	width: 50%;
 }
 #txt_txt{
   text-align: center;
@@ -84,7 +85,7 @@ body{
   text-align: center;
 }
 #learnocaml-test {
-  left: 0px; top:110px; right: 0px; bottom: 60%;
+  left: 0px; top:110px; right: 50%; bottom: 55%;
 }
 #learnocaml-tab-name{
   padding: 5px;text-align:center;
@@ -97,13 +98,13 @@ body{
 }
 #learnocaml-tabs {
   position: absolute;
-  z-index: 998;
+  z-index: 997;
   background: #eee;
   padding: 0;
   opacity: 1;
 }
 #learnocaml-tabs {
-  left: 0px; top:40%; right: 0px; bottom: 0px;
+  left: 0px; top:0px; right: 0px; bottom: 0px;
 }
 
 #learnocaml-tabs > * {
@@ -122,35 +123,35 @@ body{
 }
 
 #learnocaml-tab-solution-input {
-	left: 0px; top: 10px; right: 50%; bottom: 0px;
+	left: 0px; top: 48%; right: 0px; bottom: 0px;
 	position:absolute;
 	margin: 10px;
 	background : #666;
 	border : 3px solid #fff
 }
-#txt_input_solution {
-	left: 10px;	
+#txt_input_sol {
+	left: 10px;	top:45%;
 	position: absolute;
 }
 
 #learnocaml-tab-solution-extra {
-	left: 50%; top: 0px; right: 0px; bottom: 0px; position :absolute;
+	left: 50%; top: 15%; right: 0px; bottom: 0px;
+	position: absolute;
 	text-align:center;
 }
 #learnocaml-tab-solution-datalist{
+	position: absolute;
 	left: 50%;
-	top: 25%;	
 	text-align: center;
 	right: 0px;
-	position: absolute;
+	top: 25%;
 }
 #sol-datalist{
 	width:80%;
 }
-
 #learnocaml-tab-solution-sampler{
 	position: absolute;
-	top: 50%;
+	top: 35%;
 	right: 0px;
 	left: 50%;
 	text-align: center;
@@ -160,7 +161,7 @@ body{
 }
 
 #learnocaml-tab-spec-input {
-	left: 0px; top: 10px; right: 50%; bottom: 20%;
+	left: 0px; top: 48%; right: 50%; bottom: 0px;
 	position: absolute;
 	margin: 10px;
 	background : #666;
@@ -168,12 +169,12 @@ body{
 }
 
 #txt_input_spec {
-	left: 10px;	
+	left: 10px; top: 45%;	
 	position: absolute;
 }
 
 #learnocaml-tab-spec-extra {
-	left: 50%; top: 0px; right: 0px; bottom: 20%;
+	left: 50%; top: 15%; right: 0px; bottom: 0px;
 	position: absolute;
 	text-align:center;
 }
@@ -189,7 +190,7 @@ body{
 }
 #learnocaml-tab-spec-sampler{
 	position: absolute;
-	top: 50%;
+	top: 35%;
 	right: 0px;
 	left: 50%;
 	text-align: center;
@@ -198,7 +199,7 @@ body{
 	width:80%;
 }
 #learnocaml-tab-spec-spec {
-	left: 125px; top: 80%; right: 125px; bottom: 0px;
+	left: 50%; top: 48%; right: 0px; bottom: 0px;
 	position: absolute;
 	margin: 10px;
 	background : #666;
@@ -207,12 +208,12 @@ body{
 
 #txt_spec_specification {
 	position: absolute;
-	left: 10px;
-	top: 87%;
+	left: 52%;
+	top: 45%;
 }
 
 #learnocaml-tab-suite-input{
-  	left: 0%; top: 10px; right: 50%; bottom: 0px;
+  	left: 0%; top: 48%; right: 0px; bottom: 0px;
 	position: absolute;
 	margin: 10px;
 	background : #666;
@@ -220,7 +221,7 @@ body{
 }
 
 #txt_suite_input {
-	left: 10px;	
+	left: 10px;	top: 45%;
 	position: absolute;
 }
 #learnocaml-tab-suite-datalist{
@@ -228,7 +229,7 @@ body{
 	left: 50%;
 	text-align: center;
 	right: 0px;
-	top: 0%;
+	top: 20%;
 }
 #suite-datalist{
 	width:80%;

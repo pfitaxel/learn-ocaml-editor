@@ -232,7 +232,17 @@ let metadata_enc =conv
        (req "description" string)
        (req "diff" float )
     )
-    
+type checkbox=
+  { imperative : bool;
+    undesirable : bool}
+  
+let checkbox_enc = conv
+    (fun {imperative;undesirable}-> (imperative,undesirable) )
+    (fun (imperative,undesirable) -> {imperative;undesirable} )
+    (obj2
+       (req "imperative" bool )
+       (req "undesirable" bool )
+    )
 
 type editor_state =
   { metadata :metadata;    
@@ -243,6 +253,7 @@ type editor_state =
     test : test_state ;
     prelude : string;
     incipit :string ;
+    checkbox :checkbox;
     mtime : float }
 
 open Json_encoding
@@ -250,11 +261,11 @@ open Json_encoding
 let editor_state_enc =
   
   conv
-    (fun {metadata ; prepare;solution ; question ;template ; test;prelude ;incipit;mtime } ->
-       (metadata , prepare, solution , question , template , test, prelude ,incipit, mtime))
-    (fun (metadata , prepare, solution , question , template , test, prelude ,incipit, mtime) ->
-       {metadata; prepare; solution ; question ;template ; test; prelude ;incipit ; mtime })
-    (obj9
+    (fun {metadata ; prepare;solution ; question ;template ; test;prelude ;incipit;checkbox;mtime } ->
+       (metadata , prepare, solution , question , template , test, prelude ,incipit,checkbox, mtime))
+    (fun (metadata , prepare, solution , question , template , test, prelude ,incipit,checkbox, mtime) ->
+       {metadata; prepare; solution ; question ;template ; test; prelude ;incipit ;checkbox; mtime })
+    (obj10
        (req "metadata" metadata_enc)
        (req "prepare" string)
        (req "solution" string)
@@ -263,4 +274,5 @@ let editor_state_enc =
        (req "test" test_state_enc )
        (req "prelude" string)
        (req "incipit" string)
+       (req "checkbox" checkbox_enc )
        (dft "mtime" float 0.))

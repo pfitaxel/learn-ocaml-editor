@@ -60,6 +60,9 @@ type metadata =
     diff :float
   }
 
+type checkbox=
+  { imperative : bool;
+    undesirable : bool}
 
 type editor_state =
   { metadata :metadata;    
@@ -69,9 +72,9 @@ type editor_state =
     template : string ;
     test : test_state ;
     prelude : string;
-    incipit:string;
+    incipit :string ;
+    checkbox :checkbox;
     mtime : float }
-
 
 val editor_state_enc : editor_state Json_encoding.encoding
 open Learnocaml_index

@@ -815,10 +815,10 @@ let onload () =
       (* save_quest (genQuestions (get_fct listeChars []) []) id ; *)
     disabling_button_group toplevel_buttons_group (fun () -> Learnocaml_toplevel.reset top) >>= fun () ->
     Learnocaml_toplevel.execute_phrase top (Ace.get_contents ace) >>= fun ok ->
-    if ok then
+    if ok then 
     let res_aux = decompositionSol (get_answer top) 0 in
     (*Avec prise en compte des types polymorphes :*)
-    let res = redondance (polymorph_detector (get_questions (get_all_val res_aux []) [])) in
+    let res = redondance (polymorph_detector (get_questions (get_all_val (get_only_fct res_aux []) []) [])) in
     (*let rec fct_test liste = match liste with |[]->""|(a,b)::suite->a^b^(fct_test suite) in
     (Ace.set_contents ace_temp (fct_test res));*)
     save_questions res id;

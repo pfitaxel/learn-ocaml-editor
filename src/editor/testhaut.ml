@@ -147,7 +147,7 @@ let _ = Ace.set_contents ace_input_spec ("[]");
 let spec_spec_editor = find_component "learnocaml-tab-spec-spec"
 let editor_spec_spec = Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div spec_spec_editor) 
 let ace_spec_spec = Ocaml_mode.get_editor editor_spec_spec 
-let _ =  Ace.set_contents ace_spec_spec ("");
+let _ =  Ace.set_contents ace_spec_spec ("fun f args ret -> \n ...");
          Ace.set_font_size ace_spec_spec 18;;
 
 let input_suite_editor = find_component "learnocaml-tab-suite-input" 
@@ -252,7 +252,7 @@ let _ = match arg "questionid" with
 
 
 let _ = solution##.onclick:= handler (fun _ -> select_tab "solution"; Js._true);;
-let _ = spec##.onclick:= handler (fun _ -> select_tab "spec"; Js._true);;
+let _ = spec##.onclick:= handler (fun _ -> select_tab "spec"; if Ace.get_contents ace_spec_spec ="" then Ace.set_contents ace_spec_spec "fun f args ret -> \n ..."; Js._true);;
 let _ = suite##.onclick:= handler (fun _ -> select_tab "suite"; Js._true);;
 
 

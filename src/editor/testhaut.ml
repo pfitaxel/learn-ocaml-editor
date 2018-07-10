@@ -3,7 +3,6 @@
 
 open Js_of_ocaml
 open Js_utils
-open Str
 open Lwt.Infix
 open Dom_html
 open Learnocaml_common
@@ -70,6 +69,8 @@ let name = match getElementById_coerce "name" CoerceTo.input with
 let ty = match getElementById_coerce "ty" CoerceTo.input with
     None -> failwith "unknown element ty"
    |Some s -> s;;
+
+(* bouton radio *)
 let solution = match getElementById_coerce "solution" CoerceTo.input with
     None -> failwith ""
   | Some s -> s;;
@@ -78,20 +79,19 @@ let spec = match getElementById_coerce "spec" CoerceTo.input with
   |Some s -> s;;
 let suite = match getElementById_coerce "suite" CoerceTo.input with
     None -> failwith ""
-  |Some s-> s;;
+   |Some s-> s;;
+
 
 let samplerSol = match getElementById_coerce "sol-sampler" CoerceTo.input with
   | None -> failwith "unknown element sampler sol"
-  | Some s -> s;;
-                
+  | Some s -> s;; 
 let samplerSpec = match getElementById_coerce "spec-sampler" CoerceTo.input with
   | None -> failwith "unknown element sampler spec"
   | Some s -> s;;
-                
+
 let extraAleaSol =match getElementById_coerce "sol-gen" CoerceTo.input with
     None -> failwith "unknown element extraAleaSol"
   | Some s -> s;;
-
 let extraAleaSpec = match getElementById_coerce "spec-gen" CoerceTo.input with
     None -> failwith "unknown element extraAleaSpec"
   | Some s -> s;;
@@ -99,21 +99,17 @@ let extraAleaSpec = match getElementById_coerce "spec-gen" CoerceTo.input with
 let datalistSol = match getElementById_coerce "sol-datalist" CoerceTo.input with
   | None -> failwith "unknown element datalistSol"
   | Some s -> s;;
-
 let datalistSpec = match getElementById_coerce "spec-datalist" CoerceTo.input with
     None -> failwith "unknown element datalistSpec"
   | Some s -> s;;
-
 let datalistSuite = match getElementById_coerce "suite-datalist" CoerceTo.input with
     None -> failwith "unknown element datalistSuite"
   | Some s -> s;;
     
-
 let save = getElementById "save";;
 
 let setInnerHtml elt s =    
   elt##.innerHTML:=Js.string s ;;
-
 
 open Editor_lib
 open Learnocaml_exercise_state
@@ -141,18 +137,19 @@ let editor_input_suite = Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div 
 let ace_input_suite = Ocaml_mode.get_editor editor_input_suite 
 let _ = Ace.set_contents ace_input_suite ("[]");
         Ace.set_font_size ace_input_suite 18;;
-      
+
+(* -------------------------------------------------------------------- *)
 
 let save_suite () =
   let name = Js.to_string name##.value in
   let ty = Js.to_string ty##.value in
   let input = Ace.get_contents ace_input_suite in
   let datalist = Js.to_string datalistSuite##.value in
-  let question = TestSuite {name; ty; suite= input;tester=datalist} in
+  let question = TestSuite {name; ty; suite=input; tester=datalist} in
   let testhaut =  get_testhaut id in
   let question_id = match arg "questionid" with
-    |exception Not_found ->compute_question_id testhaut
-    |qid->qid
+    |exception Not_found -> compute_question_id testhaut
+    |qid -> qid
   in
   let testhaut = StringMap.add question_id question testhaut in
   save_testhaut testhaut id;;
@@ -164,15 +161,14 @@ let save_solution () =
   let extra_alea = int_of_string (Js.to_string extraAleaSol##.value) in
   let datalist = Js.to_string datalistSol##.value in
   let sampler= Js.to_string samplerSol##.value in
-  let question = TestAgainstSol {name; ty; suite=input; gen= extra_alea;tester=datalist;sampler} in
+  let question = TestAgainstSol {name; ty; suite=input; gen=extra_alea; tester=datalist; sampler} in
   let testhaut = get_testhaut id in
   let question_id =  match arg "questionid" with
-    |exception Not_found ->compute_question_id testhaut
-    |qid->qid in
+    |exception Not_found -> compute_question_id testhaut
+    |qid -> qid in
   let testhaut = StringMap.add question_id question testhaut in
   save_testhaut testhaut id;;
 
-  
 let save_spec () =
   let name = Js.to_string name##.value in
   let ty = Js.to_string ty##.value in
@@ -181,22 +177,20 @@ let save_spec () =
   let extra_alea = int_of_string (Js.to_string extraAleaSpec##.value) in
   let datalist = Js.to_string datalistSpec##.value in
   let sampler = Js.to_string samplerSpec##.value in
-  let question = TestAgainstSpec {name; ty; suite=input;spec= output;gen= extra_alea;tester=datalist;sampler} in
+  let question = TestAgainstSpec {name; ty; suite=input; spec=output; gen=extra_alea; tester=datalist; sampler} in
   let open Editor_lib in
   let testhaut = get_testhaut id in
   let question_id =  match arg "questionid" with
-    |exception Not_found ->compute_question_id testhaut
-    |qid->qid in
+    |exception Not_found -> compute_question_id testhaut
+    |qid -> qid in
   let testhaut = StringMap.add question_id question testhaut in
   save_testhaut testhaut id;;
 
-
-(* restore fields if they are not empty *)
+(* ---- restore fields if they are not empty -----------------------------------*)
     
 let _ = match arg "questionid" with
     exception Not_found -> select_tab "suite"; suite##.checked := Js.bool true
   | qid ->let testhaut=get_testhaut id in
-
       let name_elt=name in
       let ty_elt=ty in
       let suite_elt=suite in
@@ -236,17 +230,15 @@ let _ = match arg "questionid" with
                 end;;
 
 
-
 let _ = solution##.onclick:= handler (fun _ -> select_tab "solution"; Js._true);;
 let _ = spec##.onclick:= handler (fun _ -> select_tab "spec"; if Ace.get_contents ace_spec_spec ="" then Ace.set_contents ace_spec_spec "fun f args ret -> \n ..."; Js._true);;
 let _ = suite##.onclick:= handler (fun _ -> select_tab "suite"; Js._true);;
 
-
 let transResultOption = function
   |None -> false
   |Some s-> true;;
-let nameOk s = transResultOption (Regexp.string_match (Regexp.regexp "^.+") s 0);;
-let typeOk s = transResultOption (Regexp.string_match (Regexp.regexp "^.+") s 0);;
+let nameOk s = s<>"";;
+let typeOk s = s<>"";;
 
 let close_frame () =
   (* trick to get access to  the container of the frame (learnocaml-exo-loading) *)
@@ -267,7 +259,6 @@ let close_frame () =
   let _ =testhaut_init exo_list id  in ();
   div##setAttribute (Js.string "class") (Js.string "loading-layer loaded");;
 
-
 let toString = function
   |None -> failwith "incorrect_input"
   |Some input -> Js.to_string input##.value
@@ -275,7 +266,7 @@ let toString = function
 let name_error = getElementById "name_error"
 let type_error = getElementById "type_error"
 
-(* save button  *)
+(* ---- save button ------------------------------------------------------------ *)
 let _ = save##.onclick:= handler (fun _ ->
   let name = Js.to_string name##.value in
   let ty = Js.to_string ty##.value in
@@ -311,19 +302,19 @@ let _ = save##.onclick:= handler (fun _ ->
    Js._true
 )
 
-(* Cancel button *)
+(* ---- Cancel button ---------------------------------------------------------- *)
 let cancel = getElementById "cancel"
 let _ = cancel##.onclick := handler (fun _ ->
     let _ = close_frame () in ();
     Js._true)
 
 
-(* Syntax button *)
+(* ---- Syntax button ---------------------------------------------------------- *)
 let syntax =getElementById "syntax"
 let doc_body =Dom_html.document##.body
 let syntax_div = Tyxml_js.Html.(div ~a:[ a_id "syntax_div" ]) [] ;;
 
-(* associated css *)
+(* ---- associated css --------------------------------------------------------- *)
 let _=
   Manip.SetCss.opacity syntax_div (Some "0");
   Manip.SetCss.left syntax_div  "0%" ;

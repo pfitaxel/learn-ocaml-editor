@@ -70,11 +70,9 @@ let init_tabs, select_tab =
     |None -> false
     |Some s-> true
       ;;
-(*
-    experiment button of editor.html redirects to the html associated to this ml 
+(* experiment button of editor.html redirects to the html associated to this ml 
     to know if we are in this page because of that we decide to put a '.' before the id
-    Therefore idEditor looks for a '.' before the id 
-*)
+    Therefore idEditor looks for a '.' before the id *)
 
 let idEditor s = transResultOption (Regexp.string_match (Regexp.regexp "^[.]+") s 0);;
   let id = arg "id" ;;

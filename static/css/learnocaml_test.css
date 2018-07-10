@@ -1,9 +1,12 @@
 body{
   background: #eee;
 }
+
 #txt_txt{
   text-align: center;
 }
+
+/* -------------- toolbar ---------------------------------------- */
 #learnocaml-main-toolbar {
   position: fixed;
   left: 0; top: 0;
@@ -69,6 +72,7 @@ body{
   }
 }
 
+/* --------------- fixed elements -------------------------------- */
 
 #learnocaml-test {
   position: absolute;
@@ -81,15 +85,21 @@ body{
 #learnocaml-test {
   left: 0px; top:110px; right: 50%; bottom: 55%;
 }
+
 #learnocaml-tab-name{
   padding: 5px;text-align:center;
 }
+
 #learnocaml-tab-type{
   padding: 5px;text-align:center;
 }
+
 #learnocaml-tab-choix{
   padding: 5px;text-align:center;
 }
+
+/* ----------- tabs ---------------------------------------------- */
+
 #learnocaml-tabs {
   position: absolute;
   z-index: 997;
@@ -115,6 +125,8 @@ body{
 #learnocaml-tabs > * {
   left: 0px; top: 15px; right: 0px; bottom: 0px;
 }
+
+/* ---------------- solution tab --------------------------------- */
 
 #learnocaml-tab-solution-input {
 	left: 0px; top: 48%; right: 0px; bottom: 0px;
@@ -153,6 +165,8 @@ body{
 #sol-sampler{
 	width:80%;
 }
+
+/* ----------- specification tab --------------------------------- */
 
 #learnocaml-tab-spec-input {
 	left: 0px; top: 48%; right: 50%; bottom: 0px;
@@ -206,6 +220,8 @@ body{
 	top: 45%;
 }
 
+/* ------------------ suite tab ---------------------------------- */
+
 #learnocaml-tab-suite-input{
   	left: 0%; top: 48%; right: 0px; bottom: 0px;
 	position: absolute;
@@ -230,8 +246,8 @@ body{
 }
 
 
-/* ace */
-	/* solution input */
+/* ------- aces -------------------------------------------------- */
+	/* ---- solution input -------------------------------- */
 
 #learnocaml-tab-solution-input {
   font-size: 18px;
@@ -278,7 +294,9 @@ body{
 #learnocaml-tab-solution-input .ace_active-line { background: #acf; opacity: 0.2; }
 #learnocaml-tab-solution-input .ace_selected-word { background: #e80; opacity: 0.2; }
 
-	/* spec input */
+
+	/* ---- spec input ------------------------------------ */
+
 #learnocaml-tab-spec-input {
   font-size: 18px;
   font-family: 'Inconsolata', monospace;
@@ -324,53 +342,9 @@ body{
 #learnocaml-tab-spec-input .ace_active-line { background: #acf; opacity: 0.2; }
 #learnocaml-tab-spec-input .ace_selected-word { background: #e80; opacity: 0.2; }
 
-	/* suite input */
-#learnocaml-tab-suite-input {
-  font-size: 18px;
-  font-family: 'Inconsolata', monospace;
-}
-#learnocaml-tab-suite-input .ace_gutter {
-  background: linear-gradient(to left, transparent 0, #444 8px, #ccc 8px, #ccc 9px, #444 9px) ;
-  color: #ccc;
-}
-#learnocaml-tab-suite-input .ace_gutter-active-line {
-  background: linear-gradient(to left, #777 0, #456 8px, #ccc 8px, #ccc 9px, #678 9px) ;
-  color: #888;
-}
-#learnocaml-tab-suite-input .ace_gutter-cell {
-  padding: 0 14px 0 0;
-}
-#learnocaml-tab-suite-input .ace_gutter-cell.ace_warning {
-  background: linear-gradient(to right, #980 0, #980 4px, transparent 80%) ;
-}
-#learnocaml-tab-suite-input .ace_gutter-cell.ace_error {
-  background: linear-gradient(to right, #900 0, #900 4px, transparent 80%) ;
-}
-#learnocaml-tab-suite-input .ace_comment { color: #aaa; font-style: italic; }
-#learnocaml-tab-suite-input .ace_keyword { color: #e80; font-weight:bold; }
-#learnocaml-tab-suite-input .ace_constant { color: #acf; }
-#learnocaml-tab-suite-input .ace_string { color: #acf; }
-#learnocaml-tab-suite-input .ace_function { color: #fff; }
-#learnocaml-tab-suite-input .ace_type { color: #fff; }
-#learnocaml-tab-suite-input .ace_operator { color: #fff; }
-#learnocaml-tab-suite-input .ace_meta { color: #fff; }
-#learnocaml-tab-suite-input .ace_variable { color: #fff; }
-#learnocaml-tab-suite-input .ace_text { color: #fff; }
-#learnocaml-tab-suite-input .error {
-  border-bottom: 2px #b00 solid;
-  position: absolute;
-}
 
-#learnocaml-tab-suite-input .warning {
-  border-bottom: 2px #ca0 solid;
-  position: absolute;
-}
+	/* ---- spec spec ------------------------------------- */
 
-#learnocaml-tab-suite-input .ace_selection { background: #e80; opacity: 0.4; }
-#learnocaml-tab-suite-input .ace_active-line { background: #acf; opacity: 0.2; }
-#learnocaml-tab-suite-input .ace_selected-word { background: #e80; opacity: 0.2; }
-
-	/* spec spec */
 #learnocaml-tab-spec-spec {
   font-size: 18px;
   font-family: 'Inconsolata', monospace;
@@ -415,3 +389,51 @@ body{
 #learnocaml-tab-spec-spec .ace_selection { background: #e80; opacity: 0.4; }
 #learnocaml-tab-spec-spec .ace_active-line { background: #acf; opacity: 0.2; }
 #learnocaml-tab-spec-spec .ace_selected-word { background: #e80; opacity: 0.2; }
+
+
+	/* ---- suite input ----------------------------------- */
+
+#learnocaml-tab-suite-input {
+  font-size: 18px;
+  font-family: 'Inconsolata', monospace;
+}
+#learnocaml-tab-suite-input .ace_gutter {
+  background: linear-gradient(to left, transparent 0, #444 8px, #ccc 8px, #ccc 9px, #444 9px) ;
+  color: #ccc;
+}
+#learnocaml-tab-suite-input .ace_gutter-active-line {
+  background: linear-gradient(to left, #777 0, #456 8px, #ccc 8px, #ccc 9px, #678 9px) ;
+  color: #888;
+}
+#learnocaml-tab-suite-input .ace_gutter-cell {
+  padding: 0 14px 0 0;
+}
+#learnocaml-tab-suite-input .ace_gutter-cell.ace_warning {
+  background: linear-gradient(to right, #980 0, #980 4px, transparent 80%) ;
+}
+#learnocaml-tab-suite-input .ace_gutter-cell.ace_error {
+  background: linear-gradient(to right, #900 0, #900 4px, transparent 80%) ;
+}
+#learnocaml-tab-suite-input .ace_comment { color: #aaa; font-style: italic; }
+#learnocaml-tab-suite-input .ace_keyword { color: #e80; font-weight:bold; }
+#learnocaml-tab-suite-input .ace_constant { color: #acf; }
+#learnocaml-tab-suite-input .ace_string { color: #acf; }
+#learnocaml-tab-suite-input .ace_function { color: #fff; }
+#learnocaml-tab-suite-input .ace_type { color: #fff; }
+#learnocaml-tab-suite-input .ace_operator { color: #fff; }
+#learnocaml-tab-suite-input .ace_meta { color: #fff; }
+#learnocaml-tab-suite-input .ace_variable { color: #fff; }
+#learnocaml-tab-suite-input .ace_text { color: #fff; }
+#learnocaml-tab-suite-input .error {
+  border-bottom: 2px #b00 solid;
+  position: absolute;
+}
+
+#learnocaml-tab-suite-input .warning {
+  border-bottom: 2px #ca0 solid;
+  position: absolute;
+}
+
+#learnocaml-tab-suite-input .ace_selection { background: #e80; opacity: 0.4; }
+#learnocaml-tab-suite-input .ace_active-line { background: #acf; opacity: 0.2; }
+#learnocaml-tab-suite-input .ace_selected-word { background: #e80; opacity: 0.2; }

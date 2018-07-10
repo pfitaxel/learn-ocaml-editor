@@ -237,7 +237,8 @@ let () =
   "learnocaml-exo-editor-pane", [%i"Editor"];
   "txt_grade_report", [%i"Click the Grade! button to test your solution"];
   "learnocaml-exo-test-pane", [%i"Editor"];
-  ] in Translate.set_string_translations translations;
+  ] in
+  Translate.set_string_translations translations;
   let translations = [
   "learnocaml-exo-button-editor", [%i"Type here the solution of the exercise"];
   "learnocaml-exo-button-template", [%i"Type here or generate the template the student will complete or correct"];
@@ -246,7 +247,8 @@ let () =
   "learnocaml-exo-button-question", [%i"Type here the wording of the exercise in Markdown"];
   "learnocaml-exo-button-test", [%i"Type here the tests code"];
   "learnocaml-exo-button-testhaut", [%i"Generate here the tests code"];
-  ] in Translate.set_title_translations translations;
+  ] in
+  Translate.set_title_translations translations;
   Learnocaml_local_storage.init () ;
                
   (* ---- launch everything --------------------------------------------- *)
@@ -581,38 +583,6 @@ let () =
       ~icon: "typecheck" [%i"Check"] @@ fun () ->
     Lwt.return ()
   end ;
-  begin testhaut_button
-          ~group: toplevel_buttons_group
-          ~icon: "cleanup" [%i "Delete All"] @@ fun () ->
-    let delete_all_questions () =
-      save_testhaut StringMap.empty id;
-      Manip.removeChildren (find_component "learnocaml-exo-testhaut-pane");
-      let _ = testhaut_init (find_component "learnocaml-exo-testhaut-pane") id in ()
-    in
-         let aborted, abort_message =
-           let t, u = Lwt.task () in
-           let btn_no = Tyxml_js.Html5.(button [ pcdata [%i"No"] ]) in
-           Manip.Ev.onclick btn_no ( fun _ ->
-              hide_loading ~id:"learnocaml-exo-loading" () ; true) ;
-           let btn_yes = Tyxml_js.Html5.(button [ pcdata [%i"Yes"] ]) in
-           Manip.Ev.onclick btn_yes (fun _ ->
-               hide_loading ~id:"learnocaml-exo-loading" ();
-               delete_all_questions () ; true) ;
-           let div =
-             Tyxml_js.Html5.(div ~a: [ a_class [ "dialog" ] ]
-                          [ pcdata [%i"Are you sure you want to delete all questions ?\n"] ;
-                            btn_yes ;
-                            pcdata " " ;
-                            btn_no; ]) in
-      Manip.SetCss.opacity div (Some "0") ;
-      t, div in 
-    Manip.replaceChildren messages
-      Tyxml_js.Html5.[ li [ pcdata "" ] ] ;
-    show_loading ~id:"learnocaml-exo-loading" [ abort_message ] ;
-    Manip.SetCss.opacity abort_message (Some "1") ;
-    Lwt.return ()
-  end;
-  
   let quality = match getElementById_coerce "quality_box" CoerceTo.input with
     | None -> failwith "unknown element quality_box"
     | Some s -> s
@@ -642,41 +612,6 @@ let () =
          test ; prepare ; prelude;checkbox;
         mtime = gettimeofday () } in
   recovering_callback:=recovering ;
- 
-  begin editor_button
-      ~icon: "save" [%i"Save"] @@ fun () ->
-    recovering () ;
-    Lwt.return ()
-  end ;
-
-  begin editor_button
-      ~icon: "download" [%i"Download"] @@ fun () ->
-    recovering () ;
-    let name = id ^ ".json" in
-    let content =Learnocaml_local_storage.(retrieve (editor_state id)) in  
-  let json =
-    Json_repr_browser.Json_encoding.construct
-      Learnocaml_exercise_state.editor_state_enc
-      content in
-  let contents =
-      (Js._JSON##stringify (json)) in
-    Learnocaml_common.fake_download ~name ~contents ;
-    Lwt.return ()
-  end ;
-
-  let typecheck set_class = Editor_lib.typecheck set_class ace editor top in
-  begin editor_button
-      ~group: toplevel_buttons_group
-      ~icon: "typecheck" [%i"Check"] @@ fun () ->
-    typecheck true
-  end ;
-  begin toplevel_button
-      ~group: toplevel_buttons_group
-      ~icon: "run" [%i"Eval code"] @@ fun () ->
-    Learnocaml_toplevel.execute_phrase top (Ace.get_contents ace) >>= fun _ ->
-    Lwt.return ()
-  end ;
-
   let ast_fonction () =
     let fonction = if Js.to_bool(quality##.checked) then
                      fonction_quality
@@ -775,6 +710,71 @@ let () =
     show_loading ~id:"learnocaml-exo-loading" [ abort_message ] ;
     Manip.SetCss.opacity abort_message (Some "1") ;
       Lwt.return ()
+  end ;
+  begin testhaut_button
+          ~group: toplevel_buttons_group
+          ~icon: "cleanup" [%i "Delete all"] @@ fun () ->
+    let delete_all_questions () =
+      save_testhaut StringMap.empty id;
+      Manip.removeChildren (find_component "learnocaml-exo-testhaut-pane");
+      let _ = testhaut_init (find_component "learnocaml-exo-testhaut-pane") id in ()
+    in
+         let aborted, abort_message =
+           let t, u = Lwt.task () in
+           let btn_no = Tyxml_js.Html5.(button [ pcdata [%i"No"] ]) in
+           Manip.Ev.onclick btn_no ( fun _ ->
+              hide_loading ~id:"learnocaml-exo-loading" () ; true) ;
+           let btn_yes = Tyxml_js.Html5.(button [ pcdata [%i"Yes"] ]) in
+           Manip.Ev.onclick btn_yes (fun _ ->
+               hide_loading ~id:"learnocaml-exo-loading" ();
+               delete_all_questions () ; true) ;
+           let div =
+             Tyxml_js.Html5.(div ~a: [ a_class [ "dialog" ] ]
+                          [ pcdata [%i"Are you sure you want to delete all the questions?\n"] ;
+                            btn_yes ;
+                            pcdata " " ;
+                            btn_no; ]) in
+      Manip.SetCss.opacity div (Some "0") ;
+      t, div in 
+    Manip.replaceChildren messages
+      Tyxml_js.Html5.[ li [ pcdata "" ] ] ;
+    show_loading ~id:"learnocaml-exo-loading" [ abort_message ] ;
+    Manip.SetCss.opacity abort_message (Some "1") ;
+    Lwt.return ()
+  end;
+ 
+  begin editor_button
+      ~icon: "save" [%i"Save"] @@ fun () ->
+    recovering () ;
+    Lwt.return ()
+  end ;
+
+  begin editor_button
+      ~icon: "download" [%i"Download"] @@ fun () ->
+    recovering () ;
+    let name = id ^ ".json" in
+    let content =Learnocaml_local_storage.(retrieve (editor_state id)) in  
+  let json =
+    Json_repr_browser.Json_encoding.construct
+      Learnocaml_exercise_state.editor_state_enc
+      content in
+  let contents =
+      (Js._JSON##stringify (json)) in
+    Learnocaml_common.fake_download ~name ~contents ;
+    Lwt.return ()
+  end ;
+
+  let typecheck set_class = Editor_lib.typecheck set_class ace editor top in
+  begin editor_button
+      ~group: toplevel_buttons_group
+      ~icon: "typecheck" [%i"Check"] @@ fun () ->
+    typecheck true
+  end ;
+  begin toplevel_button
+      ~group: toplevel_buttons_group
+      ~icon: "run" [%i"Eval code"] @@ fun () ->
+    Learnocaml_toplevel.execute_phrase top (Ace.get_contents ace) >>= fun _ ->
+    Lwt.return ()
   end ;
   
   (* ---- main toolbar -------------------------------------------------- *)

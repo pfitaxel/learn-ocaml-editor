@@ -845,7 +845,8 @@ let () =
     "txt_sync_doc",
     [%i"Save online using the <img src=\"icons/icon_sync_white.svg\" \
         class=\"icon\" alt=\"sync\"> button above."];
-  ] in Translate.set_string_translations translations;
+  ] in
+  Translate.set_string_translations translations;
   Learnocaml_local_storage.init () ;
   let sync_button_state = button_state () in
   disable_button sync_button_state ;

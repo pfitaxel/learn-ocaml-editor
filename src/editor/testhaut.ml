@@ -13,8 +13,8 @@ module StringMap = Map.Make (String)
 
 let () = Translate.set_lang ()
 let () =
-  let translations = [    
-
+  let translations = [
+  	"syntax", [%i"Syntax"];
     "cancel", [%i"Cancel"];
     "save", [%i"Save"];
     "txt_name", [%i"Function name: "];
@@ -33,7 +33,8 @@ let () =
     "txt_spec_specification", [%i"Specification:<br>"];
     "txt_suite_input", [%i"Arguments and results:<br>"];
     "txt_datalist_suite", [%i"Tester:<br>"];
-  ] in Translate.set_string_translations translations
+  ] in
+  Translate.set_string_translations translations
 
 let init_tabs, select_tab =
   let names = [ "solution"; "spec"; "suite" ] in
@@ -119,8 +120,9 @@ open Editor_lib
 open Learnocaml_exercise_state
 
 let input_solution_editor = find_component "learnocaml-tab-solution-input";;
-let editor_input_solution = Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div input_solution_editor) ;;
-let ace_input_sol = Ocaml_mode.get_editor editor_input_solution ;;
+let editor_input_solution = Ocaml_mode.create_ocaml_editor
+    (Tyxml_js.To_dom.of_div input_solution_editor);;
+let ace_input_sol = Ocaml_mode.get_editor editor_input_solution;;
 let _ = Ace.set_contents ace_input_sol ("[]");
         Ace.set_font_size ace_input_sol 18;;
 
@@ -181,7 +183,8 @@ let save_spec () =
   let extra_alea = int_of_string (Js.to_string extraAleaSpec##.value) in
   let datalist = Js.to_string datalistSpec##.value in
   let sampler = Js.to_string samplerSpec##.value in
-  let question = TestAgainstSpec {name; ty; suite=input;spec= output;gen= extra_alea;tester=datalist;sampler} in
+  let question = TestAgainstSpec {name; ty; suite = input; spec = output;
+                                  gen = extra_alea; tester = datalist; sampler} in
   let open Editor_lib in
   let testhaut = get_testhaut id in
   let question_id =  match arg "questionid" with
@@ -237,9 +240,13 @@ let _ = match arg "questionid" with
 
 
 
-let _ = solution##.onclick:= handler (fun _ -> select_tab "solution"; Js._true);;
-let _ = spec##.onclick:= handler (fun _ -> select_tab "spec"; if Ace.get_contents ace_spec_spec ="" then Ace.set_contents ace_spec_spec "fun f args ret -> \n ..."; Js._true);;
-let _ = suite##.onclick:= handler (fun _ -> select_tab "suite"; Js._true);;
+let () = solution##.onclick := handler (fun _ -> select_tab "solution"; Js._true);;
+let () = spec##.onclick := handler
+      (fun _ -> select_tab "spec";
+        if Ace.get_contents ace_spec_spec = "" then
+          Ace.set_contents ace_spec_spec "fun f args ret -> \n ...";
+        Js._true);;
+let () = suite##.onclick := handler (fun _ -> select_tab "suite"; Js._true);;
 
 
 let transResultOption = function
@@ -313,18 +320,18 @@ let _ = save##.onclick:= handler (fun _ ->
 
 (* Cancel button *)
 let cancel = getElementById "cancel"
-let _ = cancel##.onclick := handler (fun _ ->
+let () = cancel##.onclick := handler (fun _ ->
     let _ = close_frame () in ();
     Js._true)
 
 
 (* Syntax button *)
-let syntax =getElementById "syntax"
-let doc_body =Dom_html.document##.body
-let syntax_div = Tyxml_js.Html.(div ~a:[ a_id "syntax_div" ]) [] ;;
+let syntax = getElementById "syntax"
+let doc_body = Dom_html.document##.body
+let syntax_div = Tyxml_js.Html.(div ~a:[ a_id "syntax_div" ]) []
 
 (* associated css *)
-let _=
+let _ =
   Manip.SetCss.opacity syntax_div (Some "0");
   Manip.SetCss.left syntax_div  "0%" ;
   Manip.SetCss.right syntax_div  "0%" ;
@@ -334,16 +341,33 @@ let _=
   Manip.SetCss.zIndex syntax_div "995";
   Manip.SetCss.position syntax_div "absolute";;
 
-let content="\n<h1 id=\"Syntax-examples\">Syntax examples</h1><ul><li><strong>Arguments</strong> :</li></ul>\n\n<p> <code>[ !! 1 ; !! 2 ]</code> for 2 tests for a function with int-&gt;'a profile</p>\n                                                                         <p> <code>[ true @: 4 @:!! \"titi\"]</code> for 1 test for a function with bool-&gt;int-&gt;string -&gt;'a profile</p>\n                                                                                                                                                                               <ul><li><strong>Spec</strong> :</li></ul>\n\n                                                                                                                                                                               <p><code>fun f args ret -&gt; let x0 = apply (fun n u -&gt; n) args in ~~ (x0 &lt; ret)</code></p>\n                                                                                                                                                                                                                                                      <p> -&gt; f is the function</p>\n                                                                                                                                                                                                                                                                                 <p> -&gt; args are the arguments</p>\n                                                                                                                                                                                                                                                                                           <p> -&gt; ret the return value of the fonction when applied with args</p>\n                                                                                                                                                                                                                                                                                                                                                            <p> In this example we want the return value to be greather than the first argument</p>\n                                                                                                                                                                                                                                                                                                                                                                                                            <ul><li><strong>Suite</strong> :</li></ul>\n\n                                                                                                                                                                                                                                                                                                                                                                                                            <p> <code>[false @:!! false ==&gt; false;</code></p>\n                                                                                                                                                                                                                                                                                                                                                                                                                                                     <p> <code>false @:!! true ==&gt; true;</code></p>\n                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           <p> <code>true @:!! false ==&gt; true ;</code></p>\n                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  <p> <code>true @:!! true ==&gt; false]</code></p>\n                                                                                                                                                                                                                                                                                                                                                                                                            <p> Is the syntax for the exclusive or (it's the same syntax that Results but we\n                                                                                                                                                                                                                                                                                                                                                                                                                                                      have to provide also the return value associated with ==&gt;)</p>" ;;
+let content = "<h1 id=\"Syntax-examples\">" ^ [%i"Syntax examples"] ^
+              "</h1><ul><li><strong>" ^ [%i"Arguments"] ^
+              "</strong>:</li></ul>\n\n<p> <code>[!! 1; !! 2]</code>" ^
+              [%i" for two tests for a function with int -&gt; 'a profile"] ^
+              "</p>\n<p> <code>[true @: 4 @:!! \"titi\"]</code>" ^
+              [%i" for one test for a function with bool -&gt; int -&gt; string -&gt; 'a profile"] ^
+              "</p>\n<ul><li><strong>" ^ [%i"Specification"] ^
+              "</strong>:</li></ul>\n\n<p><code>fun f args ret -&gt; let x0 = \
+               apply (fun n u -&gt; n) args in ~~ (x0 &lt; ret)</code></p>\n<p>" ^
+              [%i" -&gt; f is the function"] ^ "</p>\n<p>" ^ [%i" -&gt; args are its arguments"] ^
+              "</p>\n<p>" ^ [%i" -&gt; ret is the return value of the function \
+                                when applied with args"] ^ "</p>\n<p>" ^
+              [%i"In this example we want the return value to be greather than the first argument."] ^
+              "</p>\n<ul><li><strong>" ^ [%i"Tests suite"] ^
+              "</strong>:</li></ul>\n\n<p> <code>[false @:!! false ==&gt; false;</code></p>\n\
+               <p> <code> false @:!! true ==&gt; true;</code></p>\n\
+               <p> <code> true @:!! false ==&gt; true;</code></p>\n\
+               <p> <code> true @:!! true ==&gt; false]</code></p>\n<p>" ^
+              [%i"This is the syntax for the exclusive or.\nIt is the same syntax as the arguments', \
+                  but we have to provide also the return value associated with ==&gt;."] ^ "</p>";;
 
 Manip.setInnerHtml syntax_div content;;
 open Tyxml_js.Html5
 let button = button ~a:[a_id "ok";
-                        a_onclick (fun _ ->  Manip.SetCss.opacity syntax_div (Some "0"); Manip.SetCss.zIndex syntax_div "995"
- ;true)]  [ pcdata "Ok" ] ;;
+a_onclick (fun _ -> Manip.SetCss.opacity syntax_div (Some "0");
+	Manip.SetCss.zIndex syntax_div "995"; true)] [ pcdata [%i"OK"] ];;
 Manip.appendChildFirst syntax_div button ;;
-syntax##.onclick:= handler (fun _ ->  Manip.SetCss.opacity syntax_div (Some "1");  Manip.SetCss.zIndex syntax_div "998"
- ;Js._true );;
+syntax##.onclick:= handler (fun _ -> Manip.SetCss.opacity syntax_div (Some "1");
+	Manip.SetCss.zIndex syntax_div "998"; Js._true);;
 Manip.appendChildFirst (Tyxml_js.Of_dom.of_body doc_body) syntax_div 
-
-  

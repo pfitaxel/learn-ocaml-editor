@@ -351,16 +351,7 @@ let () =
   (* TODO Refactor *)
   let typecheck_spec set_class =
     Learnocaml_toplevel.check top
-      ("module Dummy_Functor (Introspection :
-       Introspection_intf.INTROSPECTION) = struct
-         module Dummy_Params = struct
-           let results = ref None
-           let set_progress _ = ()
-           let timeout = None
-           module Introspection = Introspection            
-         end
-         module Test_lib = Test_lib.Make(Dummy_Params)
-         module Report = Learnocaml_report;; "
+      ("module Dummy_Functor (Introspection :\n                        Introspection_intf.INTROSPECTION) = struct\n  module Dummy_Params = struct\n    let results = ref None\n    let set_progress _ = ()\n    let timeout = None\n    module Introspection = Introspection            \n  end\n  module Test_lib = Test_lib.Make(Dummy_Params)\n  module Report = Learnocaml_report;;\n  let code_ast = (failwith \"WIP\" : Parsetree.structure);;\n\n "
        ^ Ace.get_contents ace_t ^ " end") >>= fun res ->
     let error, warnings =
       match res with

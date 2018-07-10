@@ -66,12 +66,21 @@ let init_tabs, select_tab =
     select_tab !current in
   init_tabs, select_tab
 
-let display_report exo report =
   let transResultOption = function
     |None -> false
-    |Some s-> true in
-  let idEditor s = transResultOption (Regexp.string_match (Regexp.regexp "^[.]+") s 0) in
-  let id = arg "id" in
+    |Some s-> true
+      ;;
+(*
+    experiment button of editor.html redirects to the html associated to this ml 
+    to know if we are in this page because of that we decide to put a '.' before the id
+    Therefore idEditor looks for a '.' before the id 
+*)
+
+let idEditor s = transResultOption (Regexp.string_match (Regexp.regexp "^[.]+") s 0);;
+  let id = arg "id" ;;
+
+let display_report exo report =
+
   let score_maxi =if idEditor id then int_of_string (arg "score") else (Learnocaml_exercise.(get max_score) exo) in
 
   let score, failed = Learnocaml_report.result_of_report report in
@@ -126,31 +135,15 @@ let () =
   let editor_toolbar = find_component "learnocaml-exo-editor-toolbar" in
   let toplevel_button = button ~container: toplevel_toolbar ~theme: "dark" in
   let editor_button = button ~container: editor_toolbar ~theme: "light" in
-  let transResultOption = function
-  |None -> false
-  |Some s-> true in
-  let idEditor s = transResultOption (Regexp.string_match (Regexp.regexp "^[.]+") s 0) in
-  let id = arg "id" in
-
+  
+(* if we came from a true exercise we search in the server. In the other case we get
+   the exercise information from the Local storage *)
   let exercise_fetch = match idEditor id with
     | false -> Server_caller.fetch_exercise id
-    | _ -> let id = String.sub id 1 ((String.length id)-1) in
-  let exo0 ()=
-  let titre = get_titre id in
-  let question = get_question id in
-  let question = Omd.to_html (Omd.of_string question) in
+    | _ -> let proper_id = String.sub id 1 ((String.length id)-1) in
+        
 
-  let exo1= Learnocaml_exercise.set  Learnocaml_exercise.id id Learnocaml_exercise.empty in
-  let exo2= Learnocaml_exercise.set Learnocaml_exercise.title titre exo1 in
-  let exo3 =Learnocaml_exercise.set Learnocaml_exercise.max_score 80 exo2 in
-  let exo4 =Learnocaml_exercise.set Learnocaml_exercise.prepare (get_prepare id) exo3 in
-  let exo5 =Learnocaml_exercise.set Learnocaml_exercise.prelude (get_prelude id) exo4 in
-  let exo6 =Learnocaml_exercise.set Learnocaml_exercise.solution (get_solution id) exo5 in
-  let exo7 =Learnocaml_exercise.set Learnocaml_exercise.test (get_testml id) exo6 in
-  let exo8 =Learnocaml_exercise.set Learnocaml_exercise.template (get_template id) exo7 in
-  Learnocaml_exercise.set Learnocaml_exercise.descr (question) exo8
-  in
-   Lwt.return (exo0 () )
+   Lwt.return (exo_creator proper_id )
 in  
   let after_init top =
     exercise_fetch >>= fun exo ->

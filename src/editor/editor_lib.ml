@@ -551,7 +551,22 @@ let typecheck set_class ace editor top =
     Lwt.return ();;
 
 (*__________________________________________________*)
-
+(*create an exo *)
+  let exo_creator proper_id=
+  let titre = get_titre proper_id in
+  let question = get_question proper_id in
+  let question = Omd.to_html (Omd.of_string question) in
+  let open Learnocaml_exercise in
+  let exo1= set id proper_id empty in
+  let exo2= set title titre exo1 in
+  let exo3 =set max_score 80 exo2 in
+  let exo4 =set prepare (get_prepare proper_id) exo3 in
+  let exo5 =set prelude (get_prelude proper_id) exo4 in
+  let exo6 =set solution (get_solution proper_id) exo5 in
+  let exo7 =set test (get_testml proper_id) exo6 in
+  let exo8 =set template (get_template proper_id) exo7 in
+  set descr question exo8
+  ;;
 
 let wait milli =
   let sec = milli /. 1000. in
@@ -563,4 +578,4 @@ let wait milli =
 open Learnocaml_toplevel
 open Learnocaml_toplevel_output 
 let get_answer top =
-  Learnocaml_toplevel.execute_test top 
+  Learnocaml_toplevel.execute_test top

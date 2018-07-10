@@ -1,3 +1,6 @@
+(* This ml is associated with test.html . This one is called on a iframe.
+   This why they are functions like close_frame *) 
+
 open Js_of_ocaml
 open Js_utils
 open Str
@@ -59,7 +62,8 @@ let init_tabs, select_tab =
     select_tab !current in
   init_tabs, select_tab 
 
-let id = arg "id";;               
+let id = arg "id";;
+
 let name = match getElementById_coerce "name" CoerceTo.input with
     None -> failwith "unknown element name"
    |Some s -> s;;
@@ -110,14 +114,6 @@ let save = getElementById "save";;
 let setInnerHtml elt s =    
   elt##.innerHTML:=Js.string s ;;
 
-let compute_question_id test_haut =
-  let key_list =List.map (fun (a,b)->int_of_string a) (StringMap.bindings test_haut) in
-  let mi coulvois =
-    let rec aux c n=match c with
-        []->n
-      |x::l->if x<>n then aux l n else aux coulvois (n+1)
-    in aux coulvois 1
-  in string_of_int (mi key_list);;
 
 open Editor_lib
 open Learnocaml_exercise_state
@@ -178,7 +174,6 @@ let save_solution () =
 
   
 let save_spec () =
-  let open Learnocaml_exercise_state in
   let name = Js.to_string name##.value in
   let ty = Js.to_string ty##.value in
   let input = Ace.get_contents ace_input_spec in
@@ -194,7 +189,8 @@ let save_spec () =
     |qid->qid in
   let testhaut = StringMap.add question_id question testhaut in
   save_testhaut testhaut id;;
-    
+
+
 (* restore fields if they are not empty *)
     
 let _ = match arg "questionid" with
@@ -253,6 +249,7 @@ let nameOk s = transResultOption (Regexp.string_match (Regexp.regexp "^.+") s 0)
 let typeOk s = transResultOption (Regexp.string_match (Regexp.regexp "^.+") s 0);;
 
 let close_frame () =
+  (* trick to get access to  the container of the frame (learnocaml-exo-loading) *)
   let window=Dom_html.window in
   let window=window##.parent in
   let document=window##.document in
@@ -278,6 +275,7 @@ let toString = function
 let name_error = getElementById "name_error"
 let type_error = getElementById "type_error"
 
+(* save button  *)
 let _ = save##.onclick:= handler (fun _ ->
   let name = Js.to_string name##.value in
   let ty = Js.to_string ty##.value in
@@ -324,11 +322,13 @@ let _ = cancel##.onclick := handler (fun _ ->
 let syntax =getElementById "syntax"
 let doc_body =Dom_html.document##.body
 let syntax_div = Tyxml_js.Html.(div ~a:[ a_id "syntax_div" ]) [] ;;
+
+(* associated css *)
 let _=
   Manip.SetCss.opacity syntax_div (Some "0");
   Manip.SetCss.left syntax_div  "0%" ;
   Manip.SetCss.right syntax_div  "0%" ;
-  Manip.SetCss.top syntax_div  "0%" ;
+  Manip.SetCss.top syntax_div  "10%" ;
   Manip.SetCss.bottom syntax_div "0%";
   Manip.SetCss.background syntax_div "white";
   Manip.SetCss.zIndex syntax_div "998";

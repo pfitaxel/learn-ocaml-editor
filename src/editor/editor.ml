@@ -584,9 +584,32 @@ let () =
   begin testhaut_button
           ~group: toplevel_buttons_group
           ~icon: "cleanup" [%i "Delete All"] @@ fun () ->
-    save_testhaut StringMap.empty id;
-    Manip.removeChildren (find_component "learnocaml-exo-testhaut-pane");
-    let _ = testhaut_init (find_component "learnocaml-exo-testhaut-pane") id in ();
+    let delete_all_questions () =
+      save_testhaut StringMap.empty id;
+      Manip.removeChildren (find_component "learnocaml-exo-testhaut-pane");
+      let _ = testhaut_init (find_component "learnocaml-exo-testhaut-pane") id in ()
+    in
+         let aborted, abort_message =
+           let t, u = Lwt.task () in
+           let btn_no = Tyxml_js.Html5.(button [ pcdata [%i"No"] ]) in
+           Manip.Ev.onclick btn_no ( fun _ ->
+              hide_loading ~id:"learnocaml-exo-loading" () ; true) ;
+           let btn_yes = Tyxml_js.Html5.(button [ pcdata [%i"Yes"] ]) in
+           Manip.Ev.onclick btn_yes (fun _ ->
+               hide_loading ~id:"learnocaml-exo-loading" ();
+               delete_all_questions () ; true) ;
+           let div =
+             Tyxml_js.Html5.(div ~a: [ a_class [ "dialog" ] ]
+                          [ pcdata [%i"Are you sure you want to delete all questions ?\n"] ;
+                            btn_yes ;
+                            pcdata " " ;
+                            btn_no; ]) in
+      Manip.SetCss.opacity div (Some "0") ;
+      t, div in 
+    Manip.replaceChildren messages
+      Tyxml_js.Html5.[ li [ pcdata "" ] ] ;
+    show_loading ~id:"learnocaml-exo-loading" [ abort_message ] ;
+    Manip.SetCss.opacity abort_message (Some "1") ;
     Lwt.return ()
   end;
   

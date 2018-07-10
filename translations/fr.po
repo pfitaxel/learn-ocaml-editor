@@ -193,7 +193,7 @@ msgid "Import a new exercise from a json file"
 msgstr "Importer un nouvel exercice depuis un fichier json"
 
 #: src/app/learnocaml_index_main.ml:331,23--37
-#: src/editor/new_exercise.ml:17,22--36
+#: src/editor/new_exercise.ml:21,22--36
 msgid "New exercise"
 msgstr "Nouvel exercice"
 
@@ -298,7 +298,7 @@ msgstr ""
 "svg\" class=\"icon\" alt=\"Sync\">."
 
 #: src/app/learnocaml_index_main.ml:899,42--48 src/editor/testhaut.ml:15,15--21
-#: src/editor/new_exercise.ml:23,15--21
+#: src/editor/new_exercise.ml:27,15--21
 #: src/app/learnocaml_exercise_main.ml:305,23--29
 #: src/editor/editor.ml:751,23--29
 msgid "Save"
@@ -371,7 +371,7 @@ msgstr "Nouvelle question"
 msgid "Create a new question"
 msgstr "Créer une nouvelle question"
 
-#: src/editor/testhaut.ml:14,17--25 src/editor/new_exercise.ml:22,17--25
+#: src/editor/testhaut.ml:14,17--25 src/editor/new_exercise.ml:26,17--25
 #: src/editor/editor.ml:727,61--69 src/editor/editor.ml:977,58--66
 #: src/editor/editor.ml:1080,62--70
 msgid "Cancel"
@@ -430,25 +430,23 @@ msgstr "Nom incorrect: un nom ne peut pas être vide"
 msgid "Incorrect type: a type can't be empty"
 msgstr "Type incorrect: un type ne peut pas être vide"
 
-#: src/editor/new_exercise.ml:18,17--41
+#: src/editor/new_exercise.ml:22,17--41
 msgid "Unique identifier:<br>"
 msgstr "Identificateur unique:<br>"
 
-#: src/editor/new_exercise.ml:19,20--45
+#: src/editor/new_exercise.ml:23,20--45
 msgid "Title (unique too):<br>"
 msgstr "Titre (également unique):<br>"
 
-#: src/editor/new_exercise.ml:20,20--54
+#: src/editor/new_exercise.ml:24,20--54
 msgid "Description of the exercise:<br>"
 msgstr "Description de l'exercice:<br>"
 
-#: src/editor/new_exercise.ml:21,19--42
+#: src/editor/new_exercise.ml:25,19--42
 msgid "Difficulty level:<br>"
 msgstr "Niveau de difficulté:<br>"
 
-#: src/editor/new_exercise.ml:140,31--220
-#: src/editor/new_exercise.ml:148,31--220
-#: src/editor/new_exercise.ml:155,31--220
+#: src/editor/new_exercise.ml:147,29--220
 msgid ""
 "Incorrect identifier: an identifier can't be empty, and only lower case "
 "letters, numerals, dashes and underscores are allowed"
@@ -456,9 +454,11 @@ msgstr ""
 "Identificateur incorrect: un identificateur ne peut être vide, et seuls les "
 "lettres minuscules, chiffres, tirets et soulignés sont autorisés"
 
-#: src/editor/new_exercise.ml:143,34--145
-#: src/editor/new_exercise.ml:163,34--148
-#: src/editor/new_exercise.ml:179,34--148
+#: src/editor/new_exercise.ml:151,29--89
+msgid "This identifier is already used, please choose another one"
+msgstr "Cet identificateur est déjà utilisé, veuillez en choisir un autre"
+
+#: src/editor/new_exercise.ml:155,32--147
 msgid ""
 "Incorrect title: a title can't be empty, or begin or end with a space or a "
 "tab"
@@ -466,15 +466,9 @@ msgstr ""
 "Titre incorrect: un titre ne peut être vide, ou commencer ou finir par un "
 "espace ou une tabulation"
 
-#: src/editor/new_exercise.ml:151,34--89 src/editor/new_exercise.ml:169,34--89
-#: src/editor/new_exercise.ml:185,34--89
+#: src/editor/new_exercise.ml:158,32--87
 msgid "This title is already used, please choose another one"
 msgstr "Ce titre est déjà utilisé, veuillez en choisir un autre"
-
-#: src/editor/new_exercise.ml:162,31--91 src/editor/new_exercise.ml:168,31--91
-#: src/editor/new_exercise.ml:173,31--91
-msgid "This identifier is already used, please choose another one"
-msgstr "Cet identificateur est déjà utilisé, veuillez en choisir un autre"
 
 #: src/app/learnocaml_exercise_main.ml:86,33--41
 #: src/app/learnocaml_exercise_main.ml:90,33--41

@@ -119,31 +119,9 @@ let fonction_imperative = "let ast_imperative_check ast =\n
 
 (*_________________________Fonctions pour le bouton Generate______________________________________*)
 
-let compute_question_id test_haut =
-  let key_list =List.map (fun (a,b)->int_of_string a) (StringMap.bindings test_haut) in
-  let mi coulvois =
-    let rec aux c n=match c with
-        []->n
-       |x::l->if x<>n then aux l n else aux coulvois (n+1)
-    in aux coulvois 1
-  in string_of_int (mi key_list) ;;
 
     (*chacun des couples est sauvegardé dans le local storage*)
-(*
-let rec save_quest listeQuestions id = match listeQuestions with
-  |[]->()
-  |(nom,nbArgs)::suite ->
-    let name = nom in
-    let ty= gen_ty nbArgs in
-    let input = "[]" in
-    let extra_alea = 10 in
-    let question = TestAgainstSol {name ; ty ; suite=input ; gen= extra_alea ; tester="" ; sampler=""} in
-    let testhaut =  get_testhaut id in
-    let question_id = compute_question_id testhaut in
-    let new_testhaut = StringMap.add question_id question testhaut in
-    let () = save_testhaut new_testhaut id in
-    save_quest suite id;;
-*)
+
 let rec save_questions listeQuestions id = match listeQuestions with
   |[]->()
   |(nom,string_type)::suite ->
@@ -653,19 +631,16 @@ let onload () =
       ~icon: "sync" [%i"Generate"] @@ fun () ->
     let sol = genTemplate (Ace.get_contents ace) in
     if (sol<>"") then begin
-        (* let listeChars = supprRec (' '::(decompositionSol sol 0)) in *)
-      (* save_quest (genQuestions (get_fct listeChars []) []) id ; *)
-    disabling_button_group toplevel_buttons_group (fun () -> Learnocaml_toplevel.reset top) >>= fun () ->
-    Learnocaml_toplevel.execute_phrase top (Ace.get_contents ace) >>= fun ok ->
-    if ok then
-    let res_aux = decompositionSol (get_answer top) 0 in
-    (*Avec prise en compte des types polymorphes :*)
-    let res = redondance (polymorph_detector (get_questions (get_all_val (get_only_fct  res_aux []) []) [] )) in
-    save_questions res id;
-    
-     Manip.removeChildren (find_component "learnocaml-exo-testhaut-pane");
-      (testhaut_init (find_component "learnocaml-exo-testhaut-pane") id)
-    else (select_tab "toplevel" ; Lwt.return ())
+        disabling_button_group toplevel_buttons_group (fun () -> Learnocaml_toplevel.reset top) >>= fun () ->
+        Learnocaml_toplevel.execute_phrase top (Ace.get_contents ace) >>= fun ok ->
+        if ok then
+          let res_aux = decompositionSol (get_answer top) 0 in
+          (*Avec prise en compte des types polymorphes :*)
+          let res = redondance (polymorph_detector (get_questions (get_all_val (get_only_fct  res_aux []) []) [] )) in
+          save_questions res id;
+          Manip.removeChildren (find_component "learnocaml-exo-testhaut-pane");
+          (testhaut_init (find_component "learnocaml-exo-testhaut-pane") id)
+        else (select_tab "toplevel" ; Lwt.return ())
       end
     else Lwt.return ();
   end ;                             
@@ -852,8 +827,7 @@ recovering_callback:=recovering ;
                      "" in
     fonction
     in
-  let compile () = (*let listeFonction = constructListeQuest (get_id_question id) id in
-                     let tests = constructFinalSol listeFonction in*)
+  let compile () = 
     let tests=testprel^(ast_fonction ()) in
     let tests=tests^" \n "^((get_buffer id))^" \n" in
     let tests=

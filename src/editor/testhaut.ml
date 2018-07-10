@@ -328,7 +328,7 @@ let _=
   Manip.SetCss.opacity syntax_div (Some "0");
   Manip.SetCss.left syntax_div  "0%" ;
   Manip.SetCss.right syntax_div  "0%" ;
-  Manip.SetCss.top syntax_div  "0%" ;
+  Manip.SetCss.top syntax_div  "10%" ;
   Manip.SetCss.bottom syntax_div "0%";
   Manip.SetCss.background syntax_div "white";
   Manip.SetCss.zIndex syntax_div "998";

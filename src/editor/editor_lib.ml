@@ -34,27 +34,27 @@ let get_name_question id idQuestion= let test_list = get_test_liste id in
   match StringMap.(find idQuestion test_list) with
     TestAgainstSol a ->a.name
   | TestAgainstSpec a -> a.name
-  |TestSuite a -> a.name
+  | TestSuite a -> a.name
                     
 let get_type_question id idQuestion=
    let test_list = get_test_liste id in
   match StringMap.(find idQuestion test_list) with
     TestAgainstSol _ ->Solution
   | TestAgainstSpec _ -> Spec
-  |TestSuite _ -> Suite 
+  | TestSuite _ -> Suite 
 
 let get_extra_alea id idQuestion=  let test_list = get_test_liste id in
   match StringMap.(find idQuestion test_list) with
     TestAgainstSol a ->a.gen
   | TestAgainstSpec a -> a.gen
-  |_ -> failwith " ?"
+  | _ -> failwith " ?"
                     
 let get_input id idQuestion=
   let test_list = get_test_liste id in
   match StringMap.(find idQuestion test_list) with
     TestAgainstSol a ->a.suite
   | TestAgainstSpec a -> a.suite
-  |TestSuite a -> a.suite
+  | TestSuite a -> a.suite
                                                                                        
 let get_spec id idQuestion=  let test_list = get_test_liste id in
   match StringMap.(find idQuestion test_list) with  
@@ -62,9 +62,6 @@ let get_spec id idQuestion=  let test_list = get_test_liste id in
   |_ -> failwith ""
 
 let get_buffer id = Learnocaml_local_storage.(retrieve (editor_state id)).incipit
-
-
-let ajout_question testhaut question id = StringMap.add id question testhaut;; 
 
 let compute_question_id test_haut =
   let key_list =List.map (fun (a,b)->int_of_string a) (StringMap.bindings test_haut) in
@@ -78,11 +75,10 @@ let compute_question_id test_haut =
 let save_testhaut testhaut id =
   match Learnocaml_local_storage.(retrieve (editor_state id) ) with
     {metadata;incipit;prepare;solution;question;template;test;prelude;checkbox;mtime}->
-      let mtime=gettimeofday () in
-      let test ={testml=test.testml;testhaut} in
-      let nvexo= {metadata;incipit;prepare;solution;question;template;test;prelude;checkbox;mtime} in
-      
-  Learnocaml_local_storage.(store (editor_state id)) nvexo ;;
+    let mtime=gettimeofday () in
+    let test ={testml=test.testml;testhaut} in
+    let nvexo= {metadata;incipit;prepare;solution;question;template;test;prelude;checkbox;mtime} in
+    Learnocaml_local_storage.(store (editor_state id)) nvexo ;;
 
 
 let fetch_test_index id=
@@ -96,10 +92,13 @@ let fetch_test_index id=
   in
   try Lwt.return (Json_repr_browser.Json_encoding.destruct testhaut_enc json) with exn ->
     Lwt.fail (failwith "" )
+             
 let testhaut_iframe = Dom_html.createIframe Dom_html.document ;;
 let iframe_tyxml=Tyxml_js.Of_dom.of_iFrame testhaut_iframe ;;
+
 open Lwt.Infix
 open Js_utils
+       
 let find_div id =
   match Manip.by_id id with
     Some div -> div
@@ -121,6 +120,7 @@ let remove_exo exercise_id =
   Learnocaml_local_storage.(store (index_state "index")) index;
   Learnocaml_local_storage.(delete (editor_state exercise_id));
 ;;
+
 let titleUnique titre =
   let exos=
     match Learnocaml_local_storage.(retrieve (index_state "index")) with
@@ -156,8 +156,6 @@ let store_in_index metadata =
 
 let setInnerHtml elt s =    
   elt##.innerHTML := Js.string s
-
-
 
 let hide_load id =
   let elt_lml=match find_div id with
@@ -218,7 +216,7 @@ let checkbox_creator string cas id =
   Tyxml_js.Of_dom.of_input dom_chk ;; 
 
 
-let  rec testhaut_init content_div id =          
+let rec testhaut_init content_div id =          
     fetch_test_index id >>= fun index ->  
   let format_question_list all_question_states =
     let  format_contents acc contents =
@@ -503,7 +501,7 @@ let rec polymorph_detector listeChar = match listeChar with
   |(listeNom,listeType)::tail -> (listeNom,concatenation (polymorph_detector_aux (decompositionSol listeType 0) [] ('c'::'h'::'a'::'r'::[])))::(listeNom,concatenation (polymorph_detector_aux (decompositionSol listeType 0) [] ('i'::'n'::'t'::[])))::(polymorph_detector tail)
 
                                                        
-(*_________________________Fonctions pour generer le template_____________________________________*)                             
+(* ____ Fonctions pour generer le template______________________________________ *)                             
 
 let failchar = [' ';'f';'a';'i';'l';'w';'i';'t';'h';' ';'"';'T';'O';'D';'O';'"';'\n'] ;;
 
@@ -601,9 +599,9 @@ let typecheck set_class ace editor top =
     Ace.focus ace ;
     Lwt.return ();;
 
-(*__________________________________________________*)
-(*create an exo *)
-  let exo_creator proper_id=
+(* ---- create an exo ---------------------------------------------------------- *)
+
+let exo_creator proper_id=
   let titre = get_titre proper_id in
   let question = get_question proper_id in
   let question = Omd.to_html (Omd.of_string question) in
@@ -619,14 +617,5 @@ let typecheck set_class ace editor top =
   set descr question exo8
  ;;
 
-let wait milli =
-  let sec = milli /. 1000. in
-  let tm1 = Unix.gettimeofday () in
-  while Unix.gettimeofday () -. tm1 < sec do () done
-
-
-                 
-open Learnocaml_toplevel
-open Learnocaml_toplevel_output 
 let get_answer top =
   Learnocaml_toplevel.execute_test top

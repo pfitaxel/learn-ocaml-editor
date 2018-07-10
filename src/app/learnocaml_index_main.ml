@@ -109,7 +109,7 @@ let exercises_tab _ _ () =
 
 
 
-let init ()= Learnocaml_local_storage.(store (index_state "index")) {Learnocaml_exercise_state.exos=StringMap.empty;mtime=gettimeofday ()};; 
+let init ()= Learnocaml_local_storage.(store (index_state "index")) {Learnocaml_exercise_state.exos=StringMap.empty; mtime=gettimeofday ()};; 
 
 let delete_button_handler exercise_id =
   (fun _ ->
@@ -142,159 +142,153 @@ let delete_button_handler exercise_id =
 
 let rec editor_tab _ _ () =
   Learnocaml_local_storage.init ();
-  let pct_init=None in
+  let pct_init = None in
     let pct_signal, pct_signal_set = React.S.create pct_init in
               Learnocaml_local_storage.(listener (index_state "index")) :=
                 Some (fun _-> pct_signal_set None) ;
-       
   let ()=
-  match Learnocaml_local_storage.(retrieve (index_state "index")) with
-  |exception Not_found -> init ()
-  |_->() 
+    match Learnocaml_local_storage.(retrieve (index_state "index")) with
+    |exception Not_found -> init ()
+    |_->() 
   in
-  
     Server_caller.fetch_editor_index () >>= fun index ->  
-  show_loading ~id:"learnocaml-main-loading"
-    Tyxml_js.Html5.[ ul [ li [ pcdata [%i"Loading editor"] ] ] ] ;
-
-  Lwt_js.sleep 0.5 >>= fun () ->
-  let content_div = find_component "learnocaml-main-content" in
-  let format_exercise_list all_exercise_states =
-    let rec format_contents lvl acc contents =
-      let open Tyxml_js.Html5 in
-      match contents with
-      | Learnocaml_exercises exercises ->
-          StringMap.fold
-            (fun exercise_id { exercise_kind ;
-                               exercise_title ;
-                               exercise_short_description ;
-                               exercise_stars } acc ->
+    show_loading ~id:"learnocaml-main-loading"
+      Tyxml_js.Html5.[ ul [ li [ pcdata [%i"Loading editor"]]]] ;
+    Lwt_js.sleep 0.5 >>= fun () ->
+    let content_div = find_component "learnocaml-main-content" in
+    let format_exercise_list all_exercise_states =
+      let rec format_contents lvl acc contents =
+        let open Tyxml_js.Html5 in
+        match contents with
+        | Learnocaml_exercises exercises ->
+           StringMap.fold
+             (fun exercise_id { exercise_kind ;
+                                exercise_title ;
+                                exercise_short_description ;
+                                exercise_stars } acc ->
               let pct_init =None in
-                let pct_signal, pct_signal_set = React.S.create pct_init in
+              let pct_signal, pct_signal_set = React.S.create pct_init in
               Learnocaml_local_storage.(listener (editor_state exercise_id)) :=
                 Some (fun _-> pct_signal_set None) ;
               let status_classes_signal =
                 React.S.map
                   (function
-                    | None -> [ "stats" ]
-                    | Some 0 -> [ "stats" ; "failure" ]
-                    | Some pct when  pct >= 100 -> [ "stats" ; "success" ]
-                    | Some _ -> [ "stats" ; "partial" ])
+                   | None -> [ "stats" ]
+                   | Some 0 -> [ "stats" ; "failure" ]
+                   | Some pct when pct >= 100 -> [ "stats" ; "success" ]
+                   | Some _ -> [ "stats" ; "partial" ])
                   pct_signal in
               div ~a:[a_id ("toolbar"); a_class ["button"]] [
-              (div ~a:[a_id ("button_delete")] [
-                  let button =button ~a:[a_id exercise_id]  [img ~src:("icons/icon_cleanup_dark.svg") ~alt:"" () ; pcdata "" ]in 
-                   Manip.Ev.onclick button
-                (delete_button_handler exercise_id) ;button
-              ] );
-                (div ~a:[a_id ("button_download")] [
-                  let button =button ~a:[a_id exercise_id]  [img ~src:("icons/icon_download_dark.svg") ~alt:"" () ; pcdata "" ] in 
-                   Manip.Ev.onclick button
-                   (fun _ ->
-                     let name = exercise_id ^ ".json" in
-                     let content =Learnocaml_local_storage.(retrieve (editor_state exercise_id)) in  
-                     let json =
+                  (div ~a:[a_id ("button_delete")] [
+                       let button =button ~a:[a_id exercise_id]  [img ~src:("icons/icon_cleanup_dark.svg") ~alt:"" () ; pcdata "" ]in 
+                       Manip.Ev.onclick button
+                         (delete_button_handler exercise_id) ;button
+                  ] );
+                  (div ~a:[a_id ("button_download")] [
+                       let button =button ~a:[a_id exercise_id]
+                          [img ~src:("icons/icon_download_dark.svg") ~alt:"" () ; pcdata "" ] in 
+                       Manip.Ev.onclick button
+                         (fun _ ->
+                           let name = exercise_id ^ ".json" in
+                           let content =Learnocaml_local_storage.(retrieve (editor_state exercise_id)) in  
+                           let json =
                        Json_repr_browser.Json_encoding.construct
                          Learnocaml_exercise_state.editor_state_enc
                          content in
-                     let contents =
-                       (Js._JSON##stringify (json)) in
-                     Learnocaml_common.fake_download ~name ~contents;
-                     true) ;button
+                           let contents =
+                             (Js._JSON##stringify (json)) in
+                           Learnocaml_common.fake_download ~name ~contents;
+                           true) ;button
                 ] )] ::
-              a ~a:[ a_href ("editor.html#id="^exercise_id^"&action=open") ; 
+                a ~a:[ a_href ("editor.html#id="^exercise_id^"&action=open") ; 
                      a_class [ "exercise" ] ] [
-                  div ~a:[ a_class [ "descr" ] ] [
-                  h1 [ pcdata exercise_title ] ;
-                  p [ match exercise_short_description with
-                      | None -> pcdata [%i"No description available."]
-                      | Some text -> pcdata text ] ;
-
-                    ] ;       
-
-                div ~a:[ Tyxml_js.R.Html5.a_class status_classes_signal ] [
-                  div ~a:[ a_class [ "stars" ] ] [
-                    let num = 5 * int_of_float (exercise_stars *. 2.) in
-                    let num = max (min num 40) 0 in
-                    let alt = Format.asprintf "difficulty: %d / 40" num in
-                    let src = Format.asprintf "icons/stars_%02d.svg" num in
-                    img ~alt ~src ()
-                  ] ;
-                  div ~a:[ a_class [ "length" ] ] [
-                    match exercise_kind with
-                    | Project -> pcdata "editor project"
-                    | Problem -> pcdata "editor problem"
-                    | Learnocaml_exercise -> pcdata "editor exercise" ] ;
-
-                ]; 
-
-              ] ::
-              acc)
-            exercises acc
-      | Groups groups ->
-          let h = match lvl with 1 -> h1 | 2 -> h2 | _ -> h3 in
-          StringMap.fold
-            (fun _ { group_title ; group_contents } acc ->
+                    div ~a:[ a_class [ "descr" ] ] [
+                        h1 [ pcdata exercise_title ] ;
+                        p [ match exercise_short_description with
+                            | None -> pcdata [%i"No description available."]
+                            | Some text -> pcdata text ] ;
+                      ] ;       
+                    div ~a:[ Tyxml_js.R.Html5.a_class status_classes_signal ] [
+                        div ~a:[ a_class [ "stars" ] ] [
+                            let num = 5 * int_of_float (exercise_stars *. 2.) in
+                            let num = max (min num 40) 0 in
+                            let alt = Format.asprintf "difficulty: %d / 40" num in
+                            let src = Format.asprintf "icons/stars_%02d.svg" num in
+                            img ~alt ~src ()
+                          ] ;
+                        div ~a:[ a_class [ "length" ] ] [
+                            match exercise_kind with
+                            | Project -> pcdata "editor project"
+                            | Problem -> pcdata "editor problem"
+                            | Learnocaml_exercise -> pcdata "editor exercise" ] ;
+                      ]; 
+                  ] ::
+                  acc)
+             exercises acc
+        | Groups groups ->
+           let h = match lvl with 1 -> h1 | 2 -> h2 | _ -> h3 in
+           StringMap.fold
+             (fun _ { group_title ; group_contents } acc ->
                format_contents (succ lvl)
                  (h ~a:[ a_class [ "pack" ] ] [ pcdata group_title ] :: acc)
                  group_contents)
-            groups acc in
-    let open Tyxml_js.Html5 in
-    let restore_bar = a ~a:[ a_onclick (fun _ ->
-        let _ =begin
-            Learnocaml_common.fake_upload () >>= fun (_, contents) ->
-          let open Learnocaml_exercise_state in
-          let save_file =
-            Json_repr_browser.Json_encoding.destruct
-              Learnocaml_exercise_state.editor_state_enc 
-              (Js._JSON##(parse contents)) in
-          
-          let messages = Tyxml_js.Html5.ul [] in
-          if idUnique save_file.metadata.id && titleUnique save_file.metadata.titre then
-            (Learnocaml_local_storage.(store (editor_state save_file.metadata.id ) save_file);store_in_index save_file.metadata
-            ;Dom_html.window##.location##reload;Lwt.return_unit)
-          else
-            begin
-              let aborted, abort_message =
-                let t, u = Lwt.task () in
-                let btn_ok = Tyxml_js.Html5.(button [ pcdata [%i"OK"] ]) in
-                Manip.Ev.onclick btn_ok ( fun _ ->
-                    hide_loading ~id:"learnocaml-main-loading" () ; true) ;
+             groups acc in
+      let open Tyxml_js.Html5 in
+      let restore_bar = a ~a:[ a_onclick (fun _ ->
+         let _ = begin
+             Learnocaml_common.fake_upload () >>= fun (_, contents) ->
+             let open Learnocaml_exercise_state in
+             let save_file =
+               Json_repr_browser.Json_encoding.destruct
+                 Learnocaml_exercise_state.editor_state_enc 
+                 (Js._JSON##(parse contents)) in
+             let messages = Tyxml_js.Html5.ul [] in
+             if idUnique save_file.metadata.id && titleUnique save_file.metadata.titre then
+               (Learnocaml_local_storage.(store (editor_state save_file.metadata.id ) save_file);
+                store_in_index save_file.metadata;
+                Dom_html.window##.location##reload;
+                Lwt.return_unit)
+             else
+               begin
+                 let aborted, abort_message =
+                   let t, u = Lwt.task () in
+                   let btn_ok = Tyxml_js.Html5.(button [ pcdata [%i"OK"] ]) in
+                   Manip.Ev.onclick btn_ok ( fun _ ->
+                                             hide_loading ~id:"learnocaml-main-loading" () ; true) ;
                 
-                let div =
-                  Tyxml_js.Html5.(div ~a: [ a_class [ "dialog" ] ]
-                                    [ pcdata [%i"Identifier and/or title not unique\n"] ;
-                                      btn_ok 
-                                    ]) in
-                Manip.SetCss.opacity div (Some "0") ;
-                t, div in
-              Manip.replaceChildren messages
-                Tyxml_js.Html5.[ li [ pcdata "" ] ] ;
-              show_loading ~id:"learnocaml-main-loading" [ abort_message ] ;
-              Manip.SetCss.opacity abort_message (Some "1");
-              Lwt.return_unit
-            end;
-           Lwt.return ();
-        end in () ;
-true) ; a_class [ "exercise"] ]
-[
-      div ~a:[ a_class [ "descr" ] ] [
-        h1 [ pcdata [%i"Import an exercise"] ];
-        p [pcdata [%i"Import a new exercise from a json file"]];];
-    ]
-in
-    List.rev (format_contents 1 [a ~a:[ a_href ("new_exercise.html#&action=open") ; 
-        a_class [ "exercise" ] ] [
-      div ~a:[ a_class [ "descr" ] ] [
-        h1 [ pcdata [%i"New exercise"] ];
-        p [pcdata [%i"Create a new exercise"]];];
-      ];restore_bar] index) in
-  let list_div =
-    Tyxml_js.Html5.(div ~a: [ Tyxml_js.Html5.a_id "learnocaml-main-exercise-list" ])
-      (format_exercise_list Learnocaml_local_storage.(retrieve all_exercise_states)) in
-  Manip.appendChild content_div list_div ;
-  hide_loading ~id:"learnocaml-main-loading" () ;
-  Lwt.return list_div
+                   let div =
+                     Tyxml_js.Html5.(div ~a: [ a_class [ "dialog" ] ]
+                                       [ pcdata [%i"Identifier and/or title not unique\n"] ;
+                                         btn_ok 
+                     ]) in
+                   Manip.SetCss.opacity div (Some "0") ;
+                   t, div in
+                 Manip.replaceChildren messages
+                   Tyxml_js.Html5.[ li [ pcdata "" ] ] ;
+                 show_loading ~id:"learnocaml-main-loading" [ abort_message ] ;
+                 Manip.SetCss.opacity abort_message (Some "1");
+                 Lwt.return_unit
+               end;
+             Lwt.return ();
+           end
+         in ();
+            true); a_class [ "exercise"] ]
+                     [ div ~a:[ a_class [ "descr" ] ] [
+                           h1 [ pcdata [%i"Import an exercise"] ];
+                           p [pcdata [%i"Import a new exercise from a json file"]]]]
+      in
+      List.rev (format_contents 1 [a ~a:[ a_href ("new_exercise.html#&action=open"); 
+                                          a_class [ "exercise" ] ] [
+                                       div ~a:[ a_class [ "descr" ] ] [
+                                           h1 [ pcdata [%i"New exercise"] ];
+                                           p [pcdata [%i"Create a new exercise"]]]];
+                                   restore_bar] index) in
+    let list_div =
+      Tyxml_js.Html5.(div ~a: [ Tyxml_js.Html5.a_id "learnocaml-main-exercise-list" ])
+        (format_exercise_list Learnocaml_local_storage.(retrieve all_exercise_states)) in
+    Manip.appendChild content_div list_div ;
+    hide_loading ~id:"learnocaml-main-loading" () ;
+    Lwt.return list_div
 ;;
 
 let lessons_tab select (arg, set_arg, delete_arg) () =

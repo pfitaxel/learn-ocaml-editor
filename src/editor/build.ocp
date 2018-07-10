@@ -14,6 +14,7 @@ begin program "new_exercise"
     "ocplib_i18n"
     "ocplib-json-typed.browser"
     "translate"
+    "editor_lib"
   ]
   files = [
     "new_exercise.ml" ( comp = [ ppx_js ppx_ocplib_i18n]  )

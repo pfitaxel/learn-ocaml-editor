@@ -3,13 +3,15 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1">
-    <title>Learn OCaml by OCamlPro - Exercise</title>
+    <title>Learn OCaml by OCamlPro - Editor</title>
         <link rel="icon" type="image/x-icon" href="icons/favicon.ico" />
     <!--[if IE]><link rel="shortcut icon" type="image/x-icon" href="icons/favicon.ico"     /><![endif]-->﻿
     <link rel="stylesheet" href="css/learnocaml_common.css">
-    <link rel="stylesheet" href="css/learnocaml_exercise.css">
+    <link rel="stylesheet" href="css/learnocaml_editor.css">
     <link rel="stylesheet" href="css/learnocaml_report.css">
     <link rel="stylesheet" href="css/learnocaml_tryocaml.css">
+    <link rel="stylesheet" href="css/learnocaml_main.css">
+
     <script src="js/ace/ace.js" type="text/javascript" charset="utf-8" defer></script>
     <!-- var editor = ace.edit("learnocaml-exo-editor-pane"); -->
     <!-- editor.setOptions({ fontFamily: 'Inconsolata', fontSize: "18px" }); -->
@@ -28,6 +30,7 @@
          Set to .loaded when initial loading finished.
          Set to .loading while loading, then to .loaded. -->
     <div id="learnocaml-exo-loading" class="loading-layer initial">
+      
       <div id="chamo"><img id="chamo-img" src="icons/tryocaml_loading_5.gif"></div>
       <div class="messages"><ul><li id="txt_preparing">Preparing the environment</li></ul></div>
     </div>
@@ -78,8 +81,11 @@
       <button id="learnocaml-exo-button-question"
       title="Type here the wording of the exercise in Markdown">Question</button>
 
+      <button id="learnocaml-exo-button-testhaut" class="front-tab"
+      title="Generate here the tests code">Test</button>
+
       <button id="learnocaml-exo-button-test" class="front-tab"
-      title="Type here the tests sets code">Test.ml</button>
+      title="Type here the tests code">Test.ml</button>
 
       <button id="learnocaml-exo-button-report">Report</button>
 
@@ -143,10 +149,11 @@
              style="position: absolute; top: 50%; left: 50%;
                     margin: -100px 0 0 -100px; width: 200px;
                     opacity: 0.2">
-        <span style="position: absolute; top: 50%; margin: -12px 0 0 0;
-                     line-height: 24px; font-size: 24px; text-shadow: 0 0 5px #888;
-                     width: 100%; text-align: center;">
-          Click the Grade! button to test your solution
+        <span id="txt_grade_report"
+          style="position: absolute; top: 50%; margin: -12px 0 0 0;
+                 line-height: 24px; font-size: 24px; text-shadow: 0 0 5px #888;
+                 width: 100%; text-align: center;">
+          <!--Click the Grade! button to test your solution-->
         </span>
       </div>
 
@@ -170,12 +177,16 @@
         <div id="learnocaml-exo-question-html" class="questions-html"></div>
       </div>
 
+      <div id="learnocaml-exo-tab-testhaut">
+        <div id="learnocaml-exo-testhaut-edit" class="testhaut-edit"></div>
+        <div id="learnocaml-exo-testhaut-pane" class="testhaut-pane"></div>
+        <div id="learnocaml-exo-testhaut-toolbar" class="buttons"></div>
+      </div>      
+
       <div id="learnocaml-exo-tab-test">
-        <div id="learnocaml-exo-test-pane" class="test-pane">Editor</div>
+        <div id="learnocaml-exo-test-pane" class="test-pane"></div>
         <div id="learnocaml-exo-test-toolbar" class="buttons"></div>
       </div>
-      
-      
 
       <!-- Any tab can be added. -->
     </div>

@@ -81,6 +81,8 @@ module type S = sig
     | Ok of 'a
     | Error of exn
 
+  val typed_printer : 'a Ty.ty -> Format.formatter -> 'a -> unit
+
   val exec : (unit -> 'a) -> ('a * string * string) result
   val result : (unit -> 'a) -> 'a result
 
@@ -281,6 +283,15 @@ module type S = sig
     'a Ty.ty ->
     (('ar -> 'row) Ty.ty, 'ar -> 'urow, 'ret) prot ->
     (('a -> 'ar -> 'row) Ty.ty, ('a -> 'ar -> 'urow), 'ret) prot
+
+  val ty_of_prot :
+    (('p -> 'a) Ty.ty, 'p -> 'c, 'r) prot -> ('p -> 'a) Ty.ty
+  val to_ty : string ->'a Ty.ty
+  val get_ret_ty :
+    ('p -> 'a) Ty.ty -> ('p -> 'a, 'p -> 'c, 'r) args -> 'r Ty.ty       
+  val print :
+    (('p -> 'a) Ty.ty, 'p -> 'c, 'r) prot ->
+    Format.formatter -> ('p -> 'a, 'p -> 'c, 'r) args -> unit
 
   type 'a lookup = unit -> [ `Found of string * Learnocaml_report.report * 'a | `Unbound of string * Learnocaml_report.report ]
 
@@ -1106,6 +1117,8 @@ let run_timeout ~time v =
     | Last_ty (a, b) -> Ty.curry a b
     | Arg_ty (x, Last_ty (l, r)) -> Ty.curry x (Ty.curry l r)
     | Arg_ty (x, Arg_ty (y, r)) -> Ty.curry x (ty_of_prot (Arg_ty (y, r)))
+
+      let to_ty str=    (Ty.repr (Parse.core_type (Lexing.from_string str)));;
 
   let rec apply : type p a c r. (p -> a) -> (p -> a, p -> c, r) args -> r = fun f x ->
     match x with

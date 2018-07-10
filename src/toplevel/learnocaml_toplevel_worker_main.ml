@@ -257,9 +257,13 @@ let () =
         Lwt.return_unit
   in
   let path = "/worker_cmis" in
+  let root =
+    OCamlRes.Res.merge
+      Embedded_cmis.root
+      Embedded_grading_cmis.root in
   Sys_js.mount ~path
-    (fun ~prefix ~path ->
-       match OCamlRes.Res.find (OCamlRes.Path.of_string path) Embedded_cmis.root with
+    (fun ~prefix ~path -> 
+       match OCamlRes.Res.find (OCamlRes.Path.of_string path) root with
        | cmi ->
            Js.Unsafe.set cmi (Js.string "t") 9 ; (* XXX hack *)
            Some cmi

@@ -81,6 +81,7 @@ begin library "editor_lib"
     "js_of_ocaml.ppx"
     "learnocaml-app-common"
     "translate"
+    "omd"
     ]
 
 end

@@ -2,6 +2,7 @@ open Learnocaml_exercise_state
 module StringMap = Map.Make(String)
 open Learnocaml_common
 
+
 let () = Translate.set_lang ()
 
 
@@ -109,6 +110,55 @@ let find_div id =
                                          (fun ()-> raise Not_found)
                                          (fun node->node) )
 ;;
+
+
+let remove_exo exercise_id =
+  let exos=
+    Learnocaml_local_storage.(retrieve (index_state "index")).exos
+  in
+  let exos = StringMap.remove exercise_id exos in
+  let index = {Learnocaml_exercise_state.exos; mtime = gettimeofday ()} in
+  Learnocaml_local_storage.(store (index_state "index")) index;
+  Learnocaml_local_storage.(delete (editor_state exercise_id));
+;;
+let titleUnique titre =
+  let exos=
+    match Learnocaml_local_storage.(retrieve (index_state "index")) with
+    |{Learnocaml_exercise_state.exos ;mtime}-> exos
+  in
+  let open Learnocaml_index in
+  match StringMap.find_first_opt (fun key->(StringMap.find key exos).exercise_title=titre) exos with
+    None->true
+  | _ -> false      
+;;
+
+let idUnique id =
+  match Learnocaml_local_storage.(retrieve (editor_state id)) with
+  | exception Not_found -> true
+  | _ -> false
+;;
+
+let store_in_index metadata =
+  let exercise_title = metadata.titre in
+  let exercise_stars = metadata.diff in
+  let open Learnocaml_index in
+  let exercise_kind = Learnocaml_exercise in
+  let exercise_short_description = Some metadata.description in
+  let exo = {exercise_kind; exercise_stars; exercise_title; exercise_short_description} in
+  match Learnocaml_local_storage.(retrieve (index_state "index")) with
+  | {Learnocaml_exercise_state.exos; mtime} ->
+      let former_exos =  exos in
+      let exos = StringMap.add metadata.id exo former_exos in
+      let index = {Learnocaml_exercise_state.exos; mtime = gettimeofday ()} in
+      Learnocaml_local_storage.(store (index_state "index")) index;
+;;
+
+
+let setInnerHtml elt s =    
+  elt##.innerHTML := Js.string s
+
+
+
 let hide_load id =
   let elt_lml=match find_div id with
       exception Not_found ->
@@ -357,6 +407,7 @@ let rec concatenation listech = match listech with
   |[]->""
   |c::l -> (string_of_char c)^(concatenation l);;
 
+
 let rec get_equal listeChar = match listeChar with
   |[]->[]
   |'='::l -> []
@@ -417,7 +468,7 @@ let maj_mono val_next_mono = match val_next_mono with
   |'s'::'t'::'r'::'i'::'n'::'g'::[] -> 'i'::'n'::'t'::[]
   |_ -> failwith "erreur type monomorphe" 
                                                        
-(*met à jour la liste des couples puis revoie cette liste et le type monomorphe qui doit être utiliser*)                                                       
+(*met à jour la liste des couples puis renvoie cette liste et le type monomorphe qui doit être utilisé*)                                                       
 let rec get_association listeCouple elt listeCouple2 val_next_mono = match listeCouple with
   |[]->((elt,maj_mono val_next_mono)::listeCouple2,maj_mono val_next_mono,true)
   |(poly,mono) :: tail -> if (poly = elt) then (listeCouple2,mono,false) else (get_association tail elt listeCouple2 val_next_mono) 
@@ -566,7 +617,7 @@ let typecheck set_class ace editor top =
   let exo7 =set test (get_testml proper_id) exo6 in
   let exo8 =set template (get_template proper_id) exo7 in
   set descr question exo8
-  ;;
+ ;;
 
 let wait milli =
   let sec = milli /. 1000. in

@@ -338,7 +338,7 @@ let _ =
   Manip.SetCss.top syntax_div  "10%" ;
   Manip.SetCss.bottom syntax_div "0%";
   Manip.SetCss.background syntax_div "white";
-  Manip.SetCss.zIndex syntax_div "998";
+  Manip.SetCss.zIndex syntax_div "995";
   Manip.SetCss.position syntax_div "absolute";;
 
 let content = "<h1 id=\"Syntax-examples\">" ^ [%i"Syntax examples"] ^
@@ -365,8 +365,9 @@ let content = "<h1 id=\"Syntax-examples\">" ^ [%i"Syntax examples"] ^
 Manip.setInnerHtml syntax_div content;;
 open Tyxml_js.Html5
 let button = button ~a:[a_id "ok";
-                        a_onclick (fun _ -> Manip.SetCss.opacity syntax_div (Some "0"); true)]
-    [ pcdata [%i"OK"] ];;
-Manip.appendChildFirst syntax_div button;;
-syntax##.onclick:= handler (fun _ ->  Manip.SetCss.opacity syntax_div (Some "1") ;Js._true );;
-Manip.appendChildFirst (Tyxml_js.Of_dom.of_body doc_body) syntax_div;;
+a_onclick (fun _ -> Manip.SetCss.opacity syntax_div (Some "0");
+	Manip.SetCss.zIndex syntax_div "995"; true)] [ pcdata [%i"OK"] ];;
+Manip.appendChildFirst syntax_div button ;;
+syntax##.onclick:= handler (fun _ -> Manip.SetCss.opacity syntax_div (Some "1");
+	Manip.SetCss.zIndex syntax_div "998"; Js._true);;
+Manip.appendChildFirst (Tyxml_js.Of_dom.of_body doc_body) syntax_div 

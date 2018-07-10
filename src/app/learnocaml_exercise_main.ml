@@ -99,22 +99,7 @@ let display_report exo report =
   Manip.setInnerHtml report_container
     (Format.asprintf "%a" Learnocaml_report.(output_html_of_report ~bare: true) report) ;
   grade
-             
-             
-let set_string_translations () =
-  let translations = [
-    "txt_preparing", [%i"Preparing the environment"];
-    "learnocaml-exo-button-editor", [%i"Editor"];
-    "learnocaml-exo-button-toplevel", [%i"Toplevel"];
-    "learnocaml-exo-button-report", [%i"Report"];
-    "learnocaml-exo-button-text", [%i"Exercise"];
-    "learnocaml-exo-editor-pane", [%i"Editor"];
-    "txt_grade_report", [%i"Click the Grade! button to get your report"];
-  ] in
-  List.iter
-    (fun (id, text) ->
-       Manip.setInnerHtml (find_component id) text)
-    translations
+
 
 let () =
   Lwt.async_exception_hook := begin function
@@ -124,7 +109,15 @@ let () =
   end ;
   (match Js_utils.get_lang() with Some l -> Ocplib_i18n.set_lang l | None -> ());
   Lwt.async @@ fun () ->
-  set_string_translations ();
+  let translations = [
+    "txt_preparing", [%i"Preparing the environment"];
+    "learnocaml-exo-button-editor", [%i"Editor"];
+    "learnocaml-exo-button-toplevel", [%i"Toplevel"];
+    "learnocaml-exo-button-report", [%i"Report"];
+    "learnocaml-exo-button-text", [%i"Exercise"];
+    "learnocaml-exo-editor-pane", [%i"Editor"];
+    "txt_grade_report", [%i"Click the Grade! button to get your report"];
+  ] in Translate.set_string_translations translations;
   Learnocaml_local_storage.init () ;
   (* ---- launch everything --------------------------------------------- *)
   let toplevel_buttons_group = button_group () in

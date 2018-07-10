@@ -13,7 +13,7 @@ begin program "new_exercise"
     "js_of_ocaml.ppx"
     "ocplib_i18n"
     "ocplib-json-typed.browser"
-
+    "translate"
   ]
   files = [
     "new_exercise.ml" ( comp = [ ppx_js ppx_ocplib_i18n]  )
@@ -48,7 +48,8 @@ begin program "testhaut"
     "js_of_ocaml.ppx"
     "ocplib_i18n"
     "ocplib-json-typed.browser"
-	"editor_lib"
+    "editor_lib"
+    "translate"
   ]
   files = [
     "testhaut.ml" ( comp = [ ppx_js ppx_ocplib_i18n]  )
@@ -78,7 +79,8 @@ begin library "editor_lib"
     "learnocaml-repository" 
     "ocplib_i18n"
     "js_of_ocaml.ppx"
-    "learnocaml-app-common"    
+    "learnocaml-app-common"
+    "translate"
     ]
 
 end
@@ -98,6 +100,7 @@ begin library "test-spec"
     "testing"
     "ocplib_i18n"
     "editor_lib"
+    "translate"
   ]
   files = [
     "test_spec.ml" ( comp += [ ppx_js "-ppx" %asm_exe( p = "ppx_metaquot") ppx_ocplib_i18n ] )
@@ -121,6 +124,7 @@ begin program "editor"
     "omd"
     "editor_lib"
     "test-spec"
+    "translate"
  ]
   files = [
     "editor.ml" ( comp = [ ppx_js ppx_ocplib_i18n]  )

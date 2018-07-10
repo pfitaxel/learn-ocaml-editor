@@ -1,16 +1,8 @@
 open Learnocaml_exercise_state
-module StringMap=Map.Make(String)
+module StringMap = Map.Make(String)
 open Learnocaml_common
 
-let set_lang () =
-	match Js.Optdef.to_option (Dom_html.window##.navigator##.language) with
-	| Some l -> Ocplib_i18n.set_lang (Js.to_string l)
-	| None ->
-		match Js.Optdef.to_option (Dom_html.window##.navigator##.userLanguage) with
-		| Some l -> Ocplib_i18n.set_lang (Js.to_string l)
-		| None -> ()
-
-let () = set_lang ()
+let () = Translate.set_lang ()
 
 
 let get_titre id = Learnocaml_local_storage.(retrieve (editor_state id)).metadata.titre
@@ -62,13 +54,11 @@ let get_input id idQuestion=
     TestAgainstSol a ->a.suite
   | TestAgainstSpec a -> a.suite
   |TestSuite a -> a.suite
-                    
-                                                                    
+                                                                                       
 let get_spec id idQuestion=  let test_list = get_test_liste id in
   match StringMap.(find idQuestion test_list) with  
    TestAgainstSpec a -> a.spec
   |_ -> failwith ""
-
 
 let get_buffer id = Learnocaml_local_storage.(retrieve (editor_state id)).incipit
 
@@ -95,14 +85,14 @@ let save_testhaut testhaut id =
 
 
 let fetch_test_index id=
-    let index= get_testhaut id   
+  let index= get_testhaut id   
   in
   let open Learnocaml_exercise_state in
   let open Learnocaml_index in
   let json =
     Json_repr_browser.Json_encoding.construct
-     testhaut_enc index
-    in
+      testhaut_enc index
+  in
   try Lwt.return (Json_repr_browser.Json_encoding.destruct testhaut_enc json) with exn ->
     Lwt.fail (failwith "" )
 let testhaut_iframe = Dom_html.createIframe Dom_html.document ;;
@@ -112,22 +102,22 @@ open Js_utils
 let find_div id =
   match Manip.by_id id with
     Some div -> div
-  |None ->let window=Dom_html.window in
-      let window=window##.parent in
-      let document=window##.document in
-      Tyxml_js.Of_dom.of_element (Js.Opt.case (document##getElementById (Js.string id))
-       (fun ()-> raise Not_found)
-         (fun node->node) )
+   |None ->let window=Dom_html.window in
+           let window=window##.parent in
+           let document=window##.document in
+           Tyxml_js.Of_dom.of_element (Js.Opt.case (document##getElementById (Js.string id))
+                                         (fun ()-> raise Not_found)
+                                         (fun node->node) )
 ;;
 let hide_load id =
   let elt_lml=match find_div id with
-    exception Not_found ->
-      let div = Tyxml_js.Html.(div ~a:[ a_id id ]) [] in
-      let window=Dom_html.window in
-      let window=window##.parent in
-      let document=window##.document in
-      Manip.(appendChild (Tyxml_js.Of_dom.of_body document##.body) ) div;
-      div
+      exception Not_found ->
+       let div = Tyxml_js.Html.(div ~a:[ a_id id ]) [] in
+       let window=Dom_html.window in
+       let window=window##.parent in
+       let document=window##.document in
+       Manip.(appendChild (Tyxml_js.Of_dom.of_body document##.body) ) div;
+       div
     | div ->div
   in
   Manip.(removeClass elt_lml "initial") ;
@@ -163,7 +153,6 @@ let _= Manip.SetCss.opacity iframe_tyxml (Some "1");;
 let recovering_callback = ref (fun ()->())
 
 let checkbox_handler = (fun _ -> !recovering_callback () ;true);;
-
 
 let checkbox_creator string cas id =
   let  open Tyxml_js.Html5 in
@@ -431,12 +420,12 @@ let rec concatenation listech = match listech with
   |c::l -> (string_of_char c)^(concatenation l);;
 
 
-let rec supprRec listeChar = match listeChar with
+(*let rec supprRec listeChar = match listeChar with
   |[]->[]
   |' '::'r'::'e'::'c'::' '::l->' '::supprRec l
   |'\n'::'r'::'e'::'c'::' '::l->' '::supprRec l
   |c::s -> c::supprRec s ;;
-
+ 
 let rec trouver_egal listeChar = match listeChar with
   |[]->[]
   |'='::l -> ['=']
@@ -487,7 +476,7 @@ let rec genQuestions listeDeListeChar res = match listeDeListeChar with
 
 let rec gen_ty nbArgs =  match nbArgs with
   |0 -> "..."
-  |_ -> "... -> "^(gen_ty (nbArgs-1)) ;;
+  |_ -> "... -> "^(gen_ty (nbArgs-1)) ;;*)
 
 (*_________________Deuxième version pour Generate_____________________________*)
 (*on  récupère des "val f : int -> int -> int = <fun>"*)
@@ -556,14 +545,24 @@ let rec get_association listeCouple elt listeCouple2 val_next_mono = match liste
   |[]->((elt,maj_mono val_next_mono)::listeCouple2,maj_mono val_next_mono,true)
   |(poly,mono) :: tail -> if (poly = elt) then (listeCouple2,mono,false) else (get_association tail elt listeCouple2 val_next_mono)
 
-                                                                          
+let getC listeChar =
+  let rec before listeChar = match listeChar with
+  | [] -> []
+  | ' '::suite -> []
+  | ch::suite -> ch:: (before suite)
+  and after listeChar = match listeChar with
+    | [] -> []
+    | ' '::suite -> suite
+    | ch::suite -> after suite in
+  (before listeChar, after listeChar);;
 (*remplace les 'a,'b,... par int||char||...*)                                                                          
-let rec polymorph_detector_aux listeType listeCouple val_next_mono= match listeType with
+let rec polymorph_detector_aux listeType listeCouple val_next_mono = match listeType with
   |[]->[]
-  |'\''::ch::tail ->let v = (get_association listeCouple ch listeCouple val_next_mono) in
-                    if (third v)
-                    then (second v)@( polymorph_detector_aux tail (first v) (second v))
-                    else (second v)@( polymorph_detector_aux tail (first v) (val_next_mono))
+  | '\''::suite -> let ch,tail = getC suite in
+                   let v =(get_association listeCouple ch listeCouple val_next_mono) in
+                   if (third v)
+                   then (second v)@( polymorph_detector_aux tail (first v) (second v))
+                   else (second v)@( polymorph_detector_aux tail (first v) (val_next_mono))
   |ch::tail -> ch::(polymorph_detector_aux tail listeCouple val_next_mono)
 
 

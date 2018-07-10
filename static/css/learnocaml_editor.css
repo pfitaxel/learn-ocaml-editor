@@ -89,6 +89,9 @@ body {
   color: #eee;
   text-align: center;
 }
+#learnocaml-exo-toolbar > .special_grade{
+	background:#aaa;
+}
 #learnocaml-exo-toolbar::before {
   z-index: 1004;
   position: absolute;

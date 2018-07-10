@@ -167,13 +167,10 @@ let init_tabs, select_tab =
   let current = ref "question" in
   let select_tab name =
     set_arg "tab" name ;
-   
     if (name = "testhaut") then
       !grade_red ()
-
     else
       !grade_black ();
-
     Manip.removeClass
       (find_component ("learnocaml-exo-button-" ^ !current))
       "front-tab" ;
@@ -196,7 +193,7 @@ let init_tabs, select_tab =
         let requested = arg "tab" in
         if List.mem requested names then requested else "question"
       with Not_found -> "question"
-    end ;
+               end ;
     List.iter
       (fun name ->
          Manip.removeClass
@@ -426,38 +423,7 @@ let () =
   in
   Ace.set_contents ace_temp contents ;
   Ace.set_font_size ace_temp 18;
-
   
-  let typecheck set_class =
-    Learnocaml_toplevel.check top (Ace.get_contents ace_temp) >>= fun res ->
-    let error, warnings =
-      match res with
-      | Toploop_results.Ok ((), warnings) -> None, warnings
-      | Toploop_results.Error (err, warnings) -> Some err, warnings in
-    let transl_loc { Toploop_results.loc_start ; loc_end } =
-      { Ocaml_mode.loc_start ; loc_end } in
-    let error = match error with
-      | None -> None
-      | Some { Toploop_results.locs ; msg ; if_highlight } ->
-          Some { Ocaml_mode.locs = List.map transl_loc locs ;
-                 msg = (if if_highlight <> "" then if_highlight else msg) } in
-    let warnings =
-      List.map
-        (fun { Toploop_results.locs ; msg ; if_highlight } ->
-           { Ocaml_mode.loc = transl_loc (List.hd locs) ;
-             msg = (if if_highlight <> "" then if_highlight else msg) })
-        warnings in
-    Ocaml_mode.report_error ~set_class editor_temp error warnings  >>= fun () ->
-    Ace.focus ace_temp ;
-    Lwt.return () in
-  begin template_button
-      ~group: toplevel_buttons_group
-      ~icon: "typecheck" [%i"Check"] @@ fun () ->
-    typecheck true
-  end ;
-
-
-
   (*-------question pane  -------------------------------------------------*)
   let editor_question = find_component "learnocaml-exo-question-mark" in
   let ace_quest = Ace.create_editor (Tyxml_js.To_dom.of_div editor_question ) in
@@ -634,88 +600,7 @@ let onload () =
   Ace.set_font_size ace 18;
 
 
-
-  (* ---- testhaut pane --------------------------------------------------- *)
-  
-  let editor_testhaut = find_component "learnocaml-exo-testhaut-edit" in
-  let editor_th =Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div editor_testhaut ) in
-  let ace_testhaut = Ocaml_mode.get_editor editor_th in
-  let buffer = match get_buffer id with
-  | buff -> if (buff="")
-            then [%i"(* Incipit: contains local definitions\n\
-            		 that will be reachable when you will create\n\
-        			 a new question *)\n"]
-            else buff in
-  Ace.set_contents ace_testhaut buffer ;
-  Ace.set_font_size ace_testhaut 18;
-
-  let _ = testhaut_init (find_component "learnocaml-exo-testhaut-pane") id in ();
-                                                                          
-  begin testhaut_button
-      ~group: toplevel_buttons_group
-      ~icon: "sync" [%i"Generate"] @@ fun () ->
-    let sol = genTemplate (Ace.get_contents ace) in
-    if (sol<>"") then begin
-        (* let listeChars = supprRec (' '::(decompositionSol sol 0)) in *)
-      (* save_quest (genQuestions (get_fct listeChars []) []) id ; *)
-    disabling_button_group toplevel_buttons_group (fun () -> Learnocaml_toplevel.reset top) >>= fun () ->
-    Learnocaml_toplevel.execute_phrase top (Ace.get_contents ace) >>= fun ok ->
-    if ok then
-    let res_aux = decompositionSol (get_answer top) 0 in
-    (*Avec prise en compte des types polymorphes :*)
-    let res = redondance (polymorph_detector (get_questions (get_all_val (get_only_fct  res_aux []) []) [] )) in
-    (*let rec fct_test liste = match liste with |[]->""|(a,b)::suite->a^b^(fct_test suite) in
-    (Ace.set_contents ace_temp (fct_test res));*)
-    save_questions res id;
-    
-     Manip.removeChildren (find_component "learnocaml-exo-testhaut-pane");
-      (testhaut_init (find_component "learnocaml-exo-testhaut-pane") id)
-    else (select_tab "toplevel" ; Lwt.return ())
-      end
-    else Lwt.return ();
-  end ;                             
-  begin testhaut_button
-      ~group: toplevel_buttons_group
-      ~icon: "typecheck" [%i"Check"] @@ fun () ->
-    Lwt.return ()
-  end ;
-  
-
-  
-  let quality = match getElementById_coerce "quality_box" CoerceTo.input with
-    | None -> failwith "unknown element quality_box"
-    | Some s -> s
-in
-let imperative = match getElementById_coerce "imperative_box" CoerceTo.input with
-  | None -> failwith "unknown element imperative_box"
-  | Some s -> s
-in
-
-
-    
-  let recovering () =
-    let solution = Ace.get_contents ace in
-    let titre = get_titre id  in
-    let incipit= Ace.get_contents ace_testhaut in
-    let question = Ace.get_contents ace_quest in
-    let template = Ace.get_contents ace_temp in
-    let testml = Ace.get_contents ace_t in
-    let testhaut= get_testhaut id in
-    let prepare= Ace.get_contents ace_prep in
-    let prelude =Ace.get_contents ace_prel in 
-    let test ={testml;testhaut} in
-    let  diff = get_diff id in
-    let description=get_description id in
-    let metadata ={id;titre;description;diff} in
-    let checkbox = {imperative= Js.to_bool imperative##.checked ; undesirable=Js.to_bool quality##.checked} in
-    Learnocaml_local_storage.(store (editor_state id))
-      { Learnocaml_exercise_state.metadata ;incipit; solution ; question ; template ;
-         test ; prepare ; prelude;checkbox;
-        mtime = gettimeofday () } in
-recovering_callback:=recovering ;
-
-
-  let messages = Tyxml_js.Html5.ul [] in
+    let messages = Tyxml_js.Html5.ul [] in
   begin template_button
       ~icon: "sync" [%i"Gen. template"] @@ fun () ->
     if (Ace.get_contents ace_temp) = "" then        
@@ -746,6 +631,145 @@ recovering_callback:=recovering ;
       end;
     Lwt.return ()
   end ;
+
+  let typecheck set_class =
+    Learnocaml_toplevel.check top (Ace.get_contents ace_temp) >>= fun res ->
+    let error, warnings =
+      match res with
+      | Toploop_results.Ok ((), warnings) -> None, warnings
+      | Toploop_results.Error (err, warnings) -> Some err, warnings in
+    let transl_loc { Toploop_results.loc_start ; loc_end } =
+      { Ocaml_mode.loc_start ; loc_end } in
+    let error = match error with
+      | None -> None
+      | Some { Toploop_results.locs ; msg ; if_highlight } ->
+          Some { Ocaml_mode.locs = List.map transl_loc locs ;
+                 msg = (if if_highlight <> "" then if_highlight else msg) } in
+    let warnings =
+      List.map
+        (fun { Toploop_results.locs ; msg ; if_highlight } ->
+           { Ocaml_mode.loc = transl_loc (List.hd locs) ;
+             msg = (if if_highlight <> "" then if_highlight else msg) })
+        warnings in
+    Ocaml_mode.report_error ~set_class editor_temp error warnings  >>= fun () ->
+    Ace.focus ace_temp ;
+    Lwt.return () in
+  begin template_button
+      ~group: toplevel_buttons_group
+      ~icon: "typecheck" [%i"Check"] @@ fun () ->
+    typecheck true
+  end ;
+
+  (* ---- testhaut pane --------------------------------------------------- *)
+  
+  let editor_testhaut = find_component "learnocaml-exo-testhaut-edit" in
+  let editor_th =Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div editor_testhaut ) in
+  let ace_testhaut = Ocaml_mode.get_editor editor_th in
+  let buffer = match get_buffer id with
+  | buff -> if (buff="")
+            then [%i"(* Incipit: contains local definitions\n\
+            		 that will be reachable when you will create\n\
+        			 a new question *)\n"]
+            else buff in
+  Ace.set_contents ace_testhaut buffer ;
+  Ace.set_font_size ace_testhaut 18;
+
+  let _ = testhaut_init (find_component "learnocaml-exo-testhaut-pane") id in ();
+                                                                          
+  begin testhaut_button
+      ~group: toplevel_buttons_group
+      ~icon: "sync" [%i"Generate"] @@ fun () ->
+    let sol = genTemplate (Ace.get_contents ace) in
+    if (sol<>"") then begin
+        (* let listeChars = supprRec (' '::(decompositionSol sol 0)) in *)
+      (* save_quest (genQuestions (get_fct listeChars []) []) id ; *)
+    disabling_button_group toplevel_buttons_group (fun () -> Learnocaml_toplevel.reset top) >>= fun () ->
+    Learnocaml_toplevel.execute_phrase top (Ace.get_contents ace) >>= fun ok ->
+    if ok then
+    let res_aux = decompositionSol (get_answer top) 0 in
+    (*Avec prise en compte des types polymorphes :*)
+    let res = redondance (polymorph_detector (get_questions (get_all_val (get_only_fct  res_aux []) []) [] )) in
+    save_questions res id;
+    
+     Manip.removeChildren (find_component "learnocaml-exo-testhaut-pane");
+      (testhaut_init (find_component "learnocaml-exo-testhaut-pane") id)
+    else (select_tab "toplevel" ; Lwt.return ())
+      end
+    else Lwt.return ();
+  end ;                             
+  begin testhaut_button
+      ~group: toplevel_buttons_group
+      ~icon: "typecheck" [%i"Check"] @@ fun () ->
+    Lwt.return ()
+  end ;
+  begin testhaut_button
+          ~group: toplevel_buttons_group
+          ~icon: "cleanup" [%i "Delete All"] @@ fun () ->
+    let delete_all_questions () =
+      save_testhaut StringMap.empty id;
+      Manip.removeChildren (find_component "learnocaml-exo-testhaut-pane");
+      let _ = testhaut_init (find_component "learnocaml-exo-testhaut-pane") id in ()
+    in
+         let aborted, abort_message =
+           let t, u = Lwt.task () in
+           let btn_no = Tyxml_js.Html5.(button [ pcdata [%i"No"] ]) in
+           Manip.Ev.onclick btn_no ( fun _ ->
+              hide_loading ~id:"learnocaml-exo-loading" () ; true) ;
+           let btn_yes = Tyxml_js.Html5.(button [ pcdata [%i"Yes"] ]) in
+           Manip.Ev.onclick btn_yes (fun _ ->
+               hide_loading ~id:"learnocaml-exo-loading" ();
+               delete_all_questions () ; true) ;
+           let div =
+             Tyxml_js.Html5.(div ~a: [ a_class [ "dialog" ] ]
+                          [ pcdata [%i"Are you sure you want to delete all questions ?\n"] ;
+                            btn_yes ;
+                            pcdata " " ;
+                            btn_no; ]) in
+      Manip.SetCss.opacity div (Some "0") ;
+      t, div in 
+    Manip.replaceChildren messages
+      Tyxml_js.Html5.[ li [ pcdata "" ] ] ;
+    show_loading ~id:"learnocaml-exo-loading" [ abort_message ] ;
+    Manip.SetCss.opacity abort_message (Some "1") ;
+      Lwt.return ()
+  
+  
+  
+  end;
+  
+
+  
+  let quality = match getElementById_coerce "quality_box" CoerceTo.input with
+    | None -> failwith "unknown element quality_box"
+    | Some s -> s
+in
+let imperative = match getElementById_coerce "imperative_box" CoerceTo.input with
+  | None -> failwith "unknown element imperative_box"
+  | Some s -> s
+in
+
+
+    
+  let recovering () =
+    let solution = Ace.get_contents ace in
+    let titre = get_titre id  in
+    let incipit= Ace.get_contents ace_testhaut in
+    let question = Ace.get_contents ace_quest in
+    let template = Ace.get_contents ace_temp in
+    let testml = Ace.get_contents ace_t in
+    let testhaut= get_testhaut id in
+    let prepare= Ace.get_contents ace_prep in
+    let prelude =Ace.get_contents ace_prel in 
+    let test ={testml;testhaut} in
+    let diff = get_diff id in
+    let description=get_description id in
+    let metadata ={id;titre;description;diff} in
+    let checkbox = {imperative= Js.to_bool imperative##.checked ; undesirable=Js.to_bool quality##.checked} in
+    Learnocaml_local_storage.(store (editor_state id))
+      { Learnocaml_exercise_state.metadata ;incipit; solution ; question ; template ;
+         test ; prepare ; prelude;checkbox;
+        mtime = gettimeofday () } in
+recovering_callback:=recovering ;
  
   begin editor_button
       ~icon: "save" [%i"Save"] @@ fun () ->
@@ -1108,11 +1132,11 @@ recovering_callback:=recovering ;
       grade ()
   end ;
   grade_black:= (fun ()->
-    let button_grade = getElementById "grade_id" in
-    button_grade##.style##.background := (Js.string "#222") );
+    Manip.removeClass (find_component "grade_id") "special_grade");
   grade_red:= (fun ()->
-    let button_grade = getElementById "grade_id" in
-    button_grade##.style##.background := (Js.string "#aaa") );                  
+    Manip.addClass (find_component "grade_id") "special_grade" );
+  if arg "tab" = "testhaut" then
+    !grade_red ();
   (* ---- return -------------------------------------------------------- *)
   toplevel_launch >>= fun _ ->
   typecheck false >>= fun () ->

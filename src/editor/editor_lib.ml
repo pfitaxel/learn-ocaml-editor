@@ -374,12 +374,7 @@ let  rec testhaut_init content_div id =
   Lwt.return_unit;;
 
 
-(* ---------- Fonctions pour generer le test ---------- *)
-
-let rec listFst liste= match liste with
-  |[]->[]
-  |a::b -> (fst a)::(listFst b)
-
+(* ---------- Fonctions pour generer le test -> Compile ---------- *)
                       
 let rec redondanceAux liste elem= match liste with
   |[]->[]
@@ -388,80 +383,23 @@ let rec redondanceAux liste elem= match liste with
 
 let rec redondance liste = match liste with
   |[]->[]
-  |e::s -> e :: (redondance (redondanceAux s e))
+  |e::s -> e :: (redondance (redondanceAux s e)) 
 
 
 let rec decomposition str n = 
   if (n+1= String.length str) then [(str.[n])]
   else ( (str.[n])::(decomposition str (n+1)) );;
 
-let rec rechercheParenthese listeChar n =
-  if n=0 
-  then listeChar 
-  else 
-    match listeChar with
-    |[]-> failwith "error type"
-    |'('::l ->(rechercheParenthese l (n+1))
-    |')'::l->(rechercheParenthese l (n-1))
-    |ch::l->rechercheParenthese l n ;;
-
-
-let rec nbArgs listeChar = match listeChar with
-  |[] -> 0
-  |'-'::'>'::suite -> 1+(nbArgs suite)
-  |ch::s -> if (ch = '(') then (nbArgs (rechercheParenthese listeChar 1)) else (nbArgs s) ;;
-
-let test_fun ty =
-  let nb = (nbArgs (decomposition ty 0)) in
-  if nb<=4
-  then "test_function_"^(string_of_int nb)^"_against_solution"
-  else "test_function_against";;
-
-let testAlea nombreTestAlea = " ~gen:"^(string_of_int nombreTestAlea) ;;
-
-let typeFct ty name = "[%ty : "^ty^" ] \""^name^"\"" ;;
-
-let librairie = "open Test_lib ;;\n open Report ;;\n" ;;
-
 let init = "let () =
             set_result @@
             ast_sanity_check code_ast @@ fun () ->\n" ;;
 
-
-let rec suppr_id_0 listKey = match listKey with
-  |[]->[]
-  |k::suite -> if k="0" then (suppr_id_0 suite) else k::(suppr_id_0 suite)
-
-
-let get_id_question id = let test_list = get_test_liste id  in let all_id = StringMap.bindings test_list in suppr_id_0 (redondance (listFst all_id))
-                                                                                                                       
-
-let rec constructListeQuest listKey id = match listKey with
-  |[]->[]
-  |key::suite -> ((get_name_question id key),(get_ty id key),(get_extra_alea id key),
-                  (get_input id key),false)::(constructListeQuest suite id)
-
-
-let sectionSol fct = match fct with
-  | (name,typeF,nbAlea,jdt,b)->"Section
-      		               ([ Text \"Function:\" ; Code \""^name^"\" ],\n"
-      			      ^(test_fun typeF)^(testAlea nbAlea)^"\n"
-      			      ^(typeFct typeF name)^"\n"
-      			      ^jdt^" )"
 let section name report= "Section
-      		               ([ Text \"Function:\" ; Code \""^name^"\" ], "^report^" ); \n" ;;
-
-let rec constructSectionSol listeFonction = match listeFonction with
-  |[]->"]"
-  |fct::suite->if ((constructSectionSol suite)<>"]") 
-	       then ((sectionSol fct)^" ;\n"^(constructSectionSol suite)) 
-	       else ((sectionSol fct)^(constructSectionSol suite)) ;;
-
-let constructFinalSol listeFonction = 
-  librairie^init^"["^(constructSectionSol listeFonction)^";;"
+      		          ([ Text \"Function:\" ; Code \""^name^"\" ], "^report^" ); \n" ;; 
 
 
 (*_________________________Fonctions pour le bouton Generate______________________________________*)
+(*on  récupère des "val f : int -> int -> int = <fun>"*)
 
 let string_of_char ch = String.make 1 ch ;;
 
@@ -470,29 +408,26 @@ let rec concatenation listech = match listech with
   |c::l -> (string_of_char c)^(concatenation l);;
 
 
-
-(*_________________Deuxième version pour Generate_____________________________*)
-(*on  récupère des "val f : int -> int -> int = <fun>"*)
 let rec get_equal listeChar = match listeChar with
   |[]->[]
   |'='::l -> []
-  |ch::tail -> ch :: (get_equal tail) ;;
+  |ch::tail -> ch :: (get_equal tail) ;; 
 
 let rec get_val listeChar = match listeChar with
   |[]->[]
   |'v'::'a'::'l'::tail -> get_equal tail
-  |ch::suite -> get_val suite ;;
+  |ch::suite -> get_val suite ;; 
 
 let rec get_next_val listeChar = match listeChar with
   |[]->[]
   |'v'::'a'::'l'::tail -> tail
-  |ch::suite -> get_next_val suite ;;
+  |ch::suite -> get_next_val suite ;; 
 
 let rec get_all_val listeChar listeRes = match listeChar with
   |[] -> listeRes
   |_ -> if ((get_val listeChar)<>[])
         then (get_all_val (get_next_val listeChar) ((get_val listeChar)::listeRes))
-        else (listeRes)
+        else (listeRes) 
 
 let rec get_only_fct listeChar listeFinale= match listeChar with
   | [] -> listeFinale
@@ -502,41 +437,41 @@ and isFct listeChar listeAux = match listeChar with
   | [] -> []
   | 'v'::'a'::'l'::suite -> isFct suite ['v';'a';'l']
   | '<'::'f'::'u'::'n'::'>'::suite ->  get_only_fct suite (listeAux@['<';'f';'u';'n';'>'])
-  | ch::suite -> isFct suite (listeAux@[ch])
+  | ch::suite -> isFct suite (listeAux@[ch]) 
                
 let rec get_type_of_fct listeChar b= match listeChar with
   |[] -> []
   |':'::tail -> get_type_of_fct tail true
-  |ch::tail -> if b then (ch::(get_type_of_fct tail b)) else (get_type_of_fct tail b) ;;
+  |ch::tail -> if b then (ch::(get_type_of_fct tail b)) else (get_type_of_fct tail b) ;; 
 
 
 let rec get_nom listeChar nom = match listeChar with
   |[]->nom
   |' '::suite-> get_nom suite nom
   |ch::' '::suite -> if (ch<>' ') then nom@[ch] else get_nom suite nom
-  |ch::suite -> get_nom suite (nom@[ch]) ;;
+  |ch::suite -> get_nom suite (nom@[ch]) ;; 
 
 let rec get_questions listeChar name_and_type= match listeChar with
   |[]->name_and_type
-  |liste::suite -> get_questions suite name_and_type@[(concatenation (get_nom liste []),concatenation (get_type_of_fct liste false))]
+  |liste::suite -> get_questions suite name_and_type@[(concatenation (get_nom liste []),concatenation (get_type_of_fct liste false))] 
 
 (*////////////*)
 
-let third (a,b,c) = c;;
+let third (a,b,c) = c;; 
 let first (a,b,c) = a ;;
-let second (a,b,c) = b ;;
+let second (a,b,c) = b ;; 
 
 let maj_mono val_next_mono = match val_next_mono with
   |'i'::'n'::'t'::[]->'c'::'h'::'a'::'r'::[]
   |'c'::'h'::'a'::'r'::[]->'b'::'o'::'o'::'l'::[]
   |'b'::'o'::'o'::'l'::[] -> 's'::'t'::'r'::'i'::'n'::'g'::[]
   |'s'::'t'::'r'::'i'::'n'::'g'::[] -> 'i'::'n'::'t'::[]
-  |_ -> failwith "erreur type monomorphe"
+  |_ -> failwith "erreur type monomorphe" 
                                                        
 (*met à jour la liste des couples puis renvoie cette liste et le type monomorphe qui doit être utilisé*)                                                       
 let rec get_association listeCouple elt listeCouple2 val_next_mono = match listeCouple with
   |[]->((elt,maj_mono val_next_mono)::listeCouple2,maj_mono val_next_mono,true)
-  |(poly,mono) :: tail -> if (poly = elt) then (listeCouple2,mono,false) else (get_association tail elt listeCouple2 val_next_mono)
+  |(poly,mono) :: tail -> if (poly = elt) then (listeCouple2,mono,false) else (get_association tail elt listeCouple2 val_next_mono) 
 
 let getC listeChar =
   let rec before listeChar = match listeChar with
@@ -547,7 +482,7 @@ let getC listeChar =
     | [] -> []
     | ' '::suite -> suite
     | ch::suite -> after suite in
-  (before listeChar, after listeChar);;
+  (before listeChar, after listeChar);; 
 (*remplace les 'a,'b,... par int||char||...*)                                                                          
 let rec polymorph_detector_aux listeType listeCouple val_next_mono = match listeType with
   |[]->[]
@@ -556,20 +491,17 @@ let rec polymorph_detector_aux listeType listeCouple val_next_mono = match liste
                    if (third v)
                    then (second v)@( polymorph_detector_aux tail (first v) (second v))
                    else (second v)@( polymorph_detector_aux tail (first v) (val_next_mono))
-  |ch::tail -> ch::(polymorph_detector_aux tail listeCouple val_next_mono)
-
-
+  |ch::tail -> ch::(polymorph_detector_aux tail listeCouple val_next_mono) 
                      
 let rec decompositionSol str n = if str="" then [] else
   (if (n+1= String.length str) then [(str.[n])]
-  else ( (str.[n])::(decompositionSol str (n+1)) ));;
+   else ( (str.[n])::(decompositionSol str (n+1)) ));; 
                      
 (*prend en entrée listeChar qui est une liste de couple de deux listes de char*)
 let rec polymorph_detector listeChar = match listeChar with
   |[]-> []
   |(listeNom,listeType)::tail -> (listeNom,concatenation (polymorph_detector_aux (decompositionSol listeType 0) [] ('c'::'h'::'a'::'r'::[])))::(listeNom,concatenation (polymorph_detector_aux (decompositionSol listeType 0) [] ('i'::'n'::'t'::[])))::(polymorph_detector tail)
 
-(*redondance (polymorph_detector (get_questions (get_all_val values []) [])) ;;*)
                                                        
 (*_________________________Fonctions pour generer le template_____________________________________*)                             
 
@@ -638,11 +570,36 @@ let rec genLet listech =
   let liste = rechercheLet listech true in
   match liste with
   |[]->[]
-  |_-> (decomposition2 liste)@failchar@(genLet (tail liste)) ;;
+  |_-> (decomposition2 liste)@failchar@(genLet (tail liste)) ;; 
 
 let rec genTemplate chaine = if chaine="" then "" else
-	                       concatenation (genLet (decompositionSol chaine 0));;
+	                       concatenation (genLet (decompositionSol chaine 0));; 
 
+
+(*_________ Check _________________________________________*)
+
+let typecheck set_class ace editor top =
+    Learnocaml_toplevel.check top (Ace.get_contents ace) >>= fun res ->
+    let error, warnings =
+      match res with
+      | Toploop_results.Ok ((), warnings) -> None, warnings
+      | Toploop_results.Error (err, warnings) -> Some err, warnings in
+    let transl_loc { Toploop_results.loc_start ; loc_end } =
+      { Ocaml_mode.loc_start ; loc_end } in
+    let error = match error with
+      | None -> None
+      | Some { Toploop_results.locs ; msg ; if_highlight } ->
+          Some { Ocaml_mode.locs = List.map transl_loc locs ;
+                 msg = (if if_highlight <> "" then if_highlight else msg) } in
+    let warnings =
+      List.map
+        (fun { Toploop_results.locs ; msg ; if_highlight } ->
+           { Ocaml_mode.loc = transl_loc (List.hd locs) ;
+             msg = (if if_highlight <> "" then if_highlight else msg) })
+        warnings in
+    Ocaml_mode.report_error ~set_class editor error warnings  >>= fun () ->
+    Ace.focus ace ;
+    Lwt.return ();;
 
 (*__________________________________________________*)
 (*create an exo *)
@@ -672,5 +629,4 @@ let wait milli =
 open Learnocaml_toplevel
 open Learnocaml_toplevel_output 
 let get_answer top =
-   Learnocaml_toplevel.execute_test top
-
+  Learnocaml_toplevel.execute_test top

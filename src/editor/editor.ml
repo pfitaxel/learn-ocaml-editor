@@ -423,38 +423,7 @@ let () =
   in
   Ace.set_contents ace_temp contents ;
   Ace.set_font_size ace_temp 18;
-
   
-  let typecheck set_class =
-    Learnocaml_toplevel.check top (Ace.get_contents ace_temp) >>= fun res ->
-    let error, warnings =
-      match res with
-      | Toploop_results.Ok ((), warnings) -> None, warnings
-      | Toploop_results.Error (err, warnings) -> Some err, warnings in
-    let transl_loc { Toploop_results.loc_start ; loc_end } =
-      { Ocaml_mode.loc_start ; loc_end } in
-    let error = match error with
-      | None -> None
-      | Some { Toploop_results.locs ; msg ; if_highlight } ->
-          Some { Ocaml_mode.locs = List.map transl_loc locs ;
-                 msg = (if if_highlight <> "" then if_highlight else msg) } in
-    let warnings =
-      List.map
-        (fun { Toploop_results.locs ; msg ; if_highlight } ->
-           { Ocaml_mode.loc = transl_loc (List.hd locs) ;
-             msg = (if if_highlight <> "" then if_highlight else msg) })
-        warnings in
-    Ocaml_mode.report_error ~set_class editor_temp error warnings  >>= fun () ->
-    Ace.focus ace_temp ;
-    Lwt.return () in
-  begin template_button
-      ~group: toplevel_buttons_group
-      ~icon: "typecheck" [%i"Check"] @@ fun () ->
-    typecheck true
-  end ;
-
-
-
   (*-------question pane  -------------------------------------------------*)
   let editor_question = find_component "learnocaml-exo-question-mark" in
   let ace_quest = Ace.create_editor (Tyxml_js.To_dom.of_div editor_question ) in
@@ -631,6 +600,65 @@ let onload () =
   Ace.set_font_size ace 18;
 
 
+    let messages = Tyxml_js.Html5.ul [] in
+  begin template_button
+      ~icon: "sync" [%i"Gen. template"] @@ fun () ->
+    if (Ace.get_contents ace_temp) = "" then        
+        Ace.set_contents ace_temp (genTemplate (Ace.get_contents ace) )
+    else
+      begin
+       let aborted, abort_message =
+         let t, u = Lwt.task () in
+         let btn_cancel = Tyxml_js.Html5.(button [ pcdata [%i"Cancel"] ]) in
+         Manip.Ev.onclick btn_cancel ( fun _ ->
+                                       hide_loading ~id:"learnocaml-exo-loading" () ; true) ;
+         let btn_yes = Tyxml_js.Html5.(button [ pcdata [%i"Yes"] ]) in
+         Manip.Ev.onclick btn_yes (fun _ -> Ace.set_contents ace_temp (genTemplate (Ace.get_contents ace));
+                                            hide_loading ~id:"learnocaml-exo-loading" ();
+                                            true) ;
+         let div =
+           Tyxml_js.Html5.(div ~a: [ a_class [ "dialog" ] ]
+                             [ pcdata [%i"Do you want to crush the template?\n"] ;
+                               btn_yes ;
+                               pcdata " " ;
+                               btn_cancel ]) in
+         Manip.SetCss.opacity div (Some "0") ;
+         t, div in
+       Manip.replaceChildren messages
+         Tyxml_js.Html5.[ li [ pcdata "" ] ] ;
+       show_loading ~id:"learnocaml-exo-loading" [ abort_message ] ;
+       Manip.SetCss.opacity abort_message (Some "1") 
+      end;
+    Lwt.return ()
+  end ;
+
+  let typecheck set_class =
+    Learnocaml_toplevel.check top (Ace.get_contents ace_temp) >>= fun res ->
+    let error, warnings =
+      match res with
+      | Toploop_results.Ok ((), warnings) -> None, warnings
+      | Toploop_results.Error (err, warnings) -> Some err, warnings in
+    let transl_loc { Toploop_results.loc_start ; loc_end } =
+      { Ocaml_mode.loc_start ; loc_end } in
+    let error = match error with
+      | None -> None
+      | Some { Toploop_results.locs ; msg ; if_highlight } ->
+          Some { Ocaml_mode.locs = List.map transl_loc locs ;
+                 msg = (if if_highlight <> "" then if_highlight else msg) } in
+    let warnings =
+      List.map
+        (fun { Toploop_results.locs ; msg ; if_highlight } ->
+           { Ocaml_mode.loc = transl_loc (List.hd locs) ;
+             msg = (if if_highlight <> "" then if_highlight else msg) })
+        warnings in
+    Ocaml_mode.report_error ~set_class editor_temp error warnings  >>= fun () ->
+    Ace.focus ace_temp ;
+    Lwt.return () in
+  begin template_button
+      ~group: toplevel_buttons_group
+      ~icon: "typecheck" [%i"Check"] @@ fun () ->
+    typecheck true
+  end ;
 
   (* ---- testhaut pane --------------------------------------------------- *)
   
@@ -716,39 +744,6 @@ in
          test ; prepare ; prelude;checkbox;
         mtime = gettimeofday () } in
 recovering_callback:=recovering ;
-
-
-  let messages = Tyxml_js.Html5.ul [] in
-  begin template_button
-      ~icon: "sync" [%i"Gen. template"] @@ fun () ->
-    if (Ace.get_contents ace_temp) = "" then        
-        Ace.set_contents ace_temp (genTemplate (Ace.get_contents ace) )
-    else
-      begin
-       let aborted, abort_message =
-         let t, u = Lwt.task () in
-         let btn_cancel = Tyxml_js.Html5.(button [ pcdata [%i"Cancel"] ]) in
-         Manip.Ev.onclick btn_cancel ( fun _ ->
-                                       hide_loading ~id:"learnocaml-exo-loading" () ; true) ;
-         let btn_yes = Tyxml_js.Html5.(button [ pcdata [%i"Yes"] ]) in
-         Manip.Ev.onclick btn_yes (fun _ -> Ace.set_contents ace_temp (genTemplate (Ace.get_contents ace));
-                                            hide_loading ~id:"learnocaml-exo-loading" ();
-                                            true) ;
-         let div =
-           Tyxml_js.Html5.(div ~a: [ a_class [ "dialog" ] ]
-                             [ pcdata [%i"Do you want to crush the template?\n"] ;
-                               btn_yes ;
-                               pcdata " " ;
-                               btn_cancel ]) in
-         Manip.SetCss.opacity div (Some "0") ;
-         t, div in
-       Manip.replaceChildren messages
-         Tyxml_js.Html5.[ li [ pcdata "" ] ] ;
-       show_loading ~id:"learnocaml-exo-loading" [ abort_message ] ;
-       Manip.SetCss.opacity abort_message (Some "1") 
-      end;
-    Lwt.return ()
-  end ;
  
   begin editor_button
       ~icon: "save" [%i"Save"] @@ fun () ->

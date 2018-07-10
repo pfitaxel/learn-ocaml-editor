@@ -10,6 +10,7 @@ open Js_utils
 open Learnocaml_common
 open Learnocaml_exercise_state
 open Learnocaml_index
+open Editor_lib
 
 module StringMap = Map.Make (String)
 
@@ -28,9 +29,6 @@ let () =
   ] in
   Translate.set_string_translations translations
 
-
-let setInnerHtml elt s =    
-  elt##.innerHTML := Js.string s
 
 
 let getString = function
@@ -78,7 +76,7 @@ let previous_descr =
   in exo.exercise_short_description
 let () = match previous_descr with
   | Some d -> setInnerHtml (getElementById "description") d
-  | None -> setInnerHtml (getElementById "description") ""
+  | None -> ()
 let () = match difficulty with
   | None -> ()
   | Some select -> select##.value := Js.string (string_of_float previous_diff)
@@ -90,20 +88,6 @@ let resultOptionToBool = function
 let isIdCorrect s = resultOptionToBool (Regexp.string_match (Regexp.regexp "^[a-z0-9_-]+$") s 0)
 let isTitleCorrect s = (resultOptionToBool (Regexp.string_match (Regexp.regexp "^[^ \t]") s 0)) &&
                        (resultOptionToBool (Regexp.string_match (Regexp.regexp ".*[^ \t]$") s 0))
-let isIdUnique id =
-  id = previous_id ||
-  (match Learnocaml_local_storage.(retrieve (editor_state id)) with
-   | exception Not_found -> true
-   | _ -> false)
-let isTitleUnique title =
-  let exos =
-    match Learnocaml_local_storage.(retrieve (index_state "index")) with
-    | {Learnocaml_exercise_state.exos; mtime} -> exos in
-  previous_title = title ||
-  (match StringMap.find_first_opt
-           (fun key -> (StringMap.find key exos).exercise_title = title) exos with
-  | None -> true
-  | _ -> false)
 
 
 let store id titre description diff =
@@ -114,18 +98,7 @@ let store id titre description diff =
   Learnocaml_local_storage.(store (editor_state id))
     {Learnocaml_exercise_state.metadata; solution; incipit; question; template;
      test; prelude; prepare; checkbox; mtime = gettimeofday ()};
-  let exercise_title = titre in
-  let exercise_stars = diff in
-  let exercise_kind = Learnocaml_exercise in
-  let exercise_short_description = Some description in
-  let exo = {exercise_kind; exercise_stars; exercise_title; exercise_short_description} in
-  match Learnocaml_local_storage.(retrieve (index_state "index")) with
-  | {Learnocaml_exercise_state.exos; mtime} ->
-      let former_exos =
-        if previous_id <> "" then StringMap.remove previous_id exos else exos in
-      let exos = StringMap.add id exo former_exos in
-      let index = {Learnocaml_exercise_state.exos; mtime = gettimeofday ()} in
-      Learnocaml_local_storage.(store (index_state "index")) index
+  store_in_index metadata;;
 
 
 let id_error = getElementById "id_error"
@@ -140,9 +113,9 @@ let () = save##.onclick := handler (fun _ ->
     | None -> 0.
     | Some x -> x in
   let id_correct = isIdCorrect id
-  and id_unique = isIdUnique id
+  and id_unique = idUnique id
   and title_correct = isTitleCorrect titre
-  and title_unique = isTitleUnique titre in
+  and title_unique = titleUnique titre in
   (if not id_correct then
     setInnerHtml id_error [%i"Incorrect identifier: an identifier can't be empty, \
                               and only lower case letters, numerals, dashes \

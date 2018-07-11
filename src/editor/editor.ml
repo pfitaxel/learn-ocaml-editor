@@ -641,11 +641,11 @@ let () =
   recovering_callback:=recovering ;
   let ast_fonction () =
     let fonction = if Js.to_bool(quality##.checked) then
-                     fonction_quality
+                     quality_function
                    else
                      "" in
     let fonction = if Js.to_bool(imperative##.checked) then
-                      fonction ^ fonction_imperative
+                      fonction ^ imperative_function
                     else
                       fonction ^ "" in
     let fonction = fonction ^ "\n\nlet ast_quality ast =" in

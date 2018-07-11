@@ -685,7 +685,7 @@ let () =
     fonction
   in
   let compile () = 
-    let tests=testprel^(ast_fonction ()) in
+    let tests=test_prel^(ast_fonction ()) in
     let tests=tests^" \n "^((get_buffer id))^" \n" in
     let tests=
       StringMap.fold (fun qid->fun quest -> fun str ->

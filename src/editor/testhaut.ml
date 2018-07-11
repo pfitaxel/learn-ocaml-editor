@@ -1,15 +1,19 @@
-(* This ml is associated with test.html . This one is called on a iframe.
-   This why they are functions like close_frame *) 
+(** This ocaml file is associated with test.html. This one is called on an iframe.
+  * This is why there are functions like close_frame *) 
 
 open Js_of_ocaml
 open Js_utils
 open Lwt.Infix
 open Dom_html
 open Learnocaml_common
+open Editor_lib
+open Learnocaml_exercise_state
+open Tyxml_js.Html5
 
 module StringMap = Map.Make (String)
 
 
+(* Internationalization *)
 let () = Translate.set_lang ()
 let () =
   let translations = [
@@ -34,6 +38,7 @@ let () =
     "txt_datalist_suite", [%i"Tester:<br>"];
   ] in
   Translate.set_string_translations translations
+
 
 let init_tabs, select_tab =
   let names = [ "solution"; "spec"; "suite" ] in
@@ -62,58 +67,56 @@ let init_tabs, select_tab =
     select_tab !current in
   init_tabs, select_tab 
 
-let id = arg "id";;
+let id = arg "id"
 
 let name = match getElementById_coerce "name" CoerceTo.input with
-    None -> failwith "unknown element name"
-   |Some s -> s;;
+   | None -> failwith "unknown element name"
+   | Some s -> s
 let ty = match getElementById_coerce "ty" CoerceTo.input with
-    None -> failwith "unknown element ty"
-   |Some s -> s;;
+   | None -> failwith "unknown element ty"
+   | Some s -> s
 
-(* bouton radio *)
+(* radio button *)
 let solution = match getElementById_coerce "solution" CoerceTo.input with
-    None -> failwith ""
-  | Some s -> s;;
+  | None -> failwith ""
+  | Some s -> s
 let spec = match getElementById_coerce "spec" CoerceTo.input with
-    None -> failwith ""
-  |Some s -> s;;
+  | None -> failwith ""
+  |Some s -> s
 let suite = match getElementById_coerce "suite" CoerceTo.input with
-    None -> failwith ""
-   |Some s-> s;;
+  | None -> failwith ""
+  | Some s -> s
 
 
 let samplerSol = match getElementById_coerce "sol-sampler" CoerceTo.input with
   | None -> failwith "unknown element sampler sol"
-  | Some s -> s;; 
+  | Some s -> s
 let samplerSpec = match getElementById_coerce "spec-sampler" CoerceTo.input with
   | None -> failwith "unknown element sampler spec"
-  | Some s -> s;;
+  | Some s -> s
 
 let extraAleaSol =match getElementById_coerce "sol-gen" CoerceTo.input with
-    None -> failwith "unknown element extraAleaSol"
-  | Some s -> s;;
+  | None -> failwith "unknown element extraAleaSol"
+  | Some s -> s
 let extraAleaSpec = match getElementById_coerce "spec-gen" CoerceTo.input with
-    None -> failwith "unknown element extraAleaSpec"
-  | Some s -> s;;
+  | None -> failwith "unknown element extraAleaSpec"
+  | Some s -> s
 
 let datalistSol = match getElementById_coerce "sol-datalist" CoerceTo.input with
   | None -> failwith "unknown element datalistSol"
-  | Some s -> s;;
+  | Some s -> s
 let datalistSpec = match getElementById_coerce "spec-datalist" CoerceTo.input with
-    None -> failwith "unknown element datalistSpec"
-  | Some s -> s;;
+  | None -> failwith "unknown element datalistSpec"
+  | Some s -> s
 let datalistSuite = match getElementById_coerce "suite-datalist" CoerceTo.input with
-    None -> failwith "unknown element datalistSuite"
-  | Some s -> s;;
+  | None -> failwith "unknown element datalistSuite"
+  | Some s -> s
     
-let save = getElementById "save";;
+let save = getElementById "save"
 
 let setInnerHtml elt s =    
-  elt##.innerHTML:=Js.string s ;;
+  elt##.innerHTML := Js.string s
 
-open Editor_lib
-open Learnocaml_exercise_state
 
 let input_solution_editor = find_component "learnocaml-tab-solution-input";;
 let editor_input_solution = Ocaml_mode.create_ocaml_editor
@@ -150,9 +153,8 @@ let save_suite () =
   let question = TestSuite {name; ty; suite=input; tester=datalist} in
   let testhaut =  get_testhaut id in
   let question_id = match arg "questionid" with
-    |exception Not_found -> compute_question_id testhaut
-    |qid -> qid
-  in
+    | exception Not_found -> compute_question_id testhaut
+    | qid -> qid in
   let testhaut = StringMap.add question_id question testhaut in
   save_testhaut testhaut id;;
 
@@ -166,8 +168,8 @@ let save_solution () =
   let question = TestAgainstSol {name; ty; suite=input; gen=extra_alea; tester=datalist; sampler} in
   let testhaut = get_testhaut id in
   let question_id =  match arg "questionid" with
-    |exception Not_found -> compute_question_id testhaut
-    |qid -> qid in
+    | exception Not_found -> compute_question_id testhaut
+    | qid -> qid in
   let testhaut = StringMap.add question_id question testhaut in
   save_testhaut testhaut id;;
 
@@ -181,23 +183,22 @@ let save_spec () =
   let sampler = Js.to_string samplerSpec##.value in
   let question = TestAgainstSpec {name; ty; suite = input; spec = output;
                                  gen = extra_alea; tester = datalist; sampler} in
-  let open Editor_lib in
   let testhaut = get_testhaut id in
   let question_id =  match arg "questionid" with
-    |exception Not_found -> compute_question_id testhaut
-    |qid -> qid in
+    | exception Not_found -> compute_question_id testhaut
+    | qid -> qid in
   let testhaut = StringMap.add question_id question testhaut in
   save_testhaut testhaut id;;
 
 (* ---- restore fields if they are not empty -----------------------------------*)
-    
+
 let _ = match arg "questionid" with
-    exception Not_found -> select_tab "suite"; suite##.checked := Js.bool true
-  | qid ->let testhaut=get_testhaut id in
-      let name_elt=name in
-      let ty_elt=ty in
-      let suite_elt=suite in
-      let spec_elt=spec in
+  | exception Not_found -> select_tab "suite"; suite##.checked := Js.bool true
+  | qid -> let testhaut=get_testhaut id in
+      let name_elt = name in
+      let ty_elt = ty in
+      let suite_elt = suite in
+      let spec_elt = spec in
           match StringMap.find qid testhaut with
              | TestSuite {name;ty;suite;tester} ->
                 begin
@@ -241,78 +242,64 @@ let () = spec##.onclick := handler
 let () = suite##.onclick := handler (fun _ -> select_tab "suite"; Js._true);;
 
 let transResultOption = function
-  |None -> false
-  |Some s-> true;;
-let nameOk s = s<>"";;
-let typeOk s = s<>"";;
+  | None -> false
+  | Some s -> true
+let name_correct s = s <> ""
+let type_correct s = s <> ""
 
 let close_frame () =
-  (* trick to get access to  the container of the frame (learnocaml-exo-loading) *)
-  let window=Dom_html.window in
-  let window=window##.parent in
-  let document=window##.document in
-  let div= Js.Opt.case (document##getElementById (Js.string "learnocaml-exo-loading"))
-      (fun ()-> failwith "titi")
-      (fun node->node)
-  in
+  (* trick to get access to the container of the frame (learnocaml-exo-loading) *)
+  let window = Dom_html.window in
+  let window = window##.parent in
+  let document = window##.document in
+  let div = Js.Opt.case (document##getElementById (Js.string "learnocaml-exo-loading"))
+      (fun () -> failwith "titi")
+      (fun node -> node) in
   let exo_list=Js.Opt.case (document##getElementById (Js.string "learnocaml-exo-testhaut-pane"))
       (fun () -> failwith "toto")
-      (fun pnode -> pnode)
-  in
+      (fun pnode -> pnode) in
   let exo_list=Tyxml_js.Of_dom.of_element exo_list in
   Manip.removeChildren exo_list;
   
-  let _ =testhaut_init exo_list id  in ();
-  div##setAttribute (Js.string "class") (Js.string "loading-layer loaded");;
+  let _ = testhaut_init exo_list id in ();
+  div##setAttribute (Js.string "class") (Js.string "loading-layer loaded")
 
 let toString = function
-  |None -> failwith "incorrect_input"
-  |Some input -> Js.to_string input##.value
+  | None -> failwith "incorrect_input"
+  | Some input -> Js.to_string input##.value
 
 let name_error = getElementById "name_error"
 let type_error = getElementById "type_error"
 
 (* ---- save button ------------------------------------------------------------ *)
-let _ = save##.onclick:= handler (fun _ ->
+let _ = save##.onclick := handler (fun _ ->
   let name = Js.to_string name##.value in
   let ty = Js.to_string ty##.value in
-  let name_correct = nameOk name in
-  let type_correct = typeOk ty in
-  if not name_correct && not type_correct then
-    begin
-      setInnerHtml name_error [%i"Incorrect name: a name can't be empty"];
-      setInnerHtml type_error [%i"Incorrect type: a type can't be empty"]
-    end
-  else if name_correct && not type_correct then
-    begin
-      setInnerHtml name_error "";
-      setInnerHtml type_error [%i"Incorrect type: a type can't be empty"]
-    end
-  else if not name_correct && type_correct then
-    begin
-      setInnerHtml name_error [%i"Incorrect name: a name can't be empty"];
-      setInnerHtml type_error ""
-    end
-  else
-    begin
-      setInnerHtml name_error "";
-      setInnerHtml type_error "";
-      if arg "tab" = "suite" then
-	save_suite ();  
-      if arg "tab" = "solution" then
-	save_solution ();
-      if arg "tab" = "spec" then
-        save_spec ();
-      close_frame ();
-    end;
-   Js._true
+  let name_correct = name_correct name in
+  let type_correct = type_correct ty in
+  (if not name_correct then
+     setInnerHtml name_error [%i"Incorrect name: a name can't be empty"]
+   else
+     setInnerHtml name_error "");
+  (if not type_correct then
+     setInnerHtml type_error [%i"Incorrect type: a type can't be empty"]
+   else
+     setInnerHtml type_error "");
+  if name_correct && type_correct then (
+  	match arg "tab" with
+  	| "suite" -> save_suite ();
+  	| "solution" -> save_solution ();
+  	| "spec" -> save_spec ();
+  	| _ -> failwith "";
+  	close_frame ();
+  );
+  Js._true
 )
 
 (* ---- Cancel button ---------------------------------------------------------- *)
 let cancel = getElementById "cancel"
 let () = cancel##.onclick := handler (fun _ ->
-    let _ = close_frame () in ();
-    Js._true)
+  close_frame (); Js._true)
 
 
 (* ---- Syntax button ---------------------------------------------------------- *)
@@ -330,7 +317,7 @@ let _ =
   Manip.SetCss.bottom syntax_div "0%";
   Manip.SetCss.background syntax_div "white";
   Manip.SetCss.zIndex syntax_div "995";
-  Manip.SetCss.position syntax_div "absolute";;
+  Manip.SetCss.position syntax_div "absolute"
 
 let content = "<h1 id=\"Syntax-examples\">" ^ [%i"Syntax examples"] ^
               "</h1><ul><li><strong>" ^ [%i"Arguments"] ^
@@ -354,7 +341,6 @@ let content = "<h1 id=\"Syntax-examples\">" ^ [%i"Syntax examples"] ^
                   but we have to provide also the return value associated with ==&gt;."] ^ "</p>";;
 
 Manip.setInnerHtml syntax_div content;;
-open Tyxml_js.Html5
 let button = button ~a:[a_id "ok";
 a_onclick (fun _ -> Manip.SetCss.opacity syntax_div (Some "0");
 	Manip.SetCss.zIndex syntax_div "995"; true)] [ pcdata [%i"OK"] ];;

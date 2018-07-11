@@ -21,7 +21,7 @@ open Learnocaml_index
 open Learnocaml_common
 open Editor_lib
 module StringMap = Map.Make (String)
-                            
+
 
 let exercises_tab _ _ () =
   show_loading ~id:"learnocaml-main-loading"
@@ -104,12 +104,11 @@ let exercises_tab _ _ () =
       (format_exercise_list Learnocaml_local_storage.(retrieve all_exercise_states)) in
   Manip.appendChild content_div list_div ;
   hide_loading ~id:"learnocaml-main-loading" () ;
- Lwt.return list_div
-;;
+ Lwt.return list_div;;
 
 
-
-let init ()= Learnocaml_local_storage.(store (index_state "index")) {Learnocaml_exercise_state.exos=StringMap.empty; mtime=gettimeofday ()};; 
+let init () = Learnocaml_local_storage.(store (index_state "index"))
+			  {Learnocaml_exercise_state.exos = StringMap.empty; mtime = gettimeofday ()};;
 
 let delete_button_handler exercise_id =
   (fun _ ->
@@ -137,8 +136,7 @@ let delete_button_handler exercise_id =
        show_loading ~id:"learnocaml-main-loading" [ abort_message ] ;
        Manip.SetCss.opacity abort_message (Some "1") ;
      end ;
-     true)
-;;
+  true) ;;
 
 let rec editor_tab _ _ () =
   Learnocaml_local_storage.init ();
@@ -146,11 +144,10 @@ let rec editor_tab _ _ () =
     let pct_signal, pct_signal_set = React.S.create pct_init in
               Learnocaml_local_storage.(listener (index_state "index")) :=
                 Some (fun _-> pct_signal_set None) ;
-  let ()=
+  let () =
     match Learnocaml_local_storage.(retrieve (index_state "index")) with
-    |exception Not_found -> init ()
-    |_->() 
-  in
+    | exception Not_found -> init ()
+    | _ -> () in
     Server_caller.fetch_editor_index () >>= fun index ->  
     show_loading ~id:"learnocaml-main-loading"
       Tyxml_js.Html5.[ ul [ li [ pcdata [%i"Loading editor"]]]] ;
@@ -288,8 +285,7 @@ let rec editor_tab _ _ () =
         (format_exercise_list Learnocaml_local_storage.(retrieve all_exercise_states)) in
     Manip.appendChild content_div list_div ;
     hide_loading ~id:"learnocaml-main-loading" () ;
-    Lwt.return list_div
-;;
+    Lwt.return list_div;;
 
 let lessons_tab select (arg, set_arg, delete_arg) () =
   let open Learnocaml_lesson in
@@ -439,11 +435,7 @@ let lessons_tab select (arg, set_arg, delete_arg) () =
     with Not_found -> failwith "lesson not found"
   end >>= fun () ->
   hide_loading ~id:"learnocaml-main-loading" () ;
-  Lwt.return lesson_div
-;;
-
-
-
+  Lwt.return lesson_div ;;
 
 
 let tryocaml_tab select (arg, set_arg, delete_arg) () =
@@ -676,8 +668,7 @@ let tryocaml_tab select (arg, set_arg, delete_arg) () =
   end ;
   toplevel_launch >>= fun _ ->
   hide_loading ~id:"learnocaml-main-loading" () ;
-  Lwt.return tutorial_div
-;;
+  Lwt.return tutorial_div;;
 
 let toplevel_tab select _ () =
   let content_div = find_component "learnocaml-main-content" in
@@ -736,8 +727,7 @@ let toplevel_tab select _ () =
     Lwt.return ()
   end ;
   hide_loading ~id:"learnocaml-main-loading" () ;
-  Lwt.return div
-;;
+  Lwt.return div;;
 
 let token_format =
   Json_encoding.(obj1 (req "token" string))
@@ -959,5 +949,4 @@ let () =
       Tyxml_js.Html5.(div ~a: [ a_class [ "placeholder" ] ])
         Tyxml_js.Html5.[ div [ pcdata [%i"Choose an activity."] ]] in
     Manip.appendChild content_div div ;
-    Lwt.return ()
-;;
+    Lwt.return () ;;

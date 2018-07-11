@@ -295,7 +295,7 @@ body{
 #learnocaml-tab-solution-input .ace_selected-word { background: #e80; opacity: 0.2; }
 
 
-	/* ---- spec input ------------------------------------ */
+/* ---- spec input ------------------------------------ */
 
 #learnocaml-tab-spec-input {
   font-size: 18px;
@@ -343,7 +343,7 @@ body{
 #learnocaml-tab-spec-input .ace_selected-word { background: #e80; opacity: 0.2; }
 
 
-	/* ---- spec spec ------------------------------------- */
+/* ---- spec spec ------------------------------------- */
 
 #learnocaml-tab-spec-spec {
   font-size: 18px;
@@ -391,7 +391,7 @@ body{
 #learnocaml-tab-spec-spec .ace_selected-word { background: #e80; opacity: 0.2; }
 
 
-	/* ---- suite input ----------------------------------- */
+/* ---- suite input ----------------------------------- */
 
 #learnocaml-tab-suite-input {
   font-size: 18px;

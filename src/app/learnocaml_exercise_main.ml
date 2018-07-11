@@ -24,7 +24,7 @@ open Editor_lib
                                       
 let ref_grade = ref 150 ;;
 let init_tabs, select_tab =
-  let names = [ "text" ; "toplevel" ; "report" ; "editor"] in
+  let names = ["text" ; "toplevel" ; "report" ; "editor"] in
   let current = ref "text" in
   let select_tab name =
     set_arg "tab" name ;
@@ -68,11 +68,11 @@ let init_tabs, select_tab =
 
   let transResultOption = function
     |None -> false
-    |Some s-> true
-      ;;
+    |Some s-> true ;;
+
 (* experiment button of editor.html redirects to the html associated to this ml 
-    to know if we are in this page because of that we decide to put a '.' before the id
-    Therefore idEditor looks for a '.' before the id *)
+   to know if we are in this page because of that we decide to put a '.' before the id
+   therefore idEditor looks for a '.' before the id *)
 
 let idEditor s = transResultOption (Regexp.string_match (Regexp.regexp "^[.]+") s 0);;
   let id = arg "id" ;;
@@ -134,16 +134,13 @@ let () =
   let editor_toolbar = find_component "learnocaml-exo-editor-toolbar" in
   let toplevel_button = button ~container: toplevel_toolbar ~theme: "dark" in
   let editor_button = button ~container: editor_toolbar ~theme: "light" in
-  
+
 (* if we came from a true exercise we search in the server. In the other case we get
    the exercise information from the Local storage *)
   let exercise_fetch = match idEditor id with
     | false -> Server_caller.fetch_exercise id
     | _ -> let proper_id = String.sub id 1 ((String.length id)-1) in
-        
-
-   Lwt.return (exo_creator proper_id )
-in  
+  Lwt.return (exo_creator proper_id ) in
   let after_init top =
     exercise_fetch >>= fun exo ->
     begin match Learnocaml_exercise.(get prelude) exo with
@@ -191,7 +188,6 @@ in
   exercise_fetch >>= fun exo ->
 
 
-  
   let solution = match Learnocaml_local_storage.(retrieve (exercise_state id)) with
     | { Learnocaml_exercise_state.report = Some report ; solution } ->
         let _ : int = display_report exo report in
@@ -400,12 +396,13 @@ in
           Lwt.return Learnocaml_report.[ Message ([ Text [%i"Grading aborted by user."] ], Failure) ] in
         Lwt.pick [ grading ; abortion ] >>= fun report ->
         let _ = display_report exo report in
-         (*if not(idEditor id) then*)
+          (* if not(idEditor id) then *)
           begin
-        worker := Grading_jsoo.get_grade ~callback exo ;
-       (* Learnocaml_local_storage.(store (exercise_state id))
-          { Learnocaml_exercise_state.grade = Some grade ; solution ; report = Some report ;
-            mtime = gettimeofday () }*) end;
+            worker := Grading_jsoo.get_grade ~callback exo ;
+            (* Learnocaml_local_storage.(store (exercise_state id))
+            { Learnocaml_exercise_state.grade = Some grade ; solution ; report = Some report ;
+            mtime = gettimeofday () } *)
+          end;
         select_tab "report" ;
         Lwt_js.yield () >>= fun () ->
         hide_loading ~id:"learnocaml-exo-loading" () ;
@@ -418,9 +415,10 @@ in
         let _ = display_report exo report in
         (* if not(idEditor id) then 
           begin
-        Learnocaml_local_storage.(store (exercise_state id))
-          { Learnocaml_exercise_state.grade = Some grade ; solution ; report = Some report ;
-            mtime = gettimeofday () } end ; *)
+            Learnocaml_local_storage.(store (exercise_state id))
+            { Learnocaml_exercise_state.grade = Some grade ; solution ; report = Some report ;
+            mtime = gettimeofday () }
+          end ; *)
         select_tab "report" ;
         Lwt_js.yield () >>= fun () ->
         hide_loading ~id:"learnocaml-exo-loading" () ;
@@ -430,5 +428,4 @@ in
   toplevel_launch >>= fun _ ->
   typecheck false >>= fun () ->
   hide_loading ~id:"learnocaml-exo-loading" () ;
-  Lwt.return ()
-;;
+  Lwt.return () ;;

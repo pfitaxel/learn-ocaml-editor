@@ -1,8 +1,3 @@
-(* TODO: Changer le nom des données stockées
-   ("identifier" plutôt qu'"id", "title" plutôt que "titre",
-   "difficulty" plutôt que "diff", etc) *)
-
-
 open Str
 open Js_of_ocaml
 open Dom_html

@@ -1,0 +1,17 @@
+File "_none_", line 1:
+Error: Internal error while testing your solution:
+
+File "_none_", line 1:
+This expression has type (char list -> char list) Ty.ty
+       but an expression was expected of type (char list -> 'a -> 'b) Ty.ty
+       Type char list is not compatible with type 'a -> 'b 
+
+
+grader outcomes:
+val print_html : 'a -> 'b = <fun>
+module Code : sig val rev : 'a list -> 'a list end
+module Solution : sig val rev : 'a list -> 'a list end
+module Test_lib : Test_lib.S
+module Report = Learnocaml_report
+
+

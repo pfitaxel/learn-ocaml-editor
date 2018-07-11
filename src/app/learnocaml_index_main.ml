@@ -666,6 +666,7 @@ let () =
     [ "tryocaml", ("Try OCaml", tryocaml_tab) ;
       "lessons", ("Lessons", lessons_tab) ;
       "exercises", ("Exercises", exercises_tab) ;
+      "editor", ("Editor", editor_tab); (* ************** *)
       "toplevel", ("Toplevel", toplevel_tab) ] in
   let tabs =
     let container = find_component "learnocaml-tab-buttons-container" in

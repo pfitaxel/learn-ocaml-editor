@@ -124,7 +124,8 @@ let () =
     "learnocaml-exo-button-text", [%i"Exercise"];
     "learnocaml-exo-editor-pane", [%i"Editor"];
     "txt_grade_report", [%i"Click the Grade! button to get your report"];
-  ] in Translate.set_string_translations translations;
+  ] in
+  Translate.set_string_translations translations;
   Learnocaml_local_storage.init () ;
   (* ---- launch everything --------------------------------------------- *)
   let toplevel_buttons_group = button_group () in

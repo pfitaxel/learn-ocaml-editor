@@ -51,11 +51,15 @@ module Dummy_Functor (Introspection :
   module Dummy_Params = struct
     let results = ref None
     let set_progress _ = ()
-    module Introspection = Introspection            
+    module Introspection = Introspection
+    let timeout = None
   end       
   module Test_lib = Test_lib.Make(Dummy_Params)
   module Report = Learnocaml_report
- *)
+end
+*)
+
+let auto_save_interval=120.0 ;; (* in seconds*)
 
 (*keep sync with test-spec*)
 let testprel ="open Test_lib\nopen Learnocaml_report\n\n\n(* sampler: (unit -> ('ar -> 'row, 'ar -> 'urow, 'ret) args) *)\n(*keep in sync with learnocaml_exercise_state.ml *)\ntype test_qst_untyped =\n  | TestAgainstSol of\n      { name: string\n      ; ty: string\n      ; gen: int\n      ; suite: string\n      ; tester: string\n      ; sampler: string}\n  | TestAgainstSpec of\n      { name: string\n      ; ty: string\n      ; gen: int\n      ; suite: string\n      ; spec : string\n      ; tester: string\n      ; sampler: string}\n  | TestSuite of\n      { name: string;\n        ty: string;\n        suite: string;\n        tester : string}\n;;\n\ntype outcome =\n  | Correct of string option\n  | Wrong of string option\n\n(* TODO val get_test_qst : test_qst_untyped -> test_qst_typed *)\n\ntype test_qst_typed =\n  | TestAgainstSol :\n      { name: string\n      ; prot: (('ar -> 'row) Ty.ty, 'ar -> 'urow, 'ret) prot\n      ; tester: 'ret tester option\n      ; sampler:(unit -> ('ar -> 'row, 'ar -> 'urow, 'ret) args) option\n      ; gen: int\n      ; suite: ('ar -> 'row, 'ar -> 'urow, 'ret) args list } -> test_qst_typed\n  | TestAgainstSpec :\n      { name: string\n      ; prot: (('ar -> 'row) Ty.ty, 'ar -> 'urow, 'ret) prot\n      ; tester: 'ret tester option  (* 'a tester option (base) mais probleme de type : 'a tester incompatible avec 'ret tester*)\n      ; sampler: (unit -> ('ar -> 'row, 'ar -> 'urow, 'ret) args) option\n      ; gen: int\n      ; suite: ('ar -> 'row, 'ar -> 'urow, 'ret) args list\n      ; spec : ('ar -> 'row) -> ('ar -> 'row, 'ar -> 'urow, 'ret) args -> 'ret -> outcome } -> test_qst_typed\n  | TestSuite :\n      { name: string\n      ; prot: (('ar -> 'row) Ty.ty, 'ar -> 'urow, 'ret) prot\n      ; tester: 'ret tester option\n      ; suite: (('ar -> 'row, 'ar -> 'urow, 'ret) args * (unit -> 'ret)) list } -> test_qst_typed\n\n(** Notation for TestAgainstSpec *)\nlet (~~) b = if b then Correct None else Wrong None\n(** Notations for TestSuite *)\nlet (==>) a b = (a, fun () -> b)\n(* let (=>) a b = (a, fun () -> Lazy.force b) (* needs module Lazy *) *)\n(** Notations for heterogeneous lists *)\nlet (@:) a l = arg a @@ l\nlet (!!) b = last b\nlet (@:!!) a b = a @: !! b\n\nlet local_dummy : 'a sampler = fun () -> failwith \"dummy sampler\"\n(* à n'utiliser que si on passe l'argument ~gen:0 (pas d'alea) *)\n                                               \nlet test_question (t : test_qst_typed) =\n  match t with\n  | TestAgainstSol t ->\n      let tester = match t.tester with\n        | None -> test\n        | Some s -> s in\n      if t.gen=0 then \n        (test_function_against\n           ~gen:t.gen ~sampler:local_dummy\n           ~test:tester (* could take into account exceptions/sorted lists/etc. *)\n           t.prot\n           (lookup_student (ty_of_prot t.prot) t.name)\n           (lookup_solution (ty_of_prot t.prot) t.name)\n           t.suite)\n      else\n        (match t.sampler with\n         | None -> (test_function_against\n                      ~gen:t.gen\n                      ~test:tester (* could take into account exceptions/sorted lists/etc. *)\n                      t.prot\n                      (lookup_student (ty_of_prot t.prot) t.name)\n                      (lookup_solution (ty_of_prot t.prot) t.name)\n                      t.suite)\n         | Some s -> (test_function_against\n                        ~gen:t.gen ~sampler:s\n                        ~test:tester (* could take into account exceptions/sorted lists/etc. *)\n                        t.prot\n                        (lookup_student (ty_of_prot t.prot) t.name)\n                        (lookup_solution (ty_of_prot t.prot) t.name)\n                        t.suite))\n  | TestAgainstSpec t ->\n      let to_string ty v = Format.asprintf \"%a\" (typed_printer ty) v in\n      let stud = lookup_student (ty_of_prot t.prot) t.name in\n      test_value stud @@ fun uf ->\n     (* no sampler for the moment *)\n      let open Learnocaml_report in\n      List.flatten @@ List.map (fun args ->\n          let code = Format.asprintf \"@[<hv 2>%s,%a@]\" t.name (print t.prot) args in\n          let ret_ty = get_ret_ty (ty_of_prot t.prot) args in\n          Message ([ Text \"Checking spec for\" ; Code code ], Informative) ::\n          let ret = apply uf args in\n          let value = to_string ret_ty ret in\n          let (text, note) = match t.spec uf args ret with\n            | Correct None -> (\"Correct spec\", Success 1)\n            | Correct (Some message) -> (message, Success 1)\n            | Wrong None -> (\"Wrong spec\", Failure)\n            | Wrong (Some message) -> (message, Failure) in\n          [Message ([Text \"Got value\"; Code value; Text (\": \" ^ text)], note)])\n        t.suite\n  | TestSuite t ->\n      let test = match t.tester with\n        | None -> test\n        | Some s -> s in\n      test_function\n        ~test:test (* could take into account exceptions/sorted lists/etc. *)\n        t.prot\n        (lookup_student (ty_of_prot t.prot) t.name)\n        t.suite\n"
@@ -237,7 +241,8 @@ let () =
   "learnocaml-exo-editor-pane", [%i"Editor"];
   "txt_grade_report", [%i"Click the Grade! button to test your solution"];
   "learnocaml-exo-test-pane", [%i"Editor"];
-  ] in Translate.set_string_translations translations;
+  ] in
+  Translate.set_string_translations translations;
   let translations = [
   "learnocaml-exo-button-editor", [%i"Type here the solution of the exercise"];
   "learnocaml-exo-button-template", [%i"Type here or generate the template the student will complete or correct"];
@@ -246,7 +251,8 @@ let () =
   "learnocaml-exo-button-question", [%i"Type here the wording of the exercise in Markdown"];
   "learnocaml-exo-button-test", [%i"Type here the tests code"];
   "learnocaml-exo-button-testhaut", [%i"Generate here the tests code"];
-  ] in Translate.set_title_translations translations;
+  ] in
+  Translate.set_title_translations translations;
   Learnocaml_local_storage.init () ;
                
   (* ---- launch everything --------------------------------------------- *)
@@ -274,7 +280,7 @@ let () =
     end >>= fun r1 ->
     Learnocaml_toplevel.load ~print_outcome:false top
      "" >>= fun r2 ->
-    if not r1 || not r2 then failwith [%i"error in prelude"] ;
+    if not r1 || not r2 then failwith [%i"unexpected error"];
     Learnocaml_toplevel.set_checking_environment top >>= fun () ->
     Lwt.return () in
   let timeout_prompt =
@@ -319,7 +325,7 @@ let () =
   end ;
   begin toplevel_button
       ~icon: "reload" [%i"Reset"] @@ fun () ->
-    toplevel_launch >>= fun top ->
+    (* toplevel_launch >>= fun top -> SHOULD BE UNNECESSARY *)
     disabling_button_group toplevel_buttons_group (fun () -> Learnocaml_toplevel.reset top)
   end ;
   begin toplevel_button
@@ -344,12 +350,36 @@ let () =
 
   Ace.set_contents ace_t  (contents); 
   Ace.set_font_size ace_t 18;
-
-  (* let typecheck set_class = Editor_lib.typecheck set_class ace_t editor_t top in*)
+  (* TODO Refactor *)
+  let typecheck_spec set_class =
+    Learnocaml_toplevel.check top
+      ("module Dummy_Functor (Introspection :\n                        Introspection_intf.INTROSPECTION) = struct\n  module Dummy_Params = struct\n    let results = ref None\n    let set_progress _ = ()\n    let timeout = None\n    module Introspection = Introspection            \n  end\n  module Test_lib = Test_lib.Make(Dummy_Params)\n  module Report = Learnocaml_report;;\n  let code_ast = (failwith \"WIP\" : Parsetree.structure);;\n\n "
+       ^ Ace.get_contents ace_t ^ " end") >>= fun res ->
+    let error, warnings =
+      match res with
+      | Toploop_results.Ok ((), warnings) -> None, warnings
+      | Toploop_results.Error (err, warnings) -> Some err, warnings in
+    let transl_loc { Toploop_results.loc_start ; loc_end } =
+      { Ocaml_mode.loc_start ; loc_end } in
+    let error = match error with
+      | None -> None
+      | Some { Toploop_results.locs ; msg ; if_highlight } ->
+          Some { Ocaml_mode.locs = List.map transl_loc locs ;
+                 msg = (if if_highlight <> "" then if_highlight else msg) } in
+    let warnings =
+      List.map
+        (fun { Toploop_results.locs ; msg ; if_highlight } ->
+           { Ocaml_mode.loc = transl_loc (List.hd locs) ;
+             msg = (if if_highlight <> "" then if_highlight else msg) })
+        warnings in
+    Ocaml_mode.report_error ~set_class editor_t error warnings  >>= fun () ->
+    Ace.focus ace_t ;
+    Lwt.return () in
   begin test_button
       ~group: toplevel_buttons_group
       ~icon: "typecheck" [%i"Check"] @@ fun () ->
-    Lwt.return ();
+    typecheck_spec true
+  (* let typecheck set_class = Editor_lib.typecheck set_class ace_t editor_t top in*)
   end ;
   
   (*-------question pane  -------------------------------------------------*)
@@ -581,38 +611,6 @@ let () =
       ~icon: "typecheck" [%i"Check"] @@ fun () ->
     Lwt.return ()
   end ;
-  begin testhaut_button
-          ~group: toplevel_buttons_group
-          ~icon: "cleanup" [%i "Delete All"] @@ fun () ->
-    let delete_all_questions () =
-      save_testhaut StringMap.empty id;
-      Manip.removeChildren (find_component "learnocaml-exo-testhaut-pane");
-      let _ = testhaut_init (find_component "learnocaml-exo-testhaut-pane") id in ()
-    in
-         let aborted, abort_message =
-           let t, u = Lwt.task () in
-           let btn_no = Tyxml_js.Html5.(button [ pcdata [%i"No"] ]) in
-           Manip.Ev.onclick btn_no ( fun _ ->
-              hide_loading ~id:"learnocaml-exo-loading" () ; true) ;
-           let btn_yes = Tyxml_js.Html5.(button [ pcdata [%i"Yes"] ]) in
-           Manip.Ev.onclick btn_yes (fun _ ->
-               hide_loading ~id:"learnocaml-exo-loading" ();
-               delete_all_questions () ; true) ;
-           let div =
-             Tyxml_js.Html5.(div ~a: [ a_class [ "dialog" ] ]
-                          [ pcdata [%i"Are you sure you want to delete all questions ?\n"] ;
-                            btn_yes ;
-                            pcdata " " ;
-                            btn_no; ]) in
-      Manip.SetCss.opacity div (Some "0") ;
-      t, div in 
-    Manip.replaceChildren messages
-      Tyxml_js.Html5.[ li [ pcdata "" ] ] ;
-    show_loading ~id:"learnocaml-exo-loading" [ abort_message ] ;
-    Manip.SetCss.opacity abort_message (Some "1") ;
-    Lwt.return ()
-  end;
-  
   let quality = match getElementById_coerce "quality_box" CoerceTo.input with
     | None -> failwith "unknown element quality_box"
     | Some s -> s
@@ -642,41 +640,6 @@ let () =
          test ; prepare ; prelude;checkbox;
         mtime = gettimeofday () } in
   recovering_callback:=recovering ;
- 
-  begin editor_button
-      ~icon: "save" [%i"Save"] @@ fun () ->
-    recovering () ;
-    Lwt.return ()
-  end ;
-
-  begin editor_button
-      ~icon: "download" [%i"Download"] @@ fun () ->
-    recovering () ;
-    let name = id ^ ".json" in
-    let content =Learnocaml_local_storage.(retrieve (editor_state id)) in  
-  let json =
-    Json_repr_browser.Json_encoding.construct
-      Learnocaml_exercise_state.editor_state_enc
-      content in
-  let contents =
-      (Js._JSON##stringify (json)) in
-    Learnocaml_common.fake_download ~name ~contents ;
-    Lwt.return ()
-  end ;
-
-  let typecheck set_class = Editor_lib.typecheck set_class ace editor top in
-  begin editor_button
-      ~group: toplevel_buttons_group
-      ~icon: "typecheck" [%i"Check"] @@ fun () ->
-    typecheck true
-  end ;
-  begin toplevel_button
-      ~group: toplevel_buttons_group
-      ~icon: "run" [%i"Eval code"] @@ fun () ->
-    Learnocaml_toplevel.execute_phrase top (Ace.get_contents ace) >>= fun _ ->
-    Lwt.return ()
-  end ;
-
   let ast_fonction () =
     let fonction = if Js.to_bool(quality##.checked) then
                      fonction_quality
@@ -775,6 +738,71 @@ let () =
     show_loading ~id:"learnocaml-exo-loading" [ abort_message ] ;
     Manip.SetCss.opacity abort_message (Some "1") ;
       Lwt.return ()
+  end ;
+  begin testhaut_button
+          ~group: toplevel_buttons_group
+          ~icon: "cleanup" [%i "Delete all"] @@ fun () ->
+    let delete_all_questions () =
+      save_testhaut StringMap.empty id;
+      Manip.removeChildren (find_component "learnocaml-exo-testhaut-pane");
+      let _ = testhaut_init (find_component "learnocaml-exo-testhaut-pane") id in ()
+    in
+         let aborted, abort_message =
+           let t, u = Lwt.task () in
+           let btn_no = Tyxml_js.Html5.(button [ pcdata [%i"No"] ]) in
+           Manip.Ev.onclick btn_no ( fun _ ->
+              hide_loading ~id:"learnocaml-exo-loading" () ; true) ;
+           let btn_yes = Tyxml_js.Html5.(button [ pcdata [%i"Yes"] ]) in
+           Manip.Ev.onclick btn_yes (fun _ ->
+               hide_loading ~id:"learnocaml-exo-loading" ();
+               delete_all_questions () ; true) ;
+           let div =
+             Tyxml_js.Html5.(div ~a: [ a_class [ "dialog" ] ]
+                          [ pcdata [%i"Are you sure you want to delete all the questions?\n"] ;
+                            btn_yes ;
+                            pcdata " " ;
+                            btn_no; ]) in
+      Manip.SetCss.opacity div (Some "0") ;
+      t, div in 
+    Manip.replaceChildren messages
+      Tyxml_js.Html5.[ li [ pcdata "" ] ] ;
+    show_loading ~id:"learnocaml-exo-loading" [ abort_message ] ;
+    Manip.SetCss.opacity abort_message (Some "1") ;
+    Lwt.return ()
+  end;
+ 
+  begin editor_button
+      ~icon: "save" [%i"Save"] @@ fun () ->
+    recovering () ;
+    Lwt.return ()
+  end ;
+
+  begin editor_button
+      ~icon: "download" [%i"Download"] @@ fun () ->
+    recovering () ;
+    let name = id ^ ".json" in
+    let content =Learnocaml_local_storage.(retrieve (editor_state id)) in  
+  let json =
+    Json_repr_browser.Json_encoding.construct
+      Learnocaml_exercise_state.editor_state_enc
+      content in
+  let contents =
+      (Js._JSON##stringify (json)) in
+    Learnocaml_common.fake_download ~name ~contents ;
+    Lwt.return ()
+  end ;
+
+  let typecheck set_class = Editor_lib.typecheck set_class ace editor top in
+  begin editor_button
+      ~group: toplevel_buttons_group
+      ~icon: "typecheck" [%i"Check"] @@ fun () ->
+    typecheck true
+  end ;
+  begin toplevel_button
+      ~group: toplevel_buttons_group
+      ~icon: "run" [%i"Eval code"] @@ fun () ->
+    Learnocaml_toplevel.execute_phrase top (Ace.get_contents ace) >>= fun _ ->
+    Lwt.return ()
   end ;
   
   (* ---- main toolbar -------------------------------------------------- *)
@@ -947,9 +975,8 @@ let () =
   if arg "tab" = "testhaut" then
     !grade_red ();
   (* ---- return -------------------------------------------------------- *)
-  toplevel_launch >>= fun _ ->
-  typecheck false >>= fun () ->
-
+  (* toplevel_launch >>= fun _ -> FIXME? SHOULD BE UNNECESSARY *)
+  (* typecheck false >>= fun () -> ? *)
   hide_loading ~id:"learnocaml-exo-loading" () ;
   let () = Lwt.async @@ fun () ->
      let _ = Dom_html.window##setInterval (Js.wrap_callback (fun () -> onload ())) 200.0; in

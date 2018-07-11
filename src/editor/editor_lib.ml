@@ -4,6 +4,7 @@ open Learnocaml_index
 open Lwt.Infix
 open Js_utils
 open Tyxml_js.Html5
+open Dom_html
 
 module StringMap = Map.Make(String)
 
@@ -183,22 +184,31 @@ let show_load id contents =
       div ~a: [ a_class [ "messages" ] ] contents
     ]
 
-let _ = testhaut_iframe##.width :=Js.string "100%"
-let _ = testhaut_iframe##.height:=Js.string "100%"
+let _ = testhaut_iframe##.width := Js.string "100%"
+let _ = testhaut_iframe##.height := Js.string "100%"
 let _ = Manip.SetCss.opacity iframe_tyxml (Some "1")
 let recovering_callback = ref (fun () -> ())
 
-let checkbox_handler = (fun _ -> !recovering_callback (); true)
 
 let checkbox_creator string cas id =
-  let chk = input ~a:[ a_id string; a_input_type `Checkbox;
-                       a_onclick checkbox_handler] () in
-  let checked=
+  let chk = input ~a:[ a_id string; a_input_type `Checkbox] () in
+  let checked =
     match cas with
     | 0 -> (get_imperative id)
     | _ -> (get_undesirable id) in
   let dom_chk = Tyxml_js.To_dom.of_input chk in
-  dom_chk##.checked:= Js.bool checked;
+  dom_chk##.checked := Js.bool checked;
+  dom_chk##.onclick := handler (fun _ ->
+      let a = Learnocaml_local_storage.(retrieve (editor_state id)) in
+      let checkbox =
+      if cas = 0 then
+        {imperative = Js.to_bool dom_chk##.checked; undesirable = a.checkbox.undesirable}
+      else
+        {imperative = a.checkbox.imperative;undesirable = Js.to_bool dom_chk##.checked} in
+      let new_e = {metadata = a.metadata; incipit = a.incipit; prepare = a.prepare;
+                   prelude = a.prelude; checkbox;test = a.test; template = a.template;
+                   solution = a.solution; mtime = a.mtime; question = a.question} in                                                                      
+      Learnocaml_local_storage.(store (editor_state id) new_e); Js._true);
   Tyxml_js.Of_dom.of_input dom_chk
 
 

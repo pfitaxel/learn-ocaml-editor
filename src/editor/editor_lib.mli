@@ -76,9 +76,13 @@ val genTemplate : string -> string
 
 (*refacoring of typecheck functions *)
 val typecheck : bool -> 'a Ace.editor -> Ocaml_mode.editor -> Learnocaml_toplevel.t -> unit Lwt.t
+val typecheck_spec : bool -> 'a Ace.editor -> Ocaml_mode.editor -> Learnocaml_toplevel.t -> unit Lwt.t
+
 
 (*creates an exercise with the data of the local storage argument: editor_exercise_id *)
 val exo_creator : string -> Learnocaml_exercise.t
 
 (*returns the output of toplevel buffer *) 
 val get_answer : Learnocaml_toplevel.t -> string
+
+

@@ -229,6 +229,34 @@ let checkbox_creator string cas id =
   Tyxml_js.Of_dom.of_input dom_chk ;; 
 
 
+    
+let typecheck_spec_aux set_class ace_t editor_t top string=
+  Learnocaml_toplevel.check top
+      ("module Dummy_Functor (Introspection :\n                        Introspection_intf.INTROSPECTION) = struct\n  module Dummy_Params = struct\n    let results = ref None\n    let set_progress _ = ()\n    let timeout = None\n    module Introspection = Introspection            \n  end\n  module Test_lib = Test_lib.Make(Dummy_Params)\n  module Report = Learnocaml_report;;\n  let code_ast = (failwith \"WIP\" : Parsetree.structure);;\n\n "
+       ^ string ^ " end") >>= fun res ->
+    let error, warnings =
+      match res with
+      | Toploop_results.Ok ((), warnings) -> None, warnings
+      | Toploop_results.Error (err, warnings) -> Some err, warnings in
+    let transl_loc { Toploop_results.loc_start ; loc_end } =
+      { Ocaml_mode.loc_start ; loc_end } in
+    let error = match error with
+      | None -> None
+      | Some { Toploop_results.locs ; msg ; if_highlight } ->
+          Some { Ocaml_mode.locs = List.map transl_loc locs ;
+                 msg = (if if_highlight <> "" then if_highlight else msg) } in
+    let warnings =
+      List.map
+        (fun { Toploop_results.locs ; msg ; if_highlight } ->
+           { Ocaml_mode.loc = transl_loc (List.hd locs) ;
+             msg = (if if_highlight <> "" then if_highlight else msg) })
+        warnings in
+    Ocaml_mode.report_error ~set_class editor_t error warnings  >>= fun () ->
+    Ace.focus ace_t ;
+    Lwt.return () ;;
+
+let typecheck_spec set_class ace_t editor_t top  =typecheck_spec_aux set_class ace_t editor_t top (Ace.get_contents ace_t)
+
 let rec testhaut_init content_div id =          
     fetch_test_index id >>= fun index ->  
   let format_question_list all_question_states =
@@ -279,7 +307,7 @@ let rec testhaut_init content_div id =
                        true) ;button
               ] );
                     (div ~a:[a_id ("up")] [
-                     let buttonUp = button ~a:[a_id question_id]  [img ~src:("icons/icon_down_dark.svg") ~alt:"" () ; pcdata "" ] in 
+                     let buttonUp = button ~a:[]  [img ~src:("icons/icon_down_dark.svg") ~alt:"" () ; pcdata "" ] in 
                      Manip.Ev.onclick buttonUp
                        (fun _ ->
                          begin
@@ -299,7 +327,7 @@ let rec testhaut_init content_div id =
                      buttonUp;
             ]);
                   (div ~a:[a_id ("down")] [
-                     let buttonDown =button ~a:[a_id question_id]  [img ~src:("icons/icon_up_dark.svg") ~alt:"" () ; pcdata "" ] in 
+                     let buttonDown =button ~a:[]  [img ~src:("icons/icon_up_dark.svg") ~alt:"" () ; pcdata "" ] in 
                      Manip.Ev.onclick buttonDown
                        (fun _ ->
                          begin
@@ -320,7 +348,7 @@ let rec testhaut_init content_div id =
                      buttonDown;
                   ]);
                   (div ~a:[a_id ("duplicate")] [
-                       let buttonDuplicate =button ~a:[a_id question_id] [img ~src:("icons/icon_list_dark.svg") ~alt:"" (); pcdata "" ] in
+                       let buttonDuplicate =button ~a:[] [img ~src:("icons/icon_list_dark.svg") ~alt:"" (); pcdata "" ] in
                        Manip.Ev.onclick buttonDuplicate
                          (fun _ ->
                            begin
@@ -333,7 +361,7 @@ let rec testhaut_init content_div id =
                              let _ = testhaut_init content_div id in ()
                            end; true);
                        buttonDuplicate;
-                  ]) ]  
+                ])]
                  ::  a ~a:[ a_onclick (fun _ ->
                   
                   let elt = find_div "learnocaml-exo-loading" in

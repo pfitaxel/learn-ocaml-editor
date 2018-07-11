@@ -33,23 +33,6 @@ embedded_grading_cmis = [
 
 ]
 
-begin library "embedded_grading_cmis"
- build_rules = [
-    "embedded_grading_cmis.ml" (
-      build_target = true
-      sources = embedded_grading_cmis
-      commands = [ {
-        "ocp-ocamlres" "-format" "ocamlres" embedded_grading_cmis
-      } ( stdout = "embedded_grading_cmis.ml" ) ]
-    )
-  ]
-  files = [
-    "embedded_grading_cmis.ml"
-  ]
-  requires = [
-      "ocplib-ocamlres.runtime"
-  ]
-end
 begin library "embedded_cmis"
   build_rules = [
     "embedded_cmis.ml" (

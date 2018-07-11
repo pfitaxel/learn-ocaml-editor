@@ -641,11 +641,11 @@ let () =
   recovering_callback:=recovering ;
   let ast_fonction () =
     let fonction = if Js.to_bool(quality##.checked) then
-                     fonction_quality
+                     quality_function
                    else
                      "" in
     let fonction = if Js.to_bool(imperative##.checked) then
-                      fonction ^ fonction_imperative
+                      fonction ^ imperative_function
                     else
                       fonction ^ "" in
     let fonction = fonction ^ "\n\nlet ast_quality ast =" in
@@ -685,7 +685,7 @@ let () =
     fonction
   in
   let compile () = 
-    let tests=testprel^(ast_fonction ()) in
+    let tests=test_prel^(ast_fonction ()) in
     let tests=tests^" \n "^((get_buffer id))^" \n" in
     let tests=
       StringMap.fold (fun qid->fun quest -> fun str ->

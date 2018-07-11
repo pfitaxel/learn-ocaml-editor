@@ -13,7 +13,7 @@ module StringMap = Map.Make (String)
 let () = Translate.set_lang ()
 let () =
   let translations = [
-    "syntax", [%i"Syntax"];
+      (* "syntax", [%i"Syntax"];*)
     "cancel", [%i"Cancel"];
     "save", [%i"Save"];
     "txt_name", [%i"Function name: "];
@@ -21,19 +21,34 @@ let () =
     "txt_sol", [%i"Solution"];
     "txt_spec", [%i"Specification"];
     "txt_suite", [%i"Tests suite"];
-    "txt_input_sol", [%i"Arguments:<br>"];
+    (* "txt_input_sol", [%i"Arguments:<br>"];*)
     "txt_gen_sol", [%i"Number of generated tests:<br>"];
     "txt_datalist_sol", [%i"Tester:<br>"];
     "txt_sampler_sol", [%i"Sampler:<br>"];
-    "txt_input_spec", [%i"Arguments:<br>"];
+   (* "txt_input_spec", [%i"Arguments:<br>"];*)
     "txt_gen_spec", [%i"Number of generated tests:<br>"];
     "txt_datalist_spec", [%i"Tester:<br>"];
     "txt_sampler_spec", [%i"Sampler:<br>"];
-    "txt_spec_specification", [%i"Specification:<br>"];
-    "txt_suite_input", [%i"Arguments and results:<br>"];
+    (* "txt_spec_specification", [%i"Specification:<br>"];*)
+    (* "txt_suite_input", [%i"Arguments and results:<br>"];*)
     "txt_datalist_suite", [%i"Tester:<br>"];
   ] in
   Translate.set_string_translations translations
+
+let txt_popup_arg = "[!! 1; !! 2]" ^ [%i" for two tests for a function with int -> 'a profile"]
+                    ^ "<br>[true @: 4 @:!! \"titi\"]" ^ [%i" for one test for a function with bool -> int -> string -> 'a profile"];;
+let txt_popup_suite = "[false @:!! false ==> false;<br>
+                       false @:!! true ==> true;<br>
+                       true @:!! false ==> true;<br>
+                       true @:!! true ==> false]<br>" ^
+                        [%i"This is the syntax for the exclusive or.\nIt is the same syntax as the arguments', \n
+                            but we have to provide also the return value associated with ==>."];;
+let txt_popup_spec = "fun f args ret -> let x0 = \
+               apply (fun n u -> n) args in ~~ (x0 < ret)<br>" ^
+              [%i" -> f is the function"] ^ "<br>" ^ [%i" -> args are its arguments"] ^
+              "<br>" ^ [%i" -> ret is the return value of the function \
+                                when applied with args"] ^ "<br>" ^
+              [%i"In this example we want the return value to be greather than the first argument."]
 
 let init_tabs, select_tab =
   let names = [ "solution"; "spec"; "suite" ] in
@@ -106,7 +121,12 @@ let datalistSpec = match getElementById_coerce "spec-datalist" CoerceTo.input wi
 let datalistSuite = match getElementById_coerce "suite-datalist" CoerceTo.input with
     None -> failwith "unknown element datalistSuite"
   | Some s -> s;;
-    
+
+let txtPopupSol = getElementById "txt_input_sol";;
+let txtPopupSpecArg = getElementById "txt_input_spec";;
+let txtPopupSuite = getElementById "txt_suite_input";;
+let txtPopupSpec = getElementById "txt_spec_specification";;
+
 let save = getElementById "save";;
 
 let setInnerHtml elt s =    
@@ -240,6 +260,83 @@ let () = spec##.onclick := handler
         Js._true);;
 let () = suite##.onclick := handler (fun _ -> select_tab "suite"; Js._true);;
 
+let show_sol = ref false;;
+let () = let popup = find_component "popup-sol" in
+         Manip.setInnerHtml popup txt_popup_arg;
+         txtPopupSol##.onclick := handler
+            (fun _ -> let popup = find_component "popup-sol" in
+                      let test = find_component "learnocaml-test" in
+                      if !show_sol then
+                        begin
+                          Manip.removeClass popup "show";
+                          Manip.SetCss.opacity test (Some "1");
+                          show_sol := false;
+                        end
+                      else
+                        begin
+                          Manip.addClass popup "show";
+                          Manip.SetCss.opacity test (Some "0");
+                          show_sol := true;
+                        end;
+                      Js._true);;
+
+let show_spec_arg = ref false;;
+let () = let popup = find_component "popup-spec-arg" in
+         Manip.setInnerHtml popup txt_popup_arg;
+         txtPopupSpecArg##.onclick := handler
+            (fun _ -> let popup = find_component "popup-spec-arg" in
+                      let test = find_component "learnocaml-test" in
+                      if !show_spec_arg then
+                        begin
+                          Manip.removeClass popup "show";
+                          Manip.SetCss.opacity test (Some "1");
+                          show_spec_arg := false;
+                        end
+                      else
+                        begin
+                          Manip.addClass popup "show";
+                          Manip.SetCss.opacity test (Some "0");
+                          show_spec_arg := true;
+                        end;
+                      Js._true);;
+
+let show_spec = ref false;;
+let () = let popup = find_component "popup-spec" in
+         Manip.setInnerHtml popup txt_popup_spec;
+         txtPopupSpec##.onclick := handler
+            (fun _ -> let popup = find_component "popup-spec" in
+                      if !show_spec then
+                        begin
+                          Manip.removeClass popup "show";
+                          show_spec := false;
+                        end
+                      else
+                        begin
+                          Manip.addClass popup "show";
+                          show_spec := true;
+                        end;
+                      Js._true);;
+
+let show_suite = ref false;;
+let () = let popup = find_component "popup-suite" in
+         Manip.setInnerHtml popup txt_popup_suite;
+         txtPopupSuite##.onclick := handler
+            (fun _ -> let popup = find_component "popup-suite" in
+                      let test = find_component "learnocaml-test" in
+                      if !show_suite then
+                        begin
+                          Manip.removeClass popup "show";
+                          Manip.SetCss.opacity test (Some "1");
+                          show_suite := false;
+                        end
+                      else
+                        begin
+                          Manip.addClass popup "show";
+                          Manip.SetCss.opacity test (Some "0");
+                          show_suite := true;
+                        end;
+                      Js._true);;
+
 let transResultOption = function
   |None -> false
   |Some s-> true;;
@@ -314,51 +411,3 @@ let () = cancel##.onclick := handler (fun _ ->
     let _ = close_frame () in ();
     Js._true)
 
-
-(* ---- Syntax button ---------------------------------------------------------- *)
-
-let syntax = getElementById "syntax"
-let doc_body = Dom_html.document##.body
-let syntax_div = Tyxml_js.Html.(div ~a:[ a_id "syntax_div" ]) []
-
-(* ---- associated css --------------------------------------------------------- *)
-let _ =
-  Manip.SetCss.opacity syntax_div (Some "0");
-  Manip.SetCss.left syntax_div  "0%" ;
-  Manip.SetCss.right syntax_div  "0%" ;
-  Manip.SetCss.top syntax_div  "10%" ;
-  Manip.SetCss.bottom syntax_div "0%";
-  Manip.SetCss.background syntax_div "white";
-  Manip.SetCss.zIndex syntax_div "995";
-  Manip.SetCss.position syntax_div "absolute";;
-
-let content = "<h1 id=\"Syntax-examples\">" ^ [%i"Syntax examples"] ^
-              "</h1><ul><li><strong>" ^ [%i"Arguments"] ^
-              "</strong>:</li></ul>\n\n<p> <code>[!! 1; !! 2]</code>" ^
-              [%i" for two tests for a function with int -&gt; 'a profile"] ^
-              "</p>\n<p> <code>[true @: 4 @:!! \"titi\"]</code>" ^
-              [%i" for one test for a function with bool -&gt; int -&gt; string -&gt; 'a profile"] ^
-              "</p>\n<ul><li><strong>" ^ [%i"Specification"] ^
-              "</strong>:</li></ul>\n\n<p><code>fun f args ret -&gt; let x0 = \
-               apply (fun n u -&gt; n) args in ~~ (x0 &lt; ret)</code></p>\n<p>" ^
-              [%i" -&gt; f is the function"] ^ "</p>\n<p>" ^ [%i" -&gt; args are its arguments"] ^
-              "</p>\n<p>" ^ [%i" -&gt; ret is the return value of the function \
-                                when applied with args"] ^ "</p>\n<p>" ^
-              [%i"In this example we want the return value to be greather than the first argument."] ^
-              "</p>\n<ul><li><strong>" ^ [%i"Tests suite"] ^
-              "</strong>:</li></ul>\n\n<p> <code>[false @:!! false ==&gt; false;</code></p>\n\
-               <p> <code> false @:!! true ==&gt; true;</code></p>\n\
-               <p> <code> true @:!! false ==&gt; true;</code></p>\n\
-               <p> <code> true @:!! true ==&gt; false]</code></p>\n<p>" ^
-              [%i"This is the syntax for the exclusive or.\nIt is the same syntax as the arguments', \
-                  but we have to provide also the return value associated with ==&gt;."] ^ "</p>";;
-
-Manip.setInnerHtml syntax_div content;;
-open Tyxml_js.Html5
-let button = button ~a:[a_id "ok";
-a_onclick (fun _ -> Manip.SetCss.opacity syntax_div (Some "0");
-	Manip.SetCss.zIndex syntax_div "995"; true)] [ pcdata [%i"OK"] ];;
-Manip.appendChildFirst syntax_div button ;;
-syntax##.onclick:= handler (fun _ -> Manip.SetCss.opacity syntax_div (Some "1");
-	Manip.SetCss.zIndex syntax_div "998"; Js._true);;
-Manip.appendChildFirst (Tyxml_js.Of_dom.of_body doc_body) syntax_div 

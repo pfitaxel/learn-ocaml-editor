@@ -6,6 +6,60 @@ body{
   text-align: center;
 }
 
+.popup {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/* The actual popup */
+.popup .popuptext {
+    visibility: hidden;
+    background-color: #555;
+    color: #fff;
+    text-align: left;
+    border-radius: 6px;
+    padding: 8px 8px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 0px;
+}
+
+/* Popup arrow */
+.popup .popuptext::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #555 transparent transparent transparent;
+}
+
+/* Toggle this class - hide and show the popup */
+.popup .show {
+    visibility: visible;
+    -webkit-animation: fadeIn 1s;
+    animation: fadeIn 1s;
+}
+
+/* Add animation (fade in the popup) */
+@-webkit-keyframes fadeIn {
+    from {opacity: 0;} 
+    to {opacity: 1;}
+}
+
+@keyframes fadeIn {
+    from {opacity: 0;}
+    to {opacity:1 ;}
+}
+
 /* -------------- toolbar ---------------------------------------- */
 #learnocaml-main-toolbar {
   position: fixed;
@@ -136,7 +190,7 @@ body{
 	border : 3px solid #fff
 }
 #txt_input_sol {
-	left: 10px;	top:45%;
+	left: 10px;	top:45%; right: 50%;
 	position: absolute;
 }
 
@@ -177,8 +231,9 @@ body{
 }
 
 #txt_input_spec {
-	left: 10px; top: 45%;	
+	left: 10px; top: 45%;	right:50%;
 	position: absolute;
+	right: 50%;
 }
 
 #learnocaml-tab-spec-extra {
@@ -218,6 +273,7 @@ body{
 	position: absolute;
 	left: 52%;
 	top: 45%;
+  right: 10px;
 }
 
 /* ------------------ suite tab ---------------------------------- */
@@ -231,7 +287,7 @@ body{
 }
 
 #txt_suite_input {
-	left: 10px;	top: 45%;
+	left: 10px;	top: 45%; right:50%;
 	position: absolute;
 }
 #learnocaml-tab-suite-datalist{

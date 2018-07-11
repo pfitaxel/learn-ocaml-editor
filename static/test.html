@@ -42,7 +42,6 @@
         <img src="icons/logo_ocp.svg">
       </div>
       <div>
-		<button id="syntax" type="button" class="button">Syntax</button>
       	<button id="cancel" type="button" class="button">Cancel</button>
     	<button id="save" type="submit" class="button">Save</button>
       </div>
@@ -73,11 +72,9 @@
     </div>
     <div id="learnocaml-tabs">
       <div id="learnocaml-tab-solution">
-
-	<a id="txt_input_sol">Arguments : 
-	  <br>
-      <!-- keep in sync with testhaut.ml -->
-	</a>
+	<div id="txt_input_sol" class="popup">Arguments : 
+	  <span class="popuptext" id="popup-sol"/>
+	</div>
 	<div id="learnocaml-tab-solution-input">
 	</div>
 	<div id="learnocaml-tab-solution-extra">
@@ -105,7 +102,9 @@
       </div>
 
       <div id="learnocaml-tab-spec">
-	<a id="txt_input_spec">Arguments:<br></a>
+	<div id="txt_input_spec" class="popup">Arguments :
+	  <span class="popuptext" id="popup-spec-arg"/>
+	</div>
 	<div id="learnocaml-tab-spec-input">
 	</div>
 	<div id="learnocaml-tab-spec-extra">
@@ -130,13 +129,17 @@
 	  <label id="txt_sampler_spec" for="spec-sampler">Sampler:<br></label>
 	  <input type="text" value="" id="spec-sampler"></input>
 	</div>
-	<a id="txt_spec_specification">Specification:<br></a>
+	<div id="txt_spec_specification" class="popup">Specification:
+	  <span class="popuptext" id="popup-spec"/>
+	</div>
 	<div id="learnocaml-tab-spec-spec">
 	</div>
       </div>
 
       <div id="learnocaml-tab-suite">
-	<a id="txt_suite_input">Arguments and results:<br></a>
+	<div id="txt_suite_input" class="popup">Arguments and results: 
+	  <span class="popuptext" id="popup-suite"/>
+	</div>
 	<div id="learnocaml-tab-suite-input">
 	</div>
 	<div id="learnocaml-tab-suite-datalist">
@@ -154,6 +157,7 @@
 	</div>
       </div>
     </div>
+
     <!--/form-->
   </body>
 </html>

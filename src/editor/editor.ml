@@ -53,10 +53,12 @@ module Dummy_Functor (Introspection :
   module Dummy_Params = struct
     let results = ref None
     let set_progress _ = ()
-    module Introspection = Introspection            
+    module Introspection = Introspection
+    let timeout = None
   end       
   module Test_lib = Test_lib.Make(Dummy_Params)
   module Report = Learnocaml_report
+end
 *)
 
 (* keep sync with test-spec *)
@@ -278,7 +280,7 @@ let () =
     end >>= fun r1 ->
     Learnocaml_toplevel.load ~print_outcome:false top
      "" >>= fun r2 ->
-    if not r1 || not r2 then failwith [%i"error in prelude"] ;
+    if not r1 || not r2 then failwith [%i"unexpected error"];
     Learnocaml_toplevel.set_checking_environment top >>= fun () ->
     Lwt.return () in
   let timeout_prompt =
@@ -323,7 +325,7 @@ let () =
   end ;
   begin toplevel_button
       ~icon: "reload" [%i"Reset"] @@ fun () ->
-    toplevel_launch >>= fun top ->
+    (* toplevel_launch >>= fun top -> SHOULD BE UNNECESSARY *)
     disabling_button_group toplevel_buttons_group (fun () -> Learnocaml_toplevel.reset top)
   end ;
   begin toplevel_button
@@ -349,11 +351,36 @@ let () =
   Ace.set_contents ace_t  (contents); 
   Ace.set_font_size ace_t 18;
 
-  (* let typecheck set_class = Editor_lib.typecheck set_class ace_t editor_t top in *)
+  (* TODO Refactor *)
+  let typecheck_spec set_class =
+    Learnocaml_toplevel.check top
+      ("module Dummy_Functor (Introspection :\n                        Introspection_intf.INTROSPECTION) = struct\n  module Dummy_Params = struct\n    let results = ref None\n    let set_progress _ = ()\n    let timeout = None\n    module Introspection = Introspection            \n  end\n  module Test_lib = Test_lib.Make(Dummy_Params)\n  module Report = Learnocaml_report;;\n  let code_ast = (failwith \"WIP\" : Parsetree.structure);;\n\n "
+       ^ Ace.get_contents ace_t ^ " end") >>= fun res ->
+    let error, warnings =
+      match res with
+      | Toploop_results.Ok ((), warnings) -> None, warnings
+      | Toploop_results.Error (err, warnings) -> Some err, warnings in
+    let transl_loc { Toploop_results.loc_start ; loc_end } =
+      { Ocaml_mode.loc_start ; loc_end } in
+    let error = match error with
+      | None -> None
+      | Some { Toploop_results.locs ; msg ; if_highlight } ->
+          Some { Ocaml_mode.locs = List.map transl_loc locs ;
+                 msg = (if if_highlight <> "" then if_highlight else msg) } in
+    let warnings =
+      List.map
+        (fun { Toploop_results.locs ; msg ; if_highlight } ->
+           { Ocaml_mode.loc = transl_loc (List.hd locs) ;
+             msg = (if if_highlight <> "" then if_highlight else msg) })
+        warnings in
+    Ocaml_mode.report_error ~set_class editor_t error warnings  >>= fun () ->
+    Ace.focus ace_t ;
+    Lwt.return () in
   begin test_button
       ~group: toplevel_buttons_group
       ~icon: "typecheck" [%i"Check"] @@ fun () ->
-    Lwt.return ();
+    typecheck_spec true
+  (* let typecheck set_class = Editor_lib.typecheck set_class ace_t editor_t top in *)
   end ;
 
   (*-------question pane  -------------------------------------------------*)
@@ -947,9 +974,8 @@ let () =
   if arg "tab" = "testhaut" then
     !grade_red ();
   (* ---- return -------------------------------------------------------- *)
-  toplevel_launch >>= fun _ ->
-  typecheck false >>= fun () ->
-
+  (* toplevel_launch >>= fun _ -> FIXME? SHOULD BE UNNECESSARY *)
+  (* typecheck false >>= fun () -> ? *)
   hide_loading ~id:"learnocaml-exo-loading" () ;
   let () = Lwt.async @@ fun () ->
      let _ = Dom_html.window##setInterval (Js.wrap_callback (fun () -> onload ())) 200.; in

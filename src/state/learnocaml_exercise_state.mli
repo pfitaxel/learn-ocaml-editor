@@ -17,13 +17,13 @@
 
 type exercise_state =
   { solution : string ;
-    grade : int (* \in [0, 100] *) option ;
+    grade : int (* in [0, 100] *) option ;
     report : Learnocaml_report.report option ;
     mtime : float }
 
 val exercise_state_enc : exercise_state Json_encoding.encoding
 
-type type_question= Suite | Solution | Spec ;;
+type type_question = Suite | Solution | Spec ;;
 
 type test_qst_untyped =
   | TestAgainstSol of
@@ -32,7 +32,7 @@ type test_qst_untyped =
       ; gen: int
       ; suite: string
       ; tester: string
-      ; sampler: string}
+      ; sampler: string }
   | TestAgainstSpec of
       { name: string
       ; ty: string
@@ -40,13 +40,12 @@ type test_qst_untyped =
       ; suite: string
       ; spec : string
       ; tester: string
-      ; sampler: string}
+      ; sampler: string }
   | TestSuite of
-      { name: string;
-        ty: string;
-        suite: string;
-        tester :string}
-;;
+      { name: string
+      ; ty: string
+      ; suite: string
+      ; tester: string } ;;
 
 type test_state = {testml : string;
                    testhaut : test_qst_untyped Map.Make (String).t}
@@ -54,26 +53,26 @@ type test_state = {testml : string;
 val testhaut_enc : test_qst_untyped Map.Make (String).t Json_encoding.encoding
     
 type metadata =
-  { id :string;
-    titre :string;
-    description :string;
-    diff :float
+  { id : string;
+    titre : string;
+    description : string;
+    diff : float
   }
 
-type checkbox=
+type checkbox =
   { imperative : bool;
     undesirable : bool}
 
 type editor_state =
-  { metadata :metadata;    
-    prepare :string;
-    solution : string ;
-    question : string ;
-    template : string ;
-    test : test_state ;
+  { metadata : metadata;    
+    prepare : string;
+    solution : string;
+    question : string;
+    template : string;
+    test : test_state;
     prelude : string;
-    incipit :string ;
-    checkbox :checkbox;
+    incipit : string ;
+    checkbox : checkbox;
     mtime : float }
 
 val editor_state_enc : editor_state Json_encoding.encoding
@@ -83,6 +82,5 @@ type index_state =
      exos : Learnocaml_index.exercise Map.Make(String).t;
      mtime : float;
   }
-  
 
 val index_state_enc : index_state Json_encoding.encoding

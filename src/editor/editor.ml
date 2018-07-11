@@ -345,8 +345,7 @@ let () =
     if a = "" then
       [%i"(* Grader and tests code *)\n"]
     else
-      a
-  in
+      a in
 
   Ace.set_contents ace_t  (contents); 
   Ace.set_font_size ace_t 18;
@@ -391,8 +390,7 @@ let () =
     if a = "" then [%i"# Questions\n\n\
     You can write here your questions using\n\
     the **Markdown** markup language\n"]
-    else a
-  in
+    else a in
 
   Ace.set_contents ace_quest question ;
   Ace.set_font_size ace_quest 18;
@@ -466,8 +464,7 @@ let () =
       [%i"(* Local definitions the student\n\
       	  will be able to see *)\n"]
     else
-      a
-  in
+      a in
   Ace.set_contents ace_prel contents ;
   Ace.set_font_size ace_prel 18;
 
@@ -489,8 +486,7 @@ let () =
       [%i"(* Local definitions the student\n\
       	  won't be able to see *)\n"]
     else
-      a
-  in  
+      a in  
   Ace.set_contents ace_prep contents ;
   Ace.set_font_size ace_prep 18;
 
@@ -512,8 +508,7 @@ let () =
   if a = "" then
     [%i"(* Your solution *)\n"]
   else
-    a
-      in
+    a in
   Ace.set_contents ace contents;
   Ace.set_font_size ace 18;
 
@@ -528,8 +523,7 @@ let () =
       [%i"(* Code the student will have\n\
       	  when he will start the exercise *)\n"]
     else
-      a
-  in
+      a in
   Ace.set_contents ace_temp contents ;
   Ace.set_font_size ace_temp 18;
 
@@ -612,16 +606,14 @@ let () =
   end ;
   let quality = match getElementById_coerce "quality_box" CoerceTo.input with
     | None -> failwith "unknown element quality_box"
-    | Some s -> s
-  in
+    | Some s -> s in
   let imperative = match getElementById_coerce "imperative_box" CoerceTo.input with
     | None -> failwith "unknown element imperative_box"
-    | Some s -> s
-  in
+    | Some s -> s in
 
   let recovering () =
     let solution = Ace.get_contents ace in
-    let titre = get_titre id  in
+    let titre = get_titre id in
     let incipit= Ace.get_contents ace_testhaut in
     let question = Ace.get_contents ace_quest in
     let template = Ace.get_contents ace_temp in
@@ -682,23 +674,20 @@ let () =
                      "Section ([Text \"Code quality:\" ], ast_quality code_ast)"
                    else
                      "" in
-    fonction
-  in
+    fonction in
   let compile () = 
     let tests=test_prel^(ast_fonction ()) in
     let tests=tests^" \n "^((get_buffer id))^" \n" in
     let tests=
       StringMap.fold (fun qid->fun quest -> fun str ->
-            str ^ (Test_spec.question_typed quest qid)^" \n") (get_testhaut id) tests
-    in 
+            str ^ (Test_spec.question_typed quest qid)^" \n") (get_testhaut id) tests in
     let tests=tests^init^"[ \n " in
     let tests=
       StringMap.fold (fun qid->fun quest-> fun str ->
           let name=match quest with
-              TestAgainstSol a->a.name
-             |TestAgainstSpec a ->a.name
-             |TestSuite a -> a.name
-          in
+            | TestAgainstSol a->a.name
+            | TestAgainstSpec a ->a.name
+            | TestSuite a -> a.name in
           (* refactor what it's up in editor_lib *)
             str ^ (section name ("test_question question"^qid ) )) (get_testhaut id) tests in
     let tests=tests^ (ast_code ()) ^ " ]" in
@@ -744,8 +733,7 @@ let () =
     let delete_all_questions () =
       save_testhaut StringMap.empty id;
       Manip.removeChildren (find_component "learnocaml-exo-testhaut-pane");
-      let _ = testhaut_init (find_component "learnocaml-exo-testhaut-pane") id in ()
-    in
+      let _ = testhaut_init (find_component "learnocaml-exo-testhaut-pane") id in () in
          let aborted, abort_message =
            let t, u = Lwt.task () in
            let btn_no = Tyxml_js.Html5.(button [ pcdata [%i"No"] ]) in

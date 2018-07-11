@@ -183,7 +183,7 @@ end
 open Editor_lib
  
 (*
-let types_de_base =
+let basic_types =
   [ ['i';'n';'t'];['c';'h';'a';'r'];['f';'l';'o';'a';'t'];
     ['s';'t';'r';'i';'n';'g'];['b';'o';'o';'l'] ] ;;
 *)

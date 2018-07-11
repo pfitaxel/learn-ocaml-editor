@@ -1,7 +1,8 @@
+(* Internationalization *)
 let () = Translate.set_lang ()
 
 module type TYPING = sig
-  (** should return a representation of a type from its string serialisation *)
+  (** Should return a representation of a type from its string serialisation *)
   val ty_of : string -> 'a Ty.ty
 end
 
@@ -12,7 +13,7 @@ open Learnocaml_report
 
 
 (* sampler: (unit -> ('ar -> 'row, 'ar -> 'urow, 'ret) args) *)
-(*keep in sync with learnocaml_exercise_state.ml *)
+(* keep in sync with learnocaml_exercise_state.ml *)
 type test_qst_untyped =
   | TestAgainstSol of
       { name: string
@@ -34,7 +35,6 @@ type test_qst_untyped =
         ty: string;
         suite: string;
         tester : string}
-;;
 
 type outcome =
   | Correct of string option
@@ -53,7 +53,8 @@ type test_qst_typed =
   | TestAgainstSpec :
       { name: string
       ; prot: (('ar -> 'row) Ty.ty, 'ar -> 'urow, 'ret) prot
-      ; tester: 'ret tester option  (* 'a tester option (base) mais probleme de type : 'a tester incompatible avec 'ret tester*)
+      ; tester: 'ret tester option 
+      (* 'a tester option (base) mais probleme de type : 'a tester incompatible avec 'ret tester *)
       ; sampler: (unit -> ('ar -> 'row, 'ar -> 'urow, 'ret) args) option
       ; gen: int
       ; suite: ('ar -> 'row, 'ar -> 'urow, 'ret) args list
@@ -77,8 +78,10 @@ let (@:!!) a b = a @: !! b
 let (@:) a l = a :: l
 let (!!) b = b :: []
 let (@:!!) a b = a @: !! b
- *)
+*)
+
 (* TODO missing: nth_arg *)
+
 (*
 let example_constr_sol =
   TestAgainstSol
@@ -89,10 +92,8 @@ let example_constr_sol =
     }
 *)
 
-
-    
-
-(*let example_constr_spec =
+(*
+let example_constr_spec =
   TestAgainstSpec
     { name = "idempotent";
       prot = (last_ty [%ty: (int)] [%ty: int]);
@@ -112,7 +113,8 @@ let example_constr_suite =
                false @:!! true ==> true;
                true @:!! false ==> true;
                true @:!! true ==> false]
-    }*)
+    }
+*)
 
 
 let local_dummy : 'a sampler = fun () -> failwith "dummy sampler"
@@ -180,21 +182,22 @@ end
 
 open Editor_lib
  
-(*let types_de_base =
+(*
+let types_de_base =
   [ ['i';'n';'t'];['c';'h';'a';'r'];['f';'l';'o';'a';'t'];
     ['s';'t';'r';'i';'n';'g'];['b';'o';'o';'l'] ] ;;
 *)
 let rec to_string_aux char_list =match char_list with
-    []-> ""
-  |c::l -> (string_of_char c) ^( to_string_aux l)
-;;
+  | []-> ""
+  | c::l -> (string_of_char c) ^ ( to_string_aux l)
 
-let to_ty str= "(to_ty \""^str^"\" )";;
+let to_ty str = "(to_ty \""^str^"\" )"
+
 let parse_type string =
   let char_list_ref = ref (List.rev (decomposition string 0)) in
   let para_cpt =ref 0 in
   let esp_cpt= ref 0 in
-  (*reverse char_list before using it *)
+  (* reverse char_list before using it *)
   let rec last_arg char_list acc= 
     match char_list with
       []->char_list_ref:=[];acc
@@ -241,7 +244,7 @@ let parse_type string =
   done;
   !acc;;
 
-(*parse_type (string : ex: int -> int) ==> (string : prot)*)
+(* parse_type (string : ex: int -> int) ==> (string : prot) *)
 
 let question_typed question id_question = 
   let open Learnocaml_exercise_state in
@@ -260,10 +263,9 @@ let question_typed question id_question =
            | Suite -> "\nlet question"^id_question^" =  TestSuite {name=\""^name^"\"; prot="^(parse_type ty)^"; tester="^tester^"; suite="^input^"}"
            | Solution -> "\nlet question"^id_question^" = TestAgainstSol {name=\""^name^"\"; prot="^(parse_type ty)^"; tester="^tester^"; sampler="^sampler^"; gen="^(string_of_int extra_alea)^"; suite="^input^"}"
            | Spec -> "\nlet question"^id_question^" = TestAgainstSpec {name=\""^name^"\"; prot="^(parse_type ty)^"; tester="^tester^"; sampler="^sampler^"; gen="^(string_of_int extra_alea)^"; suite="^input^"; spec="^output^"}") in
-  acc;;
+  acc
 
 (*
-
 let ty_of_abstract_type_from_student_module_1 module_name type_name
  (a : 'a Ty.ty) : 'a Ty.ty =
   let ty_id =
@@ -275,22 +277,19 @@ let ty_of_abstract_type_from_student_module_2 module_name type_name (a : 'a Ty.t
     Location.mknoloc (Longident.(Ldot (Ldot (Lident "Code", module_name), type_name))) in
   Ty.repr (Ast_helper.Typ.constr ty_id [Ty.obj a; Ty.obj b]);;
 
-
   type (_, _, _) prot =
     | Last_ty : 'a Ty.ty * 'r Ty.ty -> (('a -> 'r) Ty.ty, 'a -> unit, 'r) prot
     | Arg_ty : 'a Ty.ty * (('b -> 'c) Ty.ty, 'b -> 'd, 'r) prot -> (('a -> 'b -> 'c) Ty.ty, 'a -> 'b -> 'd, 'r) prot
 
-(*order issues have to be considered may be *)
-let rec to_core_type_list: type p a c r. ((p -> a) Ty.ty, p -> c, r) prot ->  Parsetree.core_type list  = function
+(* order issues have to be considered may be *)
+let rec to_core_type_list: type p a c r. ((p -> a) Ty.ty, p -> c, r) prot -> Parsetree.core_type list  = function
     | Last_ty (a, b) -> [Ty.obj a ;Ty.obj b]
     | Arg_ty (x, Last_ty (l, r)) -> [Ty.obj x ;Ty.obj l;Ty.obj r]
     | Arg_ty (x, Arg_ty (y, r)) -> (Ty.obj x) :: (to_core_type_list (Arg_ty (y, r)))
-
 
 let ty_of_abstract_type_from_student_module module_name type_name (a : 'a Ty.ty)
     (prot :  ('arrow, 'uarrow, 'ret) prot) : 'a Ty.ty =
   let ty_id =
     Location.mknoloc (Longident.(Ldot (Ldot (Lident "Code", module_name), type_name))) in
   Ty.repr (Ast_helper.Typ.constr ty_id ( (Ty.obj a)::(to_core_type_list prot)) );;
-
 *)

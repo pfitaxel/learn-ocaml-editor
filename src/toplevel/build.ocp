@@ -3,14 +3,16 @@ begin program "learnocaml-toplevel-worker"
   requires = [
     "jsutils"
     "js_of_ocaml"
+    "js_of_ocaml.ppx"
     "toploop_jsoo"
     "toploop_results"
     "ocplib-ocamlres.runtime"
     "embedded_cmis"
+    "embedded_grading_cmis"
   ]
   files = [
     "learnocaml_toplevel_worker_messages.mli"
-    "learnocaml_toplevel_worker_main.ml" ( pp = camlp4_js )
+    "learnocaml_toplevel_worker_main.ml" ( comp = ppx_js )
   ]
   build_rules = [
     "%{learnocaml-toplevel-worker_FULL_DST_DIR}%/learnocaml-toplevel-worker.js" (
@@ -18,7 +20,6 @@ begin program "learnocaml-toplevel-worker"
       sources = %byte_exe( p = "learnocaml-toplevel-worker" )
       commands = [ {
         "js_of_ocaml"
-           "+weak.js"
            "+dynlink.js"
            "+toplevel.js"
            "--toplevel"
@@ -34,7 +35,7 @@ begin library "learnocaml-toplevel-history"
     "ocplib-json-typed"
   ]
   files = [
-    "learnocaml_toplevel_history.ml" ( pp = camlp4_js )
+    "learnocaml_toplevel_history.ml"
   ]
 end
 
@@ -43,16 +44,17 @@ begin library "learnocaml-toplevel"
     "toploop_results"
     "jsutils"
     "js_of_ocaml"
-    "ocp-indent.lib"
+    "js_of_ocaml.ppx"
+    "ocp-indent-nlfork.lib"
     "ace"
     "ocplib-json-typed"
     "learnocaml-toplevel-history"
   ]
   files = [
     "learnocaml_toplevel_worker_messages.mli"
-    "learnocaml_toplevel_worker_caller.ml" ( pp = camlp4_js )
-    "learnocaml_toplevel_output.ml" ( pp = camlp4_js )
-    "learnocaml_toplevel_input.ml" ( pp = camlp4_js )
-    "learnocaml_toplevel.ml" ( pp = camlp4_optcomp_js )
+    "learnocaml_toplevel_worker_caller.ml" ( comp = ppx_js )
+    "learnocaml_toplevel_output.ml" ( comp = ppx_js )
+    "learnocaml_toplevel_input.ml" ( comp = ppx_js )
+    "learnocaml_toplevel.ml"
   ]
 end

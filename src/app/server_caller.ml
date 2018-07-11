@@ -42,10 +42,10 @@ let fetch ?message filename =
 
 let fetch_json filename =
   fetch filename >>= fun text ->
-  try Lwt.return (Js._JSON##parse (Js.string text)) with Js.Error err ->
+  try Lwt.return (Js._JSON##(parse (Js.string text))) with Js.Error err ->
     let msg =
       Format.asprintf "bad format for %s\n%s"
-        filename (Js.to_string err ## message) in
+        filename (Js.to_string err ##. message) in
     Lwt.fail (Cannot_fetch msg)
 
 let fetch_and_decode_json enc filename =
@@ -62,6 +62,33 @@ let fetch_exercise_index () =
     Learnocaml_index.exercise_index_enc
     Learnocaml_index.exercise_index_path
 
+open Learnocaml_exercise_state 
+
+let fetch_index id=
+  let open Learnocaml_exercise_state in
+  let index=
+     Learnocaml_local_storage.(retrieve (index_state id)).exos
+  in
+   
+  
+  let open Learnocaml_index in
+  let json =
+    Json_repr_browser.Json_encoding.construct
+     exercise_index_enc  (Learnocaml_exercises index)
+    in
+  try Lwt.return (Json_repr_browser.Json_encoding.destruct exercise_index_enc json) with exn ->
+    let msg =
+      Format.asprintf "bad structure for %s@.%a"
+        "index"
+        (fun ppf -> Json_encoding.print_error ppf) exn in
+    Lwt.fail (Cannot_fetch msg)
+;;
+
+let fetch_editor_index () =fetch_index "index";;
+
+    
+
+    
 let fetch_exercise id =
   fetch_and_decode_json
     Learnocaml_exercise.enc
@@ -94,10 +121,10 @@ let fetch_save_file ~token =
   let message = "cannot download server data" in
   fetch ~message ("/sync/" ^ token) >>= fun text ->
   let text = if text = "" then "{}" else text in
-  (try Lwt.return (Js._JSON##parse (Js.string text)) with Js.Error err ->
+  (try Lwt.return (Js._JSON##(parse (Js.string text))) with Js.Error err ->
      let msg =
        Format.asprintf "bad format for server data\n%s"
-         (Js.to_string err ## message) in
+         (Js.to_string err ##. message) in
      Lwt.fail (Cannot_fetch msg)) >>= fun json ->
   try Lwt.return @@
     Json_repr_browser.Json_encoding.destruct Learnocaml_sync.save_file_enc json
@@ -113,7 +140,7 @@ let upload_save_file ~token save_file =
       Learnocaml_sync.save_file_enc
       save_file in
   let body =
-    Some (Js.to_string (Js._JSON##stringify (json))) in
+    Some (Js.to_string (Js._JSON##(stringify json))) in
   Lwt.catch
     (fun () -> Lwt_request.post ~headers: [] ~get_args: []
         ~url: ("/sync/" ^ token) ~body)

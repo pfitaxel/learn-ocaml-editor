@@ -66,15 +66,22 @@ module type S = sig
 
   val compatible_type : expected:string -> string -> Learnocaml_report.report
 
-  val abstract_type : ?allow_private:bool -> string -> bool * Learnocaml_report.report
+  val existing_type : ?score:int -> string -> bool * Learnocaml_report.report
+
+  val abstract_type : ?allow_private:bool -> ?score:int -> string -> bool * Learnocaml_report.report
 
   val test_student_code : 'a Ty.ty -> ('a -> Learnocaml_report.report) -> Learnocaml_report.report
+
+  val test_module_property :
+    'a Ty.ty -> string -> ('a -> Learnocaml_report.report) -> Learnocaml_report.report
 
   (*----------------------------------------------------------------------------*)
 
   type 'a result =
     | Ok of 'a
     | Error of exn
+
+  val typed_printer : 'a Ty.ty -> Format.formatter -> 'a -> unit
 
   val exec : (unit -> 'a) -> ('a * string * string) result
   val result : (unit -> 'a) -> 'a result
@@ -277,6 +284,15 @@ module type S = sig
     (('ar -> 'row) Ty.ty, 'ar -> 'urow, 'ret) prot ->
     (('a -> 'ar -> 'row) Ty.ty, ('a -> 'ar -> 'urow), 'ret) prot
 
+  val ty_of_prot :
+    (('p -> 'a) Ty.ty, 'p -> 'c, 'r) prot -> ('p -> 'a) Ty.ty
+  val to_ty : string ->'a Ty.ty
+  val get_ret_ty :
+    ('p -> 'a) Ty.ty -> ('p -> 'a, 'p -> 'c, 'r) args -> 'r Ty.ty       
+  val print :
+    (('p -> 'a) Ty.ty, 'p -> 'c, 'r) prot ->
+    Format.formatter -> ('p -> 'a, 'p -> 'c, 'r) args -> unit
+
   type 'a lookup = unit -> [ `Found of string * Learnocaml_report.report * 'a | `Unbound of string * Learnocaml_report.report ]
 
   val lookup : 'a Ty.ty -> ?display_name: string -> string -> 'a lookup
@@ -351,6 +367,7 @@ module Make
     (Params : sig
        val results : Learnocaml_report.report option ref
        val set_progress : string -> unit
+       val timeout : int option
        module Introspection : Introspection_intf.INTROSPECTION
      end) : S = struct
 
@@ -711,7 +728,7 @@ module Make
     let open Learnocaml_report in
     [ Message ([ Text "Checking that " ; Code got ;
                  Text "is compatible with " ; Code exp ], Informative) ;
-      match Introspection.compatible_type exp got with
+      match Introspection.compatible_type exp ("Code." ^ got) with
       | Introspection.Absent ->
           Message ([ Text "Type not found" ], Failure)
       | Introspection.Incompatible msg ->
@@ -719,16 +736,24 @@ module Make
       | Introspection.Present () ->
           Message ([ Text "Type found and compatible" ], Success 5) ]
 
-  let abstract_type ?(allow_private = true) name =
+  let existing_type ?(score = 1) name =
     let open Learnocaml_report in
-    let path = Env.lookup_type Longident.(parse ("Code." ^ name)) !Toploop.toplevel_env in
-    match Env.find_type path !Toploop.toplevel_env with
-    | { Types. type_kind = Types.Type_abstract } ->
-        true, [ Message ([Text "Type" ; Code "Exp.e" ; Text "is abstract as expected." ], Success 5) ]
-    | { Types. type_kind = _ ; type_private = Asttypes.Private } when allow_private ->
-        true, [ Message ([Text "Type" ; Code "Exp.e" ; Text "is private, I'll accept that :-)." ], Success 5) ]
-    | { Types. type_kind = _ } ->
-        false, [ Message ([Text "Type" ; Code "Exp.e" ; Text "should be abstract!" ], Failure) ]
+    try let path = Env.lookup_type Longident.(parse ("Code." ^ name)) !Toploop.toplevel_env in
+        let _ = Env.find_type path !Toploop.toplevel_env in
+        true, [ Message ( [ Text "Type" ; Code name ; Text "found" ], Success score ) ]
+    with Not_found -> false, [ Message ( [ Text "type" ; Code name ; Text "not found" ], Failure ) ]
+
+  let abstract_type ?(allow_private = true) ?(score = 5) name =
+    let open Learnocaml_report in
+    try let path = Env.lookup_type Longident.(parse ("Code." ^ name)) !Toploop.toplevel_env in
+        match Env.find_type path !Toploop.toplevel_env with
+        | { Types. type_kind = Types.Type_abstract ; Types. type_manifest = None } ->
+           true, [ Message ([Text "Type" ; Code name ; Text "is abstract as expected." ], Success score) ]
+        | { Types. type_kind = _ ; type_private = Asttypes.Private } when allow_private ->
+           true, [ Message ([Text "Type" ; Code name ; Text "is private, I'll accept that :-)." ], Success score) ]
+        | { Types. type_kind = _ } ->
+           false, [ Message ([Text "Type" ; Code name ; Text "should be abstract!" ], Failure) ]
+    with Not_found -> false, [ Message ( [Text "Type" ; Code name ; Text "not found." ], Failure) ]
 
   let test_student_code ty cb =
     let open Learnocaml_report in
@@ -738,6 +763,16 @@ module Make
     | Introspection.Incompatible msg ->
         [ Message ([ Text "Your code doesn't match the expected signature." ; Break ;
                      Code msg (* TODO: hide or fix locations *) ], Failure) ]
+
+  let test_module_property ty name cb =
+    let open Learnocaml_report in
+    match Introspection.get_value ("Code." ^ name) ty with
+    | Introspection.Present v -> cb v
+    | Introspection.Absent ->
+       [ Message ([ Text "Module" ; Code name ; Text "not found." ], Failure) ]
+    | Introspection.Incompatible msg ->
+       [ Message ([ Text "Module" ; Code name ; Text "doesn't match the expected signature." ;
+                    Break ; Code msg (* TODO: hide or fix locations *) ], Failure) ]
 
   let typed_printer ty ppf v =
     Introspection.print_value ppf v ty
@@ -750,6 +785,8 @@ module Make
 
   type 'a tester =
     'a Ty.ty -> 'a result -> 'a result -> Learnocaml_report.report
+
+  exception Timeout
 
   let test_generic eq canon ty va vb =
     let to_string v = Format.asprintf "%a" (typed_printer ty) v in
@@ -767,6 +804,8 @@ module Make
             Learnocaml_report.[ Message ([ Text "Your code exceeded the output buffer size limit." ], Failure) ]
         | Error Stack_overflow ->
             Learnocaml_report.[ Message ([ Text "Your code did too many recursions." ], Failure) ]
+        | Error Timeout ->
+            Learnocaml_report.[ Message ([ Text "Your code exceeded the time limit. Too many recursions?" ], Failure) ]
         | Error exn ->
             Learnocaml_report.[ Message ([ Text "Wrong exception" ; Code (Printexc.to_string exn) ], Failure) ] end
 
@@ -814,11 +853,24 @@ module Make
 
   (*----------------------------------------------------------------------------*)
 
+let sigalrm_handler = Sys.Signal_handle (fun _ -> raise Timeout) 
+let run_timeout ~time v =
+  let old_behavior = Sys.signal Sys.sigalrm sigalrm_handler in
+  let reset_sigalrm () = Sys.set_signal Sys.sigalrm old_behavior
+  in ignore (Unix.alarm time);
+     try
+       let res = v () in
+       reset_sigalrm (); res
+     with exc ->
+       reset_sigalrm (); raise exc
+
   let exec v =
     Introspection.grab_stdout () ;
     Introspection.grab_stderr () ;
     try
-      let res = v () in
+      let res = match timeout with
+        | Some time -> run_timeout ~time v
+        | None -> v () in
       let out = Introspection.release_stdout () in
       let err = Introspection.release_stderr () in
       Ok (res, out, err)
@@ -1065,6 +1117,8 @@ module Make
     | Last_ty (a, b) -> Ty.curry a b
     | Arg_ty (x, Last_ty (l, r)) -> Ty.curry x (Ty.curry l r)
     | Arg_ty (x, Arg_ty (y, r)) -> Ty.curry x (ty_of_prot (Arg_ty (y, r)))
+
+      let to_ty str=    (Ty.repr (Parse.core_type (Lexing.from_string str)));;
 
   let rec apply : type p a c r. (p -> a) -> (p -> a, p -> c, r) args -> r = fun f x ->
     match x with

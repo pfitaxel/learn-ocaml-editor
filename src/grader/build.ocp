@@ -13,7 +13,7 @@ begin library "testing"
   files = [
     "introspection_intf.mli"
     "introspection.ml" ( comp += [ "-ppx" %asm_exe( p = "ppx_metaquot") ] )
-    "test_lib.ml" ( comp += [ "-ppx" %asm_exe( p = "ppx_metaquot") ] )
+    "test_lib.ml" ( comp += [ "-ppx" %asm_exe( p = "ppx_metaquot") ])
   ]
 end
 
@@ -33,6 +33,23 @@ embedded_grading_cmis = [
 
 ]
 
+begin library "embedded_grading_cmis"
+ build_rules = [
+    "embedded_grading_cmis.ml" (
+      build_target = true
+      sources = embedded_grading_cmis
+      commands = [ {
+        "ocp-ocamlres" "-format" "ocamlres" embedded_grading_cmis
+      } ( stdout = "embedded_grading_cmis.ml" ) ]
+    )
+  ]
+  files = [
+    "embedded_grading_cmis.ml"
+  ]
+  requires = [
+      "ocplib-ocamlres.runtime"
+  ]
+end
 begin library "embedded_cmis"
   build_rules = [
     "embedded_cmis.ml" (
@@ -52,13 +69,14 @@ begin library "embedded_cmis"
 end
 
 begin library "grading"
-  comp_requires = "ppx_metaquot:asm"
+  comp_requires = [ "ppx_metaquot:asm" "ppx_ocplib_i18n:asm" ]
   link += [ "-linkall" ]
   requires = [
     "testing"
     "ppx_metaquot"
     "ocplib-ocamlres.runtime"
     "embedded_cmis"
+    "ocplib_i18n"
   ]
   build_rules = [
     "embedded_grading_cmis.ml" (
@@ -71,7 +89,7 @@ begin library "grading"
   ]
   files = [
     "embedded_grading_cmis.ml"
-    "grading.ml" ( comp += [ "-ppx" %asm_exe( p = "ppx_metaquot") ] )
+    "grading.ml" ( comp += [ ppx_ocplib_i18n "-ppx" %asm_exe( p = "ppx_metaquot") ] )
   ]
 end
 
@@ -106,10 +124,11 @@ begin library "grading-jsoo"
     "ocplib-json-typed.browser"
     "learnocaml-repository"
     "learnocaml-state"
+    "js_of_ocaml.ppx"
   ]
   files = [
     "grader_jsoo_messages.ml"
-    "grading_jsoo.ml" ( pp = camlp4_js )
+    "grading_jsoo.ml" ( comp = ppx_js )
   ]
 end
 
@@ -123,10 +142,12 @@ begin program "learnocaml-grader-worker"
     "js_of_ocaml.syntax"
     "learnocaml-repository"
     "learnocaml-state"
+    "jsutils"
+    "js_of_ocaml.ppx"
   ]
   files = [
     "grader_jsoo_messages.ml"
-    "grader_jsoo_worker.ml" ( pp = camlp4_js )
+    "grader_jsoo_worker.ml" ( comp = ppx_js )
   ]
   build_rules = [
     "%{learnocaml-grader-worker_FULL_DST_DIR}%/learnocaml-grader-worker.js" (
@@ -134,7 +155,6 @@ begin program "learnocaml-grader-worker"
       sources = %byte_exe( p = "learnocaml-grader-worker" )
       commands = [ {
         "js_of_ocaml"
-           "+weak.js"
            "+cstruct/cstruct.js"
            "+dynlink.js"
            "+toplevel.js"

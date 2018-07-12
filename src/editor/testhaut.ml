@@ -10,11 +10,13 @@ open Editor_lib
 open Learnocaml_exercise_state
 open Tyxml_js.Html5
 
-module StringMap = Map.Make (String)
+module StringMap = Map.Make (String);;
 
+ show_loading ~id:"check-answer"
+ Tyxml_js.Html5.[ ul [ li [ pcdata [%i"loading"] ] ] ] ;
 
 (* Internationalization *)
-let () = Translate.set_lang ()
+ Translate.set_lang ()
 let () =
   let translations = [
       (* "syntax", [%i"Syntax"];*)
@@ -396,7 +398,7 @@ let () = cancel##.onclick := handler (fun _ ->
 let check=getElementById "check" ;;
 let container_div= find_component "check-answer";; 
 
-Lwt.async @@ fun () ->
+
 let after_init top =
   begin 
     Lwt.return true
@@ -404,19 +406,26 @@ let after_init top =
   if not r1  then failwith [%i"unexpected error"];
   Learnocaml_toplevel_worker_caller.set_checking_environment top >>= fun _ ->
   Lwt.return () in
+
+
 Learnocaml_toplevel_worker_caller.create ~after_init ()
-  >>= ( fun top-> 
+>>= ( fun top->
+     hide_loading ~id:"check-answer" ();
     check##.onclick := handler (fun _ ->
-        let _ = save_handler ( fun ()->() ) in ();
+        let _ = save_handler ( fun ()->() ) () in ();
+        show_loading ~id:"check-answer"
+          Tyxml_js.Html5.[ ul [ li [ pcdata [%i"Checking question"] ] ] ] ;
         let str=with_test_lib_prepare
-            (test_prel^"\n"^( Test_spec.question_typed ( get_a_question id question_id ) question_id )) in
+            (test_prel^"\n"^
+             ( Test_spec.question_typed ( get_a_question id question_id ) question_id )) in
       
         Learnocaml_toplevel_worker_caller.check top str >>= (fun res ->
         let result = 
           let open Toploop_results in
           match res with
             Ok _ -> "your question does typecheck \n"
-          | Error (err,_) ->"your question doesn't typecheck \n"^err.msg 
+          | Error ((*err*)_,_) ->
+              "your question doesn't typecheck \n"(*^err.msg should be considered*) 
         in
         begin
           let messages =Tyxml_js.Html5.ul [] in

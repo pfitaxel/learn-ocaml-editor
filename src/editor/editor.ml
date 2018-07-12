@@ -900,7 +900,7 @@ let () =
     Manip.addClass (find_component "grade_id") "special_grade" );
   if arg "tab" = "testhaut" then
     !grade_red ();
-  top_ref:=Some top;
+  
   (* ---- return -------------------------------------------------------- *)
   (* toplevel_launch >>= fun _ -> FIXME? SHOULD BE UNNECESSARY *)
   (* typecheck false >>= fun () -> ? *)

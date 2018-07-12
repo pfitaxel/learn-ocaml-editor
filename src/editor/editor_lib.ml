@@ -715,21 +715,20 @@ let exo_creator proper_id =
 
 let get_answer top =
   Learnocaml_toplevel.execute_test top
-;;
 
 let typecheck_dialog_box div_id res =
    let result = 
      let open Toploop_results in
      match res with
-       Ok _ -> "your question does typecheck \n"
+     | Ok _ ->  [%i"Your question does typecheck. "]
      | Error ((*err*)_,_) ->
-         "your question doesn't typecheck \n"(*^err.msg should be considered*) 
-   in
+         [%i"Your question does not typecheck. "]
+         (* err.msg should be considered*) in
    begin
-     let messages =Tyxml_js.Html5.ul [] in
+     let messages = Tyxml_js.Html5.ul [] in
      let checked, check_message =
        let t, u = Lwt.task () in
-       let btn_ok = Tyxml_js.Html5.(button [ pcdata [%i"Ok"] ]) in
+       let btn_ok = Tyxml_js.Html5.(button [ pcdata [%i"OK"] ]) in
        Manip.Ev.onclick btn_ok ( fun _ ->
            hide_loading ~id:div_id () ; true) ;
        let div =

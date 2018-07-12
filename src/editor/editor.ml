@@ -210,10 +210,10 @@ let () =
       "learnocaml-exo-button-editor",
       [%i"Type here the solution of the exercise"];
       "learnocaml-exo-button-template",
-      [%i"Type here or generate the template\
+      [%i"Type here or generate the template \
           the student will complete or correct"];
       "learnocaml-exo-button-prelude",
-      [%i"Type here the definitions of types and\
+      [%i"Type here the definitions of types and \
           functions given to the student"];
       "learnocaml-exo-button-prepare",
       [%i"Type here hidden definitions given to the student"];
@@ -658,7 +658,7 @@ let () =
       ~group: toplevel_buttons_group
       ~icon: "typecheck" [%i"Check"] @@ fun () ->
     show_loading ~id:"learnocaml-exo-loading"
-      Tyxml_js.Html5.[ ul [ li [ pcdata [%i"checking"] ] ] ] ;
+      Tyxml_js.Html5.[ ul [ li [ pcdata "checking" ] ] ] ;
     let str = with_test_lib_prepare (compile_aux () )
     in
     Learnocaml_toplevel.check top str >>= fun res-> 
@@ -944,7 +944,7 @@ let () =
            Manip.Ev.onclick btn_no (fun _ -> let _ = grade () in () ; true);
            let div =
              Tyxml_js.Html5.(div ~a: [ a_class [ "dialog" ] ]
-              [ pcdata [%i"The Grade feature relies on the contents of Test.ml.\
+              [ pcdata [%i"The Grade feature relies on the contents of Test.ml. \
                            Do you want to compile the high-level tests \
                            and overwrite Test.ml?\n"] ;
                 btn_compile ;

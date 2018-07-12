@@ -13,13 +13,14 @@ open Tyxml_js.Html5
 
 module StringMap = Map.Make (String);;
 
- show_loading ~id:"check-answer"
- Tyxml_js.Html5.[ ul [ li [ pcdata [%i"loading"] ] ] ] ;
+show_loading ~id:"check-answer"
+ Tyxml_js.Html5.[ ul [ li [ pcdata [%i"Loading"] ] ] ] ;
 
 (* Internationalization *)
  Translate.set_lang ()
 let () =
   let translations = [
+    "check", [%i"Check"];
     "cancel", [%i"Cancel"];
     "save", [%i"Save"];
     "txt_name", [%i"Function name: "];
@@ -433,7 +434,7 @@ let after_init top =
           check##.onclick := handler (fun _ ->
            let _ = save_handler ( fun ()->() ) () in ();
            show_loading ~id:"check-answer"
-          Tyxml_js.Html5.[ ul [ li [ pcdata [%i"Checking question"] ] ] ] ;
+          Tyxml_js.Html5.[ ul [ li [ pcdata [%i"Checking the question"] ] ] ] ;
         let str=with_test_lib_prepare
             (test_prel^"\n"^
                ( Test_spec.question_typed
@@ -442,4 +443,3 @@ let after_init top =
           typecheck_dialog_box "check-answer" res); Js._true);
           Lwt.return () )
   
-

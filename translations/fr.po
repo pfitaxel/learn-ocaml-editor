@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: learn-ocaml ~dev\n"
-"PO-Revision-Date: 2018-07-10 15:51+0200\n"
+"PO-Revision-Date: 2018-07-12 14:12+0200\n"
 "Last-Translator: Louis Gesbert <Louis.gesbert@ocamlpro.com>\n"
 "Language-Team: OCamlPro\n"
 "Language: french\n"
@@ -131,12 +131,187 @@ msgstr "lors du test de la solution utilisateur"
 msgid "INTERNAL ERROR"
 msgstr "ERREUR INTERNE"
 
+#: src/editor/editor_lib.ml:263,75--79
+#: src/app/learnocaml_index_main.ml:119,57--61 src/editor/editor.ml:651,59--63
+#: src/editor/editor.ml:681,59--63 src/editor/editor.ml:796,54--58
+msgid "No"
+msgstr "Non"
+
+#: src/editor/editor_lib.ml:267,76--81
+#: src/app/learnocaml_index_main.ml:122,58--63 src/editor/editor.ml:483,58--63
+#: src/editor/editor.ml:654,60--65 src/editor/editor.ml:684,60--65
+#: src/editor/editor.ml:791,55--60
+msgid "Yes"
+msgstr "Oui"
+
+#: src/editor/editor_lib.ml:277,59--109
+msgid "Are you sure you want to delete this question?\n"
+msgstr "Êtes-vous sûr de vouloir supprimer cette question?\n"
+
+#: src/editor/editor_lib.ml:366,23--60
+msgid "Code quality and forbidden patterns"
+msgstr "Qualité du code et traits de programmation interdits"
+
+#: src/editor/editor_lib.ml:368,24--58
+msgid "Forbid undesirable code patterns"
+msgstr "Interdire des traits de programmation indésirables"
+
+#: src/editor/editor_lib.ml:371,24--52
+msgid "Forbid imperative features"
+msgstr "Interdire des traits de programmation impérative"
+
+#: src/editor/editor_lib.ml:385,57--71
+msgid "New question"
+msgstr "Nouvelle question"
+
+#: src/editor/editor_lib.ml:386,56--79
+msgid "Create a new question"
+msgstr "Créer une nouvelle question"
+
+#: src/app/learnocaml_exercise_main.ml:93,33--41
+#: src/app/learnocaml_exercise_main.ml:97,33--41
+#: src/app/learnocaml_exercise_main.ml:102,33--41
+#: src/app/learnocaml_exercise_main.ml:123,39--47
+#: src/editor/editor.ml:170,33--41 src/editor/editor.ml:174,33--41
+#: src/editor/editor.ml:179,33--41 src/editor/editor.ml:205,37--45
+msgid "Report"
+msgstr "Rapport"
+
+#: src/app/learnocaml_exercise_main.ml:120,24--51
+#: src/editor/editor.ml:196,22--49
+msgid "Preparing the environment"
+msgstr "Préparation de l'environnement"
+
+#: src/app/learnocaml_exercise_main.ml:121,39--47
+#: src/app/learnocaml_exercise_main.ml:125,37--45
+#: src/app/learnocaml_index_main.ml:888,20--28 src/editor/editor.ml:206,35--43
+#: src/editor/editor.ml:208,33--41
+msgid "Editor"
+msgstr "Éditeur"
+
+#: src/app/learnocaml_exercise_main.ml:122,41--51
+#: src/app/learnocaml_index_main.ml:887,22--32 src/editor/editor.ml:201,39--49
+msgid "Toplevel"
+msgstr "Toplevel"
+
+#: src/app/learnocaml_exercise_main.ml:124,37--47
+msgid "Exercise"
+msgstr "Exercice"
+
+#: src/app/learnocaml_exercise_main.ml:126,27--71
+msgid "Click the Grade! button to get your report"
+msgstr "Cliquez sur le bouton Noter! pour obtenir votre rapport"
+
+#: src/app/learnocaml_exercise_main.ml:150,25--49
+msgid "loading the prelude..."
+msgstr "Chargement du prélude..."
+
+#: src/app/learnocaml_exercise_main.ml:155,41--59
+msgid "error in prelude"
+msgstr "erreur dans le prélude"
+
+#: src/app/learnocaml_exercise_main.ml:201,26--33
+#: src/app/learnocaml_index_main.ml:651,57--64
+#: src/app/learnocaml_index_main.ml:716,57--64 src/editor/editor.ml:287,26--33
+msgid "Clear"
+msgstr "Effacer"
+
+#: src/app/learnocaml_exercise_main.ml:206,25--32
+#: src/app/learnocaml_exercise_main.ml:288,26--33
+#: src/app/learnocaml_index_main.ml:658,24--31
+#: src/app/learnocaml_index_main.ml:721,24--31 src/editor/editor.ml:292,25--32
+msgid "Reset"
+msgstr "Réinitialiser"
+
+#: src/app/learnocaml_exercise_main.ml:212,22--35
+#: src/app/learnocaml_index_main.ml:664,53--66
+#: src/app/learnocaml_index_main.ml:725,53--66 src/editor/editor.ml:298,22--35
+msgid "Eval phrase"
+msgstr "Évaluer la phrase"
+
+#: src/app/learnocaml_exercise_main.ml:231,39--54
+msgid "OCaml prelude"
+msgstr "Prélude OCaml"
+
+#: src/app/learnocaml_exercise_main.ml:238,62--68
+msgid "Hide"
+msgstr "Cacher"
+
+#: src/app/learnocaml_exercise_main.ml:242,62--68
+msgid "Show"
+msgstr "Montrer"
+
+#: src/app/learnocaml_exercise_main.ml:293,23--29
+#: src/app/learnocaml_index_main.ml:842,42--48 src/editor/editor.ml:704,23--29
+#: src/editor/testhaut.ml:21,15--21 src/editor/new_exercise.ml:23,15--21
+msgid "Save"
+msgstr "Sauvegarder"
+
+#: src/app/learnocaml_exercise_main.ml:305,27--37
+#: src/editor/editor.ml:710,27--37
+msgid "Download"
+msgstr "Télécharger"
+
+#: src/app/learnocaml_exercise_main.ml:335,28--35
+#: src/editor/editor.ml:321,28--35 src/editor/editor.ml:415,28--35
+#: src/editor/editor.ml:437,28--35 src/editor/editor.ml:505,28--35
+#: src/editor/editor.ml:545,28--35 src/editor/editor.ml:727,28--35
+msgid "Check"
+msgstr "Valider"
+
+#: src/app/learnocaml_exercise_main.ml:340,22--33
+#: src/editor/editor.ml:732,22--33
+msgid "Eval code"
+msgstr "Évaluer le code"
+
+#: src/app/learnocaml_exercise_main.ml:351,26--32
+msgid "Edit"
+msgstr "Éditer"
+
+#: src/app/learnocaml_exercise_main.ml:359,23--34
+#: src/app/learnocaml_index_main.ml:886,23--34 src/editor/editor.ml:785,23--34
+msgid "Exercises"
+msgstr "Exercices"
+
+#: src/app/learnocaml_exercise_main.ml:369,25--33
+#: src/editor/editor.ml:864,25--33
+msgid "Grade!"
+msgstr "Noter!"
+
+#: src/app/learnocaml_exercise_main.ml:372,51--58
+#: src/editor/editor.ml:756,50--57 src/editor/editor.ml:823,52--59
+msgid "abort"
+msgstr "abandonner"
+
+#: src/app/learnocaml_exercise_main.ml:376,38--73
+#: src/editor/editor.ml:760,38--73 src/editor/editor.ml:827,38--73
+msgid "Grading is taking a lot of time, "
+msgstr "La notation prend du temps, "
+
+#: src/app/learnocaml_exercise_main.ml:382,38--60
+#: src/editor/editor.ml:833,38--60
+msgid "Launching the grader"
+msgstr "Lancement de la notation"
+
+#: src/app/learnocaml_exercise_main.ml:396,60--86
+#: src/editor/editor.ml:774,56--82 src/editor/editor.ml:847,60--86
+msgid "Grading aborted by user."
+msgstr "Notation annulée par l'utilisateur"
+
+#: src/app/learnocaml_exercise_main.ml:412,38--59
+msgid "Error in your code."
+msgstr "Erreur dans le code."
+
+#: src/app/learnocaml_exercise_main.ml:413,27--85
+msgid "Cannot start the grader if your code does not typecheck."
+msgstr "La notation ne peut être lancée si le code ne type pas."
+
 #: src/app/learnocaml_index_main.ml:28,41--60
 msgid "Loading exercises"
 msgstr "Chargement des exercices"
 
 #: src/app/learnocaml_index_main.ml:71,42--69
-#: src/app/learnocaml_index_main.ml:224,42--69
+#: src/app/learnocaml_index_main.ml:205,48--75
 msgid "No description available."
 msgstr "Aucune description."
 
@@ -156,126 +331,90 @@ msgstr "problème"
 msgid "exercise"
 msgstr "exercice"
 
-#: src/app/learnocaml_index_main.ml:140,41--57
-msgid "Loading editor"
-msgstr "Chargement de l'éditeur"
-
-#: src/app/learnocaml_index_main.ml:175,73--77
-#: src/editor/editor_lib.ml:193,75--79 src/editor/editor.ml:693,59--63
-#: src/editor/editor.ml:724,59--63 src/editor/editor.ml:839,54--58
-msgid "No"
-msgstr "Non"
-
-#: src/app/learnocaml_index_main.ml:178,74--79
-#: src/editor/editor_lib.ml:197,76--81 src/editor/editor.ml:521,58--63
-#: src/editor/editor.ml:696,60--65 src/editor/editor.ml:727,60--65
-#: src/editor/editor.ml:834,55--60
-msgid "Yes"
-msgstr "Oui"
-
-#: src/app/learnocaml_index_main.ml:191,57--107
+#: src/app/learnocaml_index_main.ml:128,41--91
 msgid "Are you sure you want to delete this exercise?\n"
 msgstr "Êtes-vous sûr de vouloir supprimer cet exercice?\n"
 
-#: src/app/learnocaml_index_main.ml:302,64--68
-#: src/editor/testhaut.ml:369,16--20
+#: src/app/learnocaml_index_main.ml:153,43--59
+msgid "Loading editor"
+msgstr "Chargement de l'éditeur"
+
+#: src/app/learnocaml_index_main.ml:252,67--71
 msgid "OK"
 msgstr "OK"
 
-#: src/app/learnocaml_index_main.ml:308,48--86
+#: src/app/learnocaml_index_main.ml:258,51--89
 msgid "Identifier and/or title not unique\n"
 msgstr "Identificateur et/ou titre non unique(s)\n"
 
-#: src/app/learnocaml_index_main.ml:324,23--43
+#: src/app/learnocaml_index_main.ml:274,42--62
 msgid "Import an exercise"
 msgstr "Importer un exercice"
 
-#: src/app/learnocaml_index_main.ml:325,21--61
+#: src/app/learnocaml_index_main.ml:275,40--80
 msgid "Import a new exercise from a json file"
 msgstr "Importer un nouvel exercice depuis un fichier json"
 
-#: src/app/learnocaml_index_main.ml:331,23--37
-#: src/editor/new_exercise.ml:21,22--36
+#: src/app/learnocaml_index_main.ml:280,58--72
+#: src/editor/new_exercise.ml:17,22--36
 msgid "New exercise"
 msgstr "Nouvel exercice"
 
-#: src/app/learnocaml_index_main.ml:332,21--44
+#: src/app/learnocaml_index_main.ml:281,56--79
 msgid "Create a new exercise"
 msgstr "Créer un nouvel exercice"
 
-#: src/app/learnocaml_index_main.ml:345,41--58
+#: src/app/learnocaml_index_main.ml:293,41--58
 msgid "Loading lessons"
 msgstr "Chargement des cours"
 
-#: src/app/learnocaml_index_main.ml:380,45--69
+#: src/app/learnocaml_index_main.ml:328,45--69
 msgid "Running OCaml examples"
 msgstr "Lancement des exemples d'OCaml"
 
-#: src/app/learnocaml_index_main.ml:448,39--45
-#: src/app/learnocaml_index_main.ml:669,39--45
+#: src/app/learnocaml_index_main.ml:396,39--45
+#: src/app/learnocaml_index_main.ml:613,39--45
 msgid "Prev"
 msgstr "Prec."
 
-#: src/app/learnocaml_index_main.ml:464,40--46
-#: src/app/learnocaml_index_main.ml:686,40--46
+#: src/app/learnocaml_index_main.ml:412,40--46
+#: src/app/learnocaml_index_main.ml:630,40--46
 msgid "Next"
 msgstr "Suiv."
 
-#: src/app/learnocaml_index_main.ml:553,41--60
+#: src/app/learnocaml_index_main.ml:497,41--60
 msgid "Loading tutorials"
 msgstr "Chargement des tutoriels"
 
-#: src/app/learnocaml_index_main.ml:707,57--64
-#: src/app/learnocaml_index_main.ml:773,57--64
-#: src/app/learnocaml_exercise_main.ml:207,26--33
-#: src/editor/editor.ml:318,26--33
-msgid "Clear"
-msgstr "Effacer"
-
-#: src/app/learnocaml_index_main.ml:714,24--31
-#: src/app/learnocaml_index_main.ml:778,24--31
-#: src/app/learnocaml_exercise_main.ml:212,25--32
-#: src/app/learnocaml_exercise_main.ml:294,26--33
-#: src/editor/editor.ml:323,25--32
-msgid "Reset"
-msgstr "Réinitialiser"
-
-#: src/app/learnocaml_index_main.ml:720,53--66
-#: src/app/learnocaml_index_main.ml:782,53--66
-#: src/app/learnocaml_exercise_main.ml:218,22--35
-#: src/editor/editor.ml:329,22--35
-msgid "Eval phrase"
-msgstr "Évaluer la phrase"
-
-#: src/app/learnocaml_index_main.ml:740,41--58
+#: src/app/learnocaml_index_main.ml:683,41--58
 msgid "Launching OCaml"
 msgstr "Démarrage d'OCaml"
 
-#: src/app/learnocaml_index_main.ml:869,7--56
+#: src/app/learnocaml_index_main.ml:811,7--56
 msgid "Welcome to <emph>LearnOCaml</emph> by OCamlPro."
 msgstr "Bienvenue sur <emph>LearnOCaml</emph> par OCamlPro."
 
-#: src/app/learnocaml_index_main.ml:871,7--46
+#: src/app/learnocaml_index_main.ml:813,7--46
 msgid "This App is still under construction."
 msgstr "Cette application est encore en construction."
 
-#: src/app/learnocaml_index_main.ml:873,7--36
+#: src/app/learnocaml_index_main.ml:815,7--36
 msgid "Choose your activity below."
 msgstr "Sélectionnez une activité:"
 
-#: src/app/learnocaml_index_main.ml:875,7--50
+#: src/app/learnocaml_index_main.ml:817,7--50
 msgid "Your storage token on OCamlPro's servers:"
 msgstr "Votre identifiant de stockage sur le serveur:"
 
-#: src/app/learnocaml_index_main.ml:877,7--42
+#: src/app/learnocaml_index_main.ml:819,7--42
 msgid "You can share it between devices."
 msgstr "Il peut être partagé entre appareils."
 
-#: src/app/learnocaml_index_main.ml:879,7--53
+#: src/app/learnocaml_index_main.ml:821,7--53
 msgid "Progression is saved locally in the browser."
 msgstr "Vos progrès sont sauvegardés dans le navigateur."
 
-#: src/app/learnocaml_index_main.ml:881,7--132
+#: src/app/learnocaml_index_main.ml:823,7--132
 msgid ""
 "Save it to a file using the <img src=\"icons/icon_download_white.svg\" class="
 "\"icon\" alt=\"save\"> button above."
@@ -283,7 +422,7 @@ msgstr ""
 "Sauvegardez dans un fichier local avec le bouton <img src=\"icons/"
 "icon_download_white.svg\" class=\"icon\" alt=\"Sauvegarder\">."
 
-#: src/app/learnocaml_index_main.ml:884,7--148
+#: src/app/learnocaml_index_main.ml:826,7--148
 msgid ""
 "Restore it from a file using the <img src=\"icons/icon_upload_white.svg\" "
 "class=\"icon\" alt=\"restore\"> button above."
@@ -291,7 +430,7 @@ msgstr ""
 "Restaurez depuis un fichier avec le bouton <img src=\"icons/"
 "icon_upload_white.svg\" class=\"icon\" alt=\"Restaurer\">."
 
-#: src/app/learnocaml_index_main.ml:888,7--122
+#: src/app/learnocaml_index_main.ml:830,7--122
 msgid ""
 "Save online using the <img src=\"icons/icon_sync_white.svg\" class=\"icon\" "
 "alt=\"sync\"> button above."
@@ -299,290 +438,101 @@ msgstr ""
 "Sauvegardez sur le serveur avec le bouton <img src=\"icons/icon_sync_white."
 "svg\" class=\"icon\" alt=\"Sync\">."
 
-#: src/app/learnocaml_index_main.ml:900,42--48
-#: src/editor/new_exercise.ml:27,15--21
-#: src/app/learnocaml_exercise_main.ml:299,23--29
-#: src/editor/editor.ml:747,23--29 src/editor/testhaut.ml:19,15--21
-msgid "Save"
-msgstr "Sauvegarder"
-
-#: src/app/learnocaml_index_main.ml:913,40--49
+#: src/app/learnocaml_index_main.ml:855,40--49
 msgid "Restore"
 msgstr "Restaurer"
 
-#: src/app/learnocaml_index_main.ml:925,38--44
+#: src/app/learnocaml_index_main.ml:867,38--44
 msgid "Sync"
 msgstr "Sync"
 
-#: src/app/learnocaml_index_main.ml:932,38--44
+#: src/app/learnocaml_index_main.ml:874,38--44
 msgid "Menu"
 msgstr "Menu"
 
-#: src/app/learnocaml_index_main.ml:942,22--33
+#: src/app/learnocaml_index_main.ml:884,22--33
 msgid "Try OCaml"
 msgstr "Try OCaml"
 
-#: src/app/learnocaml_index_main.ml:943,21--30
+#: src/app/learnocaml_index_main.ml:885,21--30
 msgid "Lessons"
 msgstr "Cours"
 
-#: src/app/learnocaml_index_main.ml:944,23--34
-#: src/app/learnocaml_exercise_main.ml:365,23--34
-#: src/editor/editor.ml:828,23--34
-msgid "Exercises"
-msgstr "Exercices"
-
-#: src/app/learnocaml_index_main.ml:945,22--32
-#: src/app/learnocaml_exercise_main.ml:124,41--51
-#: src/editor/editor.ml:232,39--49
-msgid "Toplevel"
-msgstr "Toplevel"
-
-#: src/app/learnocaml_index_main.ml:946,20--28
-#: src/app/learnocaml_exercise_main.ml:123,39--47
-#: src/app/learnocaml_exercise_main.ml:127,37--45
-#: src/editor/editor.ml:237,35--43 src/editor/editor.ml:239,33--41
-msgid "Editor"
-msgstr "Éditeur"
-
-#: src/app/learnocaml_index_main.ml:1008,41--62
+#: src/app/learnocaml_index_main.ml:950,41--62
 msgid "Choose an activity."
 msgstr "Sélectionnez une activité."
 
-#: src/editor/new_exercise.ml:22,17--41
-msgid "Unique identifier:<br>"
-msgstr "Identificateur unique:<br>"
-
-#: src/editor/new_exercise.ml:23,20--45
-msgid "Title (unique too):<br>"
-msgstr "Titre (également unique):<br>"
-
-#: src/editor/new_exercise.ml:24,20--54
-msgid "Description of the exercise:<br>"
-msgstr "Description de l'exercice:<br>"
-
-#: src/editor/new_exercise.ml:25,19--42
-msgid "Difficulty level:<br>"
-msgstr "Niveau de difficulté:<br>"
-
-#: src/editor/new_exercise.ml:26,17--25 src/editor/editor.ml:518,61--69
-#: src/editor/editor.ml:831,58--66 src/editor/editor.ml:913,62--70
-#: src/editor/testhaut.ml:18,17--25
-msgid "Cancel"
-msgstr "Annuler"
-
-#: src/editor/new_exercise.ml:147,29--220
-msgid ""
-"Incorrect identifier: an identifier can't be empty, and only lower case "
-"letters, numerals, dashes and underscores are allowed"
-msgstr ""
-"Identificateur incorrect: un identificateur ne peut être vide, et seuls les "
-"lettres minuscules, chiffres, tirets et soulignés sont autorisés"
-
-#: src/editor/new_exercise.ml:151,29--89
-msgid "This identifier is already used, please choose another one"
-msgstr "Cet identificateur est déjà utilisé, veuillez en choisir un autre"
-
-#: src/editor/new_exercise.ml:155,32--147
-msgid ""
-"Incorrect title: a title can't be empty, or begin or end with a space or a "
-"tab"
-msgstr ""
-"Titre incorrect: un titre ne peut être vide, ou commencer ou finir par un "
-"espace ou une tabulation"
-
-#: src/editor/new_exercise.ml:158,32--87
-msgid "This title is already used, please choose another one"
-msgstr "Ce titre est déjà utilisé, veuillez en choisir un autre"
-
-#: src/editor/editor_lib.ml:207,59--109
-msgid "Are you sure you want to delete this question?\n"
-msgstr "Êtes-vous sûr de vouloir supprimer cette question?\n"
-
-#: src/editor/editor_lib.ml:296,23--60
-msgid "Code quality and forbidden patterns"
-msgstr "Qualité du code et traits de programmation interdits"
-
-#: src/editor/editor_lib.ml:298,24--58
-msgid "Forbid undesirable code patterns"
-msgstr "Interdire des traits de programmation indésirables"
-
-#: src/editor/editor_lib.ml:301,24--52
-msgid "Forbid imperative features"
-msgstr "Interdire des traits de programmation impérative"
-
-#: src/editor/editor_lib.ml:315,57--71
-msgid "New question"
-msgstr "Nouvelle question"
-
-#: src/editor/editor_lib.ml:316,56--79
-msgid "Create a new question"
-msgstr "Créer une nouvelle question"
-
-#: src/app/learnocaml_exercise_main.ml:95,33--41
-#: src/app/learnocaml_exercise_main.ml:99,33--41
-#: src/app/learnocaml_exercise_main.ml:104,33--41
-#: src/app/learnocaml_exercise_main.ml:125,39--47
-#: src/editor/editor.ml:201,33--41 src/editor/editor.ml:205,33--41
-#: src/editor/editor.ml:210,33--41 src/editor/editor.ml:236,37--45
-msgid "Report"
-msgstr "Rapport"
-
-#: src/app/learnocaml_exercise_main.ml:122,24--51
-#: src/editor/editor.ml:227,22--49
-msgid "Preparing the environment"
-msgstr "Préparation de l'environnement"
-
-#: src/app/learnocaml_exercise_main.ml:126,37--47
-msgid "Exercise"
-msgstr "Exercice"
-
-#: src/app/learnocaml_exercise_main.ml:128,27--71
-msgid "Click the Grade! button to get your report"
-msgstr "Cliquez sur le bouton Noter! pour obtenir votre rapport"
-
-#: src/app/learnocaml_exercise_main.ml:155,25--49
-msgid "loading the prelude..."
-msgstr "Chargement du prélude..."
-
-#: src/app/learnocaml_exercise_main.ml:160,41--59
-#: src/editor/editor.ml:279,41--59
-msgid "error in prelude"
-msgstr "erreur dans le prélude"
-
-#: src/app/learnocaml_exercise_main.ml:237,39--54
-msgid "OCaml prelude"
-msgstr "Prélude OCaml"
-
-#: src/app/learnocaml_exercise_main.ml:244,62--68
-msgid "Hide"
-msgstr "Cacher"
-
-#: src/app/learnocaml_exercise_main.ml:248,62--68
-msgid "Show"
-msgstr "Montrer"
-
-#: src/app/learnocaml_exercise_main.ml:311,27--37
-#: src/editor/editor.ml:753,27--37
-msgid "Download"
-msgstr "Télécharger"
-
-#: src/app/learnocaml_exercise_main.ml:341,28--35
-#: src/editor/editor.ml:353,28--35 src/editor/editor.ml:450,28--35
-#: src/editor/editor.ml:473,28--35 src/editor/editor.ml:543,28--35
-#: src/editor/editor.ml:583,28--35 src/editor/editor.ml:770,28--35
-msgid "Check"
-msgstr "Valider"
-
-#: src/app/learnocaml_exercise_main.ml:346,22--33
-#: src/editor/editor.ml:775,22--33
-msgid "Eval code"
-msgstr "Évaluer le code"
-
-#: src/app/learnocaml_exercise_main.ml:357,26--32
-msgid "Edit"
-msgstr "Éditer"
-
-#: src/app/learnocaml_exercise_main.ml:375,25--33
-#: src/editor/editor.ml:907,25--33
-msgid "Grade!"
-msgstr "Noter!"
-
-#: src/app/learnocaml_exercise_main.ml:378,51--58
-#: src/editor/editor.ml:799,50--57 src/editor/editor.ml:866,52--59
-msgid "abort"
-msgstr "abandonner"
-
-#: src/app/learnocaml_exercise_main.ml:382,38--73
-#: src/editor/editor.ml:803,38--73 src/editor/editor.ml:870,38--73
-msgid "Grading is taking a lot of time, "
-msgstr "La notation prend du temps, "
-
-#: src/app/learnocaml_exercise_main.ml:388,38--60
-#: src/editor/editor.ml:876,38--60
-msgid "Launching the grader"
-msgstr "Lancement de la notation"
-
-#: src/app/learnocaml_exercise_main.ml:402,60--86
-#: src/editor/editor.ml:817,56--82 src/editor/editor.ml:890,60--86
-msgid "Grading aborted by user."
-msgstr "Notation annulée par l'utilisateur"
-
-#: src/app/learnocaml_exercise_main.ml:417,38--59
-msgid "Error in your code."
-msgstr "Erreur dans le code."
-
-#: src/app/learnocaml_exercise_main.ml:418,27--85
-msgid "Cannot start the grader if your code does not typecheck."
-msgstr "La notation ne peut être lancée si le code ne type pas."
-
-#: src/editor/editor.ml:228,37--47 src/editor/testhaut.ml:22,18--28
+#: src/editor/editor.ml:197,37--47 src/editor/testhaut.ml:24,18--28
 msgid "Solution"
 msgstr "Solution"
 
-#: src/editor/editor.ml:229,39--49
+#: src/editor/editor.ml:198,39--49
 msgid "Template"
 msgstr "Patron"
 
-#: src/editor/editor.ml:230,38--47
+#: src/editor/editor.ml:199,38--47
 msgid "Prelude"
 msgstr "Prélude"
 
-#: src/editor/editor.ml:231,38--47
+#: src/editor/editor.ml:200,38--47
 msgid "Prepare"
 msgstr "Prépare"
 
-#: src/editor/editor.ml:233,39--49
+#: src/editor/editor.ml:202,39--49
 msgid "Question"
 msgstr "Question"
 
-#: src/editor/editor.ml:234,35--44
+#: src/editor/editor.ml:203,35--44
 msgid "Test.ml"
 msgstr "Test.ml"
 
-#: src/editor/editor.ml:235,39--45
+#: src/editor/editor.ml:204,39--45
 msgid "Test"
 msgstr "Test"
 
-#: src/editor/editor.ml:238,25--72
+#: src/editor/editor.ml:207,25--72
 msgid "Click the Grade! button to test your solution"
 msgstr "Cliquez sur le bouton Noter! pour tester votre solution"
 
-#: src/editor/editor.ml:243,37--77
+#: src/editor/editor.ml:212,37--77
 msgid "Type here the solution of the exercise"
 msgstr "Tapez ici la solution de l'exercice"
 
-#: src/editor/editor.ml:244,39--112
+#: src/editor/editor.ml:213,39--112
 msgid "Type here or generate the template the student will complete or correct"
 msgstr ""
 "Tapez ici ou générez le squelette de code que l'étudiant va compléter ou "
 "corriger"
 
-#: src/editor/editor.ml:245,38--109
+#: src/editor/editor.ml:214,38--109
 msgid "Type here the definitions of types and functions given to the student"
 msgstr "Tapez ici les définitions de types et de fonctions donnés à l'étudiant"
 
-#: src/editor/editor.ml:246,38--89
+#: src/editor/editor.ml:215,38--89
 msgid "Type here hidden definitions given to the student"
 msgstr "Tapez ici les définitions cachées données à l'étudiant"
 
-#: src/editor/editor.ml:247,39--90
+#: src/editor/editor.ml:216,39--90
 msgid "Type here the wording of the exercise in Markdown"
 msgstr "Tapez ici l'énoncé de l'exercice en Markdown"
 
-#: src/editor/editor.ml:248,35--61
+#: src/editor/editor.ml:217,35--61
 msgid "Type here the tests code"
 msgstr "Tapez ici le code des jeux de tests"
 
-#: src/editor/editor.ml:249,39--69
+#: src/editor/editor.ml:218,39--69
 msgid "Generate here the tests code"
 msgstr "Générez ici le code des jeux de tests"
 
-#: src/editor/editor.ml:342,9--40
+#: src/editor/editor.ml:248,41--59
+msgid "unexpected error"
+msgstr "erreur inattendue"
+
+#: src/editor/editor.ml:311,9--40
 msgid "(* Grader and tests code *)\n"
 msgstr "(* Code permettant la notation et les tests *)\n"
 
-#: src/editor/editor.ml:362,22--126
+#: src/editor/editor.ml:331,22--126
 msgid ""
 "# Questions\n"
 "\n"
@@ -594,7 +544,7 @@ msgstr ""
 "Vous pouvez écrire vos questions ici\n"
 "en utilisant le langage de balisage **Markdown**\n"
 
-#: src/editor/editor.ml:439,9--80
+#: src/editor/editor.ml:405,9--80
 msgid ""
 "(* Local definitions the student\n"
 "will be able to see *)\n"
@@ -602,7 +552,7 @@ msgstr ""
 "(* Définitions locales que l'étudiant\n"
 "va pouvoir voir *)\n"
 
-#: src/editor/editor.ml:462,9--81
+#: src/editor/editor.ml:427,9--81
 msgid ""
 "(* Local definitions the student\n"
 "won't be able to see *)\n"
@@ -610,11 +560,11 @@ msgstr ""
 "(* Définitions locales que l'étudiant\n"
 "ne va pas pouvoir voir *)\n"
 
-#: src/editor/editor.ml:486,7--30
+#: src/editor/editor.ml:450,7--30
 msgid "(* Your solution *)\n"
 msgstr "(* Votre solution *)\n"
 
-#: src/editor/editor.ml:501,9--89
+#: src/editor/editor.ml:464,9--89
 msgid ""
 "(* Code the student will have\n"
 "when he will start the exercise *)\n"
@@ -622,15 +572,21 @@ msgstr ""
 "(* Code qu'aura l'étudiant\n"
 "quand il commencera l'exercice *)\n"
 
-#: src/editor/editor.ml:511,23--38
+#: src/editor/editor.ml:473,23--38
 msgid "Gen. template"
 msgstr "Créer le patron"
 
-#: src/editor/editor.ml:527,41--79
+#: src/editor/editor.ml:480,61--69 src/editor/editor.ml:788,58--66
+#: src/editor/editor.ml:870,62--70 src/editor/testhaut.ml:20,17--25
+#: src/editor/new_exercise.ml:22,17--25
+msgid "Cancel"
+msgstr "Annuler"
+
+#: src/editor/editor.ml:489,41--79
 msgid "Do you want to crush the template?\n"
 msgstr "Voulez-vous écraser le patron?\n"
 
-#: src/editor/editor.ml:554,20--157
+#: src/editor/editor.ml:516,20--157
 msgid ""
 "(* Incipit: contains local definitions\n"
 "that will be reachable when you will create\n"
@@ -640,43 +596,43 @@ msgstr ""
 "qui vont être accessibles quand vous créerez\n"
 "une nouvelle question *)\n"
 
-#: src/editor/editor.ml:565,23--33
+#: src/editor/editor.ml:527,23--33
 msgid "Generate"
 msgstr "Générer"
 
-#: src/editor/editor.ml:690,22--31 src/editor/editor.ml:916,63--72
+#: src/editor/editor.ml:648,22--31 src/editor/editor.ml:873,63--72
 msgid "Compile"
 msgstr "Compiler"
 
-#: src/editor/editor.ml:702,38--101
+#: src/editor/editor.ml:660,38--101
 msgid "Are you sure you want to overwrite the contents of Test.ml?\n"
 msgstr "Êtes-vous sûr de vouloir écraser le contenu de Test.ml?\n"
 
-#: src/editor/editor.ml:716,31--43
+#: src/editor/editor.ml:674,31--43
 msgid "Delete all"
 msgstr "Tout supprimer"
 
-#: src/editor/editor.ml:733,38--92
+#: src/editor/editor.ml:690,38--92
 msgid "Are you sure you want to delete all the questions?\n"
 msgstr "Êtes-vous sûr de vouloir supprimer toutes les questions?\n"
 
-#: src/editor/editor.ml:786,23--33
+#: src/editor/editor.ml:743,23--33
 msgid "Metadata"
 msgstr "Métadonnées"
 
-#: src/editor/editor.ml:794,25--37
+#: src/editor/editor.ml:751,25--37
 msgid "Experiment"
 msgstr "Tester"
 
-#: src/editor/editor.ml:845,38--77
+#: src/editor/editor.ml:802,38--77
 msgid "Do you want to save before closing?\n"
 msgstr "Voulez-vous sauvegarder avant de fermer?\n"
 
-#: src/editor/editor.ml:921,58--88
+#: src/editor/editor.ml:878,58--88
 msgid "Grade without compiling Test"
 msgstr "Noter sans compiler Test"
 
-#: src/editor/editor.ml:925,42--197
+#: src/editor/editor.ml:882,42--197
 msgid ""
 "The Grade feature relies on the contents of Test.ml. Do you want to compile "
 "the high-level tests and overwrite Test.ml?\n"
@@ -684,105 +640,137 @@ msgstr ""
 "La fonctionnalité de notation automatique s'appuie sur le contenu de Test."
 "ml. Voulez-vous compiler les tests de haut niveau et écraser Test.ml?\n"
 
-#: src/editor/testhaut.ml:17,16--24
-msgid "Syntax"
-msgstr "Syntaxe"
-
-#: src/editor/testhaut.ml:20,19--36
+#: src/editor/testhaut.ml:22,19--36
 msgid "Function name: "
 msgstr "Nom de la fonction: "
 
-#: src/editor/testhaut.ml:21,17--25
+#: src/editor/testhaut.ml:23,17--25
 msgid "Type: "
 msgstr "Type: "
 
-#: src/editor/testhaut.ml:23,19--34 src/editor/testhaut.ml:350,44--59
+#: src/editor/testhaut.ml:25,19--34
 msgid "Specification"
 msgstr "Spécification"
 
-#: src/editor/testhaut.ml:24,20--33 src/editor/testhaut.ml:357,44--57
+#: src/editor/testhaut.ml:26,20--33
 msgid "Tests suite"
 msgstr "Série de tests"
 
-#: src/editor/testhaut.ml:25,24--40 src/editor/testhaut.ml:29,25--41
-msgid "Arguments:<br>"
-msgstr "Arguments:<br>"
+#: src/editor/testhaut.ml:27,24--91
+msgid "Arguments:<br><span class=\"popuptext\" id=\"popup-sol\"/>"
+msgstr "Arguments:<br><span class=\"popuptext\" id=\"popup-sol\"/>"
 
-#: src/editor/testhaut.ml:26,22--54 src/editor/testhaut.ml:30,23--55
+#: src/editor/testhaut.ml:29,22--54 src/editor/testhaut.ml:34,23--55
 msgid "Number of generated tests:<br>"
 msgstr "Nombre de tests générés:<br>"
 
-#: src/editor/testhaut.ml:27,27--40 src/editor/testhaut.ml:31,28--41
-#: src/editor/testhaut.ml:35,29--42
+#: src/editor/testhaut.ml:30,27--40 src/editor/testhaut.ml:35,28--41
+#: src/editor/testhaut.ml:41,29--42
 msgid "Tester:<br>"
 msgstr "Testeur:<br>"
 
-#: src/editor/testhaut.ml:28,26--40 src/editor/testhaut.ml:32,27--41
+#: src/editor/testhaut.ml:31,26--40 src/editor/testhaut.ml:36,27--41
 msgid "Sampler:<br>"
 msgstr "Échantillonneur:<br>"
 
-#: src/editor/testhaut.ml:33,33--53
-msgid "Specification:<br>"
-msgstr "Spécification:<br>"
+#: src/editor/testhaut.ml:32,25--97
+msgid "Arguments:<br><span class=\"popuptext\" id=\"popup-spec-arg\"/>"
+msgstr "Arguments:<br><span class=\"popuptext\" id=\"popup-spec-arg\"/>"
 
-#: src/editor/testhaut.ml:34,26--54
-msgid "Arguments and results:<br>"
-msgstr "Arguments et résultats:<br>"
+#: src/editor/testhaut.ml:37,33--105
+msgid "Specification:<br><span class=\"popuptext\" id=\"popup-spec\"/>"
+msgstr "Spécification:<br><span class=\"popuptext\" id=\"popup-spec\"/>"
 
-#: src/editor/testhaut.ml:293,33--72 src/editor/testhaut.ml:303,33--72
+#: src/editor/testhaut.ml:39,26--107
+msgid ""
+"Arguments and results:<br><span class=\"popuptext\" id=\"popup-suite\"/>"
+msgstr ""
+"Arguments et résultats:<br><span class=\"popuptext\" id=\"popup-suite\"/>"
+
+#: src/editor/testhaut.ml:45,40--94
+msgid " for two tests for a function with int -> 'a profile"
+msgstr " pour deux tests pour une fonction avec le profil int -> 'a"
+
+#: src/editor/testhaut.ml:47,23--97
+msgid ""
+" for one test for a function<br>with bool -> int -> string -> 'a profile"
+msgstr ""
+" pour un seul test pour une fonction<br>avec le profil bool -> int -> string "
+"-> 'a"
+
+#: src/editor/testhaut.ml:52,27--233
+msgid ""
+"This is the syntax for the exclusive or.<br>It is the same syntax as the "
+"arguments',<br>but you also have to provide the return value after ==>."
+msgstr ""
+"Ceci est la syntaxe pour le ou exclusif.<br>C'est la même syntaxe que celle "
+"des arguments,<br>mais on doit aussi fournir la valeur de retour après "
+"==>."
+
+#: src/editor/testhaut.ml:57,17--42
+msgid "- f is the function<br>"
+msgstr "- f est la fonction<br>"
+
+#: src/editor/testhaut.ml:57,49--79
+msgid "- args are its arguments<br>"
+msgstr "- args sont ses arguments<br>"
+
+#: src/editor/testhaut.ml:58,17--87
+msgid "- ret is the return value of the function when applied with args<br>"
+msgstr "- ret est la valeur de retour de la fonction appliquée à args<br>"
+
+#: src/editor/testhaut.ml:59,17--95
+msgid ""
+"In this example, the return value should be greater than the first argument."
+msgstr ""
+"Dans cet exemple, on voudrait que la valeur de retour<br>soit supérieure au "
+"premier argument."
+
+#: src/editor/testhaut.ml:381,32--71
 msgid "Incorrect name: a name can't be empty"
 msgstr "Nom incorrect: un nom ne peut pas être vide"
 
-#: src/editor/testhaut.ml:294,33--72 src/editor/testhaut.ml:299,33--72
+#: src/editor/testhaut.ml:385,32--71
 msgid "Incorrect type: a type can't be empty"
 msgstr "Type incorrect: un type ne peut pas être vide"
 
-#: src/editor/testhaut.ml:344,49--66
-msgid "Syntax examples"
-msgstr "Exemples de syntaxe"
+#: src/editor/new_exercise.ml:18,17--41
+msgid "Unique identifier:<br>"
+msgstr "Identificateur unique:<br>"
 
-#: src/editor/testhaut.ml:345,43--54
-msgid "Arguments"
-msgstr "Arguments"
+#: src/editor/new_exercise.ml:19,20--45
+msgid "Title (unique too):<br>"
+msgstr "Titre (également unique):<br>"
 
-#: src/editor/testhaut.ml:347,17--74
-msgid " for two tests for a function with int -&gt; 'a profile"
-msgstr " pour deux tests pour une fonction avec le profil int -&gt; 'a"
+#: src/editor/new_exercise.ml:20,20--54
+msgid "Description of the exercise:<br>"
+msgstr "Description de l'exercice:<br>"
 
-#: src/editor/testhaut.ml:349,17--97
+#: src/editor/new_exercise.ml:21,19--42
+msgid "Difficulty level:<br>"
+msgstr "Niveau de difficulté:<br>"
+
+#: src/editor/new_exercise.ml:115,29--220
 msgid ""
-" for one test for a function with bool -&gt; int -&gt; string -&gt; 'a "
-"profile"
+"Incorrect identifier: an identifier can't be empty, and only lower case "
+"letters, numerals, dashes and underscores are allowed"
 msgstr ""
-" pour un seul test pour une fonction avec le profil bool -&gt; int -&gt; "
-"string -&gt; 'a"
+"Identificateur incorrect: un identificateur ne peut être vide, et seuls les "
+"lettres minuscules, chiffres, tirets et soulignés sont autorisés"
 
-#: src/editor/testhaut.ml:353,17--43
-msgid " -&gt; f is the function"
-msgstr " -&gt; f est la fonction"
+#: src/editor/new_exercise.ml:119,29--89
+msgid "This identifier is already used, please choose another one"
+msgstr "Cet identificateur est déjà utilisé, veuillez en choisir un autre"
 
-#: src/editor/testhaut.ml:353,64--95
-msgid " -&gt; args are its arguments"
-msgstr " -&gt; args sont ses arguments"
-
-#: src/editor/testhaut.ml:354,31--136
-msgid " -&gt; ret is the return value of the function when applied with args"
-msgstr " -&gt; ret est la valeur de retour de la fonction appliquée à args"
-
-#: src/editor/testhaut.ml:356,17--99
+#: src/editor/new_exercise.ml:123,32--147
 msgid ""
-"In this example we want the return value to be greather than the first "
-"argument."
+"Incorrect title: a title can't be empty, or begin or end with a space or a "
+"tab"
 msgstr ""
-"Dans cet exemple nous voulons que la valeur de retour soit supérieure au "
-"premier argument."
+"Titre incorrect: un titre ne peut être vide, ou commencer ou finir par un "
+"espace ou une tabulation"
 
-#: src/editor/testhaut.ml:362,17--190
-msgid ""
-"This is the syntax for the exclusive or.\n"
-"It is the same syntax as the arguments', but we have to provide also the "
-"return value associated with ==&gt;."
-msgstr ""
-"Ceci est la syntaxe pour le ou exclusif.\n"
-"C'est la même syntaxe que celle des arguments, mais nous devons aussi "
-"fournir la valeur de retour associée à ==&gt;."
+#: src/editor/new_exercise.ml:126,32--87
+msgid "This title is already used, please choose another one"
+msgstr "Ce titre est déjà utilisé, veuillez en choisir un autre"
+

@@ -17,7 +17,6 @@ module StringMap = Map.Make (String)
 let () = Translate.set_lang ()
 let () =
   let translations = [
-      (* "syntax", [%i"Syntax"];*)
     "cancel", [%i"Cancel"];
     "save", [%i"Save"];
     "txt_name", [%i"Function name: "];
@@ -25,34 +24,39 @@ let () =
     "txt_sol", [%i"Solution"];
     "txt_spec", [%i"Specification"];
     "txt_suite", [%i"Tests suite"];
-    (* "txt_input_sol", [%i"Arguments:<br>"];*)
+    "txt_input_sol", [%i"Arguments:<br>\
+    	<span class=\"popuptext\" id=\"popup-sol\"/>"];
     "txt_gen_sol", [%i"Number of generated tests:<br>"];
     "txt_datalist_sol", [%i"Tester:<br>"];
     "txt_sampler_sol", [%i"Sampler:<br>"];
-   (* "txt_input_spec", [%i"Arguments:<br>"];*)
+    "txt_input_spec", [%i"Arguments:<br>\
+    	<span class=\"popuptext\" id=\"popup-spec-arg\"/>"];
     "txt_gen_spec", [%i"Number of generated tests:<br>"];
     "txt_datalist_spec", [%i"Tester:<br>"];
     "txt_sampler_spec", [%i"Sampler:<br>"];
-    (* "txt_spec_specification", [%i"Specification:<br>"];*)
-    (* "txt_suite_input", [%i"Arguments and results:<br>"];*)
+    "txt_spec_specification", [%i"Specification:<br>\
+    	<span class=\"popuptext\" id=\"popup-spec\"/>"];
+    "txt_suite_input", [%i"Arguments and results:<br>\
+    	<span class=\"popuptext\" id=\"popup-suite\"/>"];
     "txt_datalist_suite", [%i"Tester:<br>"];
   ] in
   Translate.set_string_translations translations
 
 let txt_popup_arg = "[!! 1; !! 2]" ^ [%i" for two tests for a function with int -> 'a profile"]
-                    ^ "<br>[true @: 4 @:!! \"titi\"]" ^ [%i" for one test for a function with bool -> int -> string -> 'a profile"];;
+                    ^ "<br>[true @: 4 @:!! \"titi\"]" ^
+                    [%i" for one test for a function<br>with bool -> int -> string -> 'a profile"]
 let txt_popup_suite = "[false @:!! false ==> false;<br>
                        false @:!! true ==> true;<br>
                        true @:!! false ==> true;<br>
                        true @:!! true ==> false]<br>" ^
-                        [%i"This is the syntax for the exclusive or.\nIt is the same syntax as the arguments', \n
-                            but we have to provide also the return value associated with ==>."];;
+                        [%i"This is the syntax for the exclusive or.<br>\
+                            It is the same syntax as the arguments',<br>\
+                            but you also have to provide the return value after ==>."]
 let txt_popup_spec = "fun f args ret -> let x0 = \
                apply (fun n u -> n) args in ~~ (x0 < ret)<br>" ^
-              [%i" -> f is the function"] ^ "<br>" ^ [%i" -> args are its arguments"] ^
-              "<br>" ^ [%i" -> ret is the return value of the function \
-                                when applied with args"] ^ "<br>" ^
-              [%i"In this example we want the return value to be greather than the first argument."]
+              [%i"- f is the function<br>"] ^ [%i"- args are its arguments<br>"] ^
+              [%i"- ret is the return value of the function when applied with args<br>"] ^
+              [%i"In this example, the return value should be greater than the first argument."]
 
 let init_tabs, select_tab =
   let names = [ "solution"; "spec"; "suite" ] in
@@ -153,7 +157,7 @@ let _ = Ace.set_contents ace_input_spec ("[]");
 let spec_spec_editor = find_component "learnocaml-tab-spec-spec"
 let editor_spec_spec = Ocaml_mode.create_ocaml_editor (Tyxml_js.To_dom.of_div spec_spec_editor) 
 let ace_spec_spec = Ocaml_mode.get_editor editor_spec_spec 
-let _ =  Ace.set_contents ace_spec_spec ("fun f args ret -> \n ...");
+let _ =  Ace.set_contents ace_spec_spec ("fun f args ret ->\n...");
          Ace.set_font_size ace_spec_spec 18;;
 
 let input_suite_editor = find_component "learnocaml-tab-suite-input" 
@@ -256,7 +260,7 @@ let () = solution##.onclick := handler (fun _ -> select_tab "solution"; Js._true
 let () = spec##.onclick := handler
       (fun _ -> select_tab "spec";
         if Ace.get_contents ace_spec_spec = "" then
-          Ace.set_contents ace_spec_spec "fun f args ret -> \n ...";
+          Ace.set_contents ace_spec_spec "fun f args ret ->\n...";
         Js._true);;
 let () = suite##.onclick := handler (fun _ -> select_tab "suite"; Js._true);;
 

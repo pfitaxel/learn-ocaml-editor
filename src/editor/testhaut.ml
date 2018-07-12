@@ -10,11 +10,13 @@ open Editor_lib
 open Learnocaml_exercise_state
 open Tyxml_js.Html5
 
-module StringMap = Map.Make (String)
+module StringMap = Map.Make (String);;
 
+ show_loading ~id:"check-answer"
+ Tyxml_js.Html5.[ ul [ li [ pcdata [%i"loading"] ] ] ] ;
 
 (* Internationalization *)
-let () = Translate.set_lang ()
+ Translate.set_lang ()
 let () =
   let translations = [
     "cancel", [%i"Cancel"];
@@ -173,13 +175,8 @@ let save_suite () =
   let ty = Js.to_string ty##.value in
   let input = Ace.get_contents ace_input_suite in
   let datalist = Js.to_string datalistSuite##.value in
-  let question = TestSuite {name; ty; suite=input; tester=datalist} in
-  let testhaut =  get_testhaut id in
-  let question_id = match arg "questionid" with
-    | exception Not_found -> compute_question_id testhaut
-    | qid -> qid in
-  let testhaut = StringMap.add question_id question testhaut in
-  save_testhaut testhaut id;;
+  TestSuite {name; ty; suite=input; tester=datalist} 
+
 
 let save_solution () =
   let name = Js.to_string name##.value in
@@ -188,13 +185,7 @@ let save_solution () =
   let extra_alea = int_of_string (Js.to_string extraAleaSol##.value) in
   let datalist = Js.to_string datalistSol##.value in
   let sampler= Js.to_string samplerSol##.value in
-  let question = TestAgainstSol {name; ty; suite=input; gen=extra_alea; tester=datalist; sampler} in
-  let testhaut = get_testhaut id in
-  let question_id =  match arg "questionid" with
-    | exception Not_found -> compute_question_id testhaut
-    | qid -> qid in
-  let testhaut = StringMap.add question_id question testhaut in
-  save_testhaut testhaut id;;
+   TestAgainstSol {name; ty; suite=input; gen=extra_alea; tester=datalist; sampler} 
 
 let save_spec () =
   let name = Js.to_string name##.value in
@@ -204,20 +195,16 @@ let save_spec () =
   let extra_alea = int_of_string (Js.to_string extraAleaSpec##.value) in
   let datalist = Js.to_string datalistSpec##.value in
   let sampler = Js.to_string samplerSpec##.value in
-  let question = TestAgainstSpec {name; ty; suite = input; spec = output;
-                                 gen = extra_alea; tester = datalist; sampler} in
-  let testhaut = get_testhaut id in
-  let question_id =  match arg "questionid" with
-    | exception Not_found -> compute_question_id testhaut
-    | qid -> qid in
-  let testhaut = StringMap.add question_id question testhaut in
-  save_testhaut testhaut id;;
+   TestAgainstSpec {name; ty; suite = input; spec = output;
+                                 gen = extra_alea; tester = datalist; sampler}
 
 (* ---- restore fields if they are not empty -----------------------------------*)
 
+let testhaut=get_testhaut id
+    
 let _ = match arg "questionid" with
   | exception Not_found -> select_tab "suite"; suite##.checked := Js.bool true
-  | qid -> let testhaut=get_testhaut id in
+  | qid ->  
       let name_elt = name in
       let ty_elt = ty in
       let suite_elt = suite in
@@ -372,33 +359,70 @@ let name_error = getElementById "name_error"
 let type_error = getElementById "type_error"
 
 (* ---- save button ------------------------------------------------------------ *)
-let _ = save##.onclick := handler (fun _ ->
-  let name = Js.to_string name##.value in
-  let ty = Js.to_string ty##.value in
-  let name_correct = name_correct name in
-  let type_correct = type_correct ty in
-  if not name_correct then
-     setInnerHtml name_error [%i"Incorrect name: a name can't be empty"]
-   else
-     setInnerHtml name_error "";
-  if not type_correct then
-     setInnerHtml type_error [%i"Incorrect type: a type can't be empty"]
-   else
-     setInnerHtml type_error "";
-  if name_correct && type_correct then 
-     begin
-       (match arg "tab" with
-       | "suite" -> save_suite ()
-       | "solution" -> save_solution ()
-       | "spec" -> save_spec ()
-       | _ -> failwith "");
-       close_frame ();
-     end;
-  Js._true
-)
+let question_id =  match arg "questionid" with
+  | exception Not_found -> compute_question_id testhaut
+  | qid -> qid ;;
+
+let save_handler close = (fun _ ->
+    let name = Js.to_string name##.value in
+    let ty = Js.to_string ty##.value in
+    let name_correct = name_correct name in
+    let type_correct = type_correct ty in
+    (if not name_correct then
+       setInnerHtml name_error [%i"Incorrect name: a name can't be empty"]
+     else
+       setInnerHtml name_error "");
+    (if not type_correct then
+       setInnerHtml type_error [%i"Incorrect type: a type can't be empty"]
+     else
+       setInnerHtml type_error "");
+    if name_correct && type_correct then (
+      let question =
+        match arg "tab" with
+  	| "suite" -> save_suite ()
+        | "solution" -> save_solution ()
+        | "spec" -> save_spec ()
+        | _ -> failwith ""
+      in
+      let testhaut = get_testhaut id in
+      let testhaut = StringMap.add question_id question testhaut in
+      save_testhaut testhaut id ;
+      close ();
+    );
+    Js._true
+  )
+let _ = save##.onclick := handler (save_handler close_frame) 
 
 (* ---- Cancel button ---------------------------------------------------------- *)
 let cancel = getElementById "cancel"
 let () = cancel##.onclick := handler (fun _ ->
   let _ = close_frame () in (); Js._true)
+
+(* ----Check button ------------------------------------------------------------- *)
+let check = getElementById "check" ;;
+let container_div = find_component "check-answer";; 
+
+
+let after_init top =
+  begin 
+    Lwt.return true
+  end >>= fun r1 ->
+  if not r1  then failwith [%i"unexpected error"];
+  Learnocaml_toplevel_worker_caller.set_checking_environment top >>= fun _ ->
+  Lwt.return () in
+    Learnocaml_toplevel_worker_caller.create ~after_init ()
+    >>= ( fun top->
+          hide_loading ~id:"check-answer" ();
+          check##.onclick := handler (fun _ ->
+           let _ = save_handler ( fun ()->() ) () in ();
+           show_loading ~id:"check-answer"
+          Tyxml_js.Html5.[ ul [ li [ pcdata [%i"Checking question"] ] ] ] ;
+        let str=with_test_lib_prepare
+            (test_prel^"\n"^
+               ( Test_spec.question_typed
+                   ( get_a_question id question_id ) question_id )) in
+        Learnocaml_toplevel_worker_caller.check top str >>= (fun res ->
+          typecheck_dialog_box "check-answer" res); Js._true);
+          Lwt.return () )
+  
 

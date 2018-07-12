@@ -13,9 +13,9 @@ val get_prepare : string -> string
 val get_imperative : string -> bool
 val get_undesirable : string -> bool
 val get_buffer : string -> string
-
 (** Getters of a question of an editor exercise
-  * @param exercise_id question_id *)
+ * @param exercise_id question_id *)
+val get_a_question : string -> Map.Make(String).key ->Learnocaml_exercise_state.test_qst_untyped
 val get_ty : string -> Map.Make(String).key -> string
 val get_name_question : string -> Map.Make(String).key -> string
 val get_type_question : string -> Map.Make(String).key -> Learnocaml_exercise_state.type_question
@@ -31,6 +31,8 @@ val compute_question_id : 'a Map.Make(String).t -> string
 (** Setter of testhaut
   * @param new_StringMap exercise_id *)  
 val save_testhaut : Learnocaml_exercise_state.test_qst_untyped Map.Make(String).t -> string -> unit
+
+val with_test_lib_prepare :string->string
 
 (** Remove an exercise from the local storage *)
 val remove_exo : Map.Make(String).key -> unit
@@ -102,5 +104,6 @@ val exo_creator : string -> Learnocaml_exercise.t
 
 (** @return the output of toplevel buffer *) 
 val get_answer : Learnocaml_toplevel.t -> string
-
+val typecheck_dialog_box : string-> 'a Toploop_results.toplevel_result -> unit Lwt.t
+val test_prel :string 
 

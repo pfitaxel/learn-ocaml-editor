@@ -424,32 +424,7 @@ Learnocaml_toplevel_worker_caller.create ~after_init ()
              ( Test_spec.question_typed ( get_a_question id question_id ) question_id )) in
       
         Learnocaml_toplevel_worker_caller.check top str >>= (fun res ->
-        let result = 
-          let open Toploop_results in
-          match res with
-            Ok _ -> "your question does typecheck \n"
-          | Error ((*err*)_,_) ->
-              "your question doesn't typecheck \n"(*^err.msg should be considered*) 
-        in
-        begin
-          let messages =Tyxml_js.Html5.ul [] in
-          let checked, check_message =
-            let t, u = Lwt.task () in
-            let btn_ok = Tyxml_js.Html5.(button [ pcdata [%i"Ok"] ]) in
-            Manip.Ev.onclick btn_ok ( fun _ ->
-                hide_loading ~id:"check-answer" () ; true) ;
-            let div =
-              Tyxml_js.Html5.(div ~a: [ a_class [ "dialog" ] ]
-                                [ pcdata result ;
-                                  btn_ok ;
-                                 ]) in
-            Manip.SetCss.opacity div (Some "0") ;
-            t, div in
-       Manip.replaceChildren messages
-         Tyxml_js.Html5.[ li [ pcdata "" ] ] ;
-       show_loading ~id:"check-answer" [ check_message ] ;
-       Manip.SetCss.opacity check_message (Some "1") 
-        end;      
-        Lwt.return () ); Js._true); Lwt.return () )
+            typecheck_dialog_box "answer-check" res
+       ); Js._true); Lwt.return () )
   
 

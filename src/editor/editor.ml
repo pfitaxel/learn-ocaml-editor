@@ -528,7 +528,7 @@ let () =
         Learnocaml_toplevel.execute_phrase top (Ace.get_contents ace) >>= fun ok ->
         if ok then
           let res_aux = decompositionSol (get_answer top) 0 in
-          (*Avec prise en compte des types polymorphes :*)
+          (*Taking consideration  polymorphe types :*)
           let res = redondance (polymorph_detector (get_questions (get_all_val (get_only_fct  res_aux []) []) [] )) in
           save_questions res id;
           Manip.removeChildren (find_component "learnocaml-exo-testhaut-pane");
@@ -537,38 +537,13 @@ let () =
       end
     else Lwt.return ();
   end ;                             
-  begin testhaut_button
-      ~group: toplevel_buttons_group
-      ~icon: "typecheck" [%i"Check"] @@ fun () ->
-    Lwt.return ()
-  end ;
-  let quality = match getElementById_coerce "quality_box" CoerceTo.input with
+    let quality = match getElementById_coerce "quality_box" CoerceTo.input with
     | None -> failwith "unknown element quality_box"
     | Some s -> s in
   let imperative = match getElementById_coerce "imperative_box" CoerceTo.input with
     | None -> failwith "unknown element imperative_box"
     | Some s -> s in
-
-  let recovering () =
-    let solution = Ace.get_contents ace in
-    let titre = get_titre id in
-    let incipit= Ace.get_contents ace_testhaut in
-    let question = Ace.get_contents ace_quest in
-    let template = Ace.get_contents ace_temp in
-    let testml = Ace.get_contents ace_t in
-    let testhaut= get_testhaut id in
-    let prepare= Ace.get_contents ace_prep in
-    let prelude =Ace.get_contents ace_prel in 
-    let test ={testml;testhaut} in
-    let diff = get_diff id in
-    let description=get_description id in
-    let metadata ={id;titre;description;diff} in
-    let checkbox = {imperative= Js.to_bool imperative##.checked ; undesirable=Js.to_bool quality##.checked} in
-    Learnocaml_local_storage.(store (editor_state id))
-      { Learnocaml_exercise_state.metadata ;incipit; solution ; question ; template ;
-         test ; prepare ; prelude;checkbox;
-        mtime = gettimeofday () } in
-  recovering_callback:=recovering ;
+    
   let ast_fonction () =
     let fonction = if Js.to_bool(quality##.checked) then
                      quality_function
@@ -613,7 +588,8 @@ let () =
                    else
                      "" in
     fonction in
-  let compile () = 
+  
+  let compile_aux () = 
     
     let tests=test_prel^(ast_fonction ()) in
     let tests=tests^" \n "^((get_buffer id))^" \n" in
@@ -629,17 +605,53 @@ let () =
             | TestSuite a -> a.name in
           (* refactor what it's up in editor_lib *)
             str ^ (section name ("test_question question"^qid ) )) (get_testhaut id) tests in
-    let tests=tests^ (ast_code ()) ^ " ]" in
+    tests^ (ast_code ()) ^ " ]"
+  in
+  begin testhaut_button
+      ~group: toplevel_buttons_group
+      ~icon: "typecheck" [%i"Check"] @@ fun () ->
+    show_loading ~id:"learnocaml-exo-loading"
+      Tyxml_js.Html5.[ ul [ li [ pcdata [%i"checking"] ] ] ] ;
+    let str=with_test_lib_prepare (compile_aux () )
+    in
+    Learnocaml_toplevel.check top (str )>>= fun res-> 
+    typecheck_dialog_box "learnocaml-exo-loading" res 
+  end ;
+
+  let recovering () =
+    let solution = Ace.get_contents ace in
+    let titre = get_titre id in
+    let incipit= Ace.get_contents ace_testhaut in
+    let question = Ace.get_contents ace_quest in
+    let template = Ace.get_contents ace_temp in
+    let testml = Ace.get_contents ace_t in
+    let testhaut= get_testhaut id in
+    let prepare= Ace.get_contents ace_prep in
+    let prelude =Ace.get_contents ace_prel in 
+    let test ={testml;testhaut} in
+    let diff = get_diff id in
+    let description=get_description id in
+    let metadata ={id;titre;description;diff} in
+    let checkbox = {imperative= Js.to_bool imperative##.checked ; undesirable=Js.to_bool quality##.checked} in
+    Learnocaml_local_storage.(store (editor_state id))
+      { Learnocaml_exercise_state.metadata ;incipit; solution ; question ; template ;
+         test ; prepare ; prelude;checkbox;
+        mtime = gettimeofday () } in
+  recovering_callback:=recovering ;
+
+
+  let compile () =
+    let tests =compile_aux () in
     match Learnocaml_local_storage.(retrieve (editor_state id) ) with
     |{metadata;prepare;incipit;solution;question;template;test;prelude;checkbox;mtime}->
         let mtime=gettimeofday () in
         let test ={testml=tests;testhaut=test.testhaut} in
-        let nvexo= {metadata;incipit;prepare;solution;question;template;test;prelude;checkbox;mtime} in    
+        let nvexo= {metadata;incipit;prepare;solution;
+                    question;template;test;prelude;checkbox;mtime} in    
         Learnocaml_local_storage.(store (editor_state id)) nvexo;
         Ace.set_contents ace_t  (get_testml id);
-        Manip.removeChildren (find_component "learnocaml-exo-testhaut-pane");
-        let _ =testhaut_init (find_component "learnocaml-exo-testhaut-pane") id in () ;
-        select_tab "test" in
+        select_tab "test"
+  in
   begin testhaut_button
       ~group: toplevel_buttons_group
       ~icon: "run" [%i"Compile"] @@ fun () ->

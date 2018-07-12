@@ -94,6 +94,6 @@ val exo_creator : string -> Learnocaml_exercise.t
 
 (** @return the output of toplevel buffer *) 
 val get_answer : Learnocaml_toplevel.t -> string
-
+val typecheck_dialog_box : string-> 'a Toploop_results.toplevel_result -> unit Lwt.t
 val test_prel :string 
 

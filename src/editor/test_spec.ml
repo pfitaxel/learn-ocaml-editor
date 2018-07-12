@@ -53,17 +53,20 @@ type test_qst_typed =
   | TestAgainstSpec :
       { name: string
       ; prot: (('ar -> 'row) Ty.ty, 'ar -> 'urow, 'ret) prot
-      ; tester: 'ret tester option 
-      (* 'a tester option (base) mais probleme de type : 'a tester incompatible avec 'ret tester *)
+      ; tester: 'ret tester option
+      (* 'a tester option (base) mais probleme de type :
+         'a tester incompatible avec 'ret tester *)
       ; sampler: (unit -> ('ar -> 'row, 'ar -> 'urow, 'ret) args) option
       ; gen: int
       ; suite: ('ar -> 'row, 'ar -> 'urow, 'ret) args list
-      ; spec : ('ar -> 'row) -> ('ar -> 'row, 'ar -> 'urow, 'ret) args -> 'ret -> outcome } -> test_qst_typed
+      ; spec : ('ar -> 'row) -> ('ar -> 'row, 'ar -> 'urow, 'ret) args ->
+               'ret -> outcome } -> test_qst_typed
   | TestSuite :
       { name: string
       ; prot: (('ar -> 'row) Ty.ty, 'ar -> 'urow, 'ret) prot
       ; tester: 'ret tester option
-      ; suite: (('ar -> 'row, 'ar -> 'urow, 'ret) args * (unit -> 'ret)) list } -> test_qst_typed
+      ; suite: (('ar -> 'row, 'ar -> 'urow, 'ret) args *
+                  (unit -> 'ret)) list } -> test_qst_typed
 
 (** Notation for TestAgainstSpec *)
 let (~~) b = if b then Correct None else Wrong None
@@ -85,7 +88,7 @@ let (@:!!) a b = a @: !! b
 (*
 let example_constr_sol =
   TestAgainstSol
-    { name = "opp"; 
+    { name = "opp";
       prot = (last_ty [%ty: int] [%ty: int] );
       gen = 0;
       suite = [!! 0; !! 1; !! 2; !! ~-1]
@@ -119,37 +122,43 @@ let example_constr_suite =
 
 let local_dummy : 'a sampler = fun () -> failwith "dummy sampler"
 (* à n'utiliser que si on passe l'argument ~gen:0 (pas d'alea) *)
-                                               
+
 let test_question (t : test_qst_typed) =
   match t with
   | TestAgainstSol t ->
      let tester = match t.tester with
        | None -> test
        | Some s -> s in
-     if t.gen=0 then 
-       (test_function_against
+     if t.gen = 0 then
+       begin
+         test_function_against
          ~gen:t.gen ~sampler:local_dummy
          ~test:tester (* could take into account exceptions/sorted lists/etc. *)
          t.prot
          (lookup_student (ty_of_prot t.prot) t.name)
          (lookup_solution (ty_of_prot t.prot) t.name)
-         t.suite)
+         t.suite
+       end
      else
-       (match t.sampler with
-       | None -> (test_function_against
+       begin
+         match t.sampler with
+         | None -> (test_function_against
                    ~gen:t.gen
-                   ~test:tester (* could take into account exceptions/sorted lists/etc. *)
+                   ~test:tester
+                   (* could take into account exceptions/sorted lists/etc. *)
                    t.prot
                    (lookup_student (ty_of_prot t.prot) t.name)
                    (lookup_solution (ty_of_prot t.prot) t.name)
                    t.suite)
-       | Some s -> (test_function_against
+         | Some s -> (test_function_against
                      ~gen:t.gen ~sampler:s
-                     ~test:tester (* could take into account exceptions/sorted lists/etc. *)
+                     ~test:tester
+                     (* could take into account exceptions/sorted lists/etc. *)
                      t.prot
                      (lookup_student (ty_of_prot t.prot) t.name)
                      (lookup_solution (ty_of_prot t.prot) t.name)
-                     t.suite))
+                     t.suite)
+       end
   | TestAgainstSpec t ->
      let to_string ty v = Format.asprintf "%a" (typed_printer ty) v in
      let stud = lookup_student (ty_of_prot t.prot) t.name in
@@ -157,7 +166,8 @@ let test_question (t : test_qst_typed) =
      (* no sampler for the moment *)
      let open Learnocaml_report in
      List.flatten @@ List.map (fun args ->
-       let code = Format.asprintf "@[<hv 2>%s,%a@]" t.name (print t.prot) args in
+       let code =
+         Format.asprintf "@[<hv 2>%s,%a@]" t.name (print t.prot) args in
        let ret_ty = get_ret_ty (ty_of_prot t.prot) args in
        Message ([ Text "Checking spec for" ; Code code ], Informative) ::
          let ret = apply uf args in
@@ -181,7 +191,7 @@ let test_question (t : test_qst_typed) =
 end
 
 open Editor_lib
- 
+
 (*
 let basic_types =
   [ ['i';'n';'t'];['c';'h';'a';'r'];['f';'l';'o';'a';'t'];
@@ -198,14 +208,14 @@ let parse_type string =
   let para_cpt =ref 0 in
   let esp_cpt= ref 0 in
   (* reverse char_list before using it *)
-  let rec last_arg char_list acc= 
+  let rec last_arg char_list acc =
     match char_list with
       []->char_list_ref:=[];acc
     |elt :: l ->
         if elt = ')' then
-          para_cpt:= !para_cpt + 1;
+          incr para_cpt;
         if elt ='(' then
-          para_cpt:= !para_cpt - 1;
+          decr para_cpt;
         if elt='>' && !para_cpt=0 then
           match l with
             '-'::l2 -> char_list_ref:=l2;acc
@@ -225,17 +235,15 @@ let parse_type string =
                     last_arg l (elt::acc)
                   end
                 else
-                  last_arg l (acc)
+                  last_arg l acc
               end
-          end              
-  in
+          end in
   let init_acc () =
-    let arg1=last_arg (!char_list_ref ) [] in                               
+    let arg1=last_arg (!char_list_ref ) [] in
     let arg2=last_arg (!char_list_ref)  [] in
-    let ty1=to_ty (to_string_aux arg1) in 
+    let ty1=to_ty (to_string_aux arg1) in
     let ty2=to_ty (to_string_aux arg2) in
-    "last_ty "^ty2^" "^ty1
-  in 
+    "last_ty "^ty2^" "^ty1 in
   let acc =ref (init_acc ()) in
   while !char_list_ref <>[] do
     let arg=last_arg (!char_list_ref) [] in
@@ -246,13 +254,15 @@ let parse_type string =
 
 (* parse_type (string : ex: int -> int) ==> (string : prot) *)
 
-let question_typed question id_question = 
+let question_typed question id_question =
   let open Learnocaml_exercise_state in
-  let name,ty,input,extra_alea,output,type_question,tester,sampler=match question with
-      TestAgainstSol a -> a.name, a.ty, a.suite, a.gen, "", Solution, a.tester, a.sampler
-    |TestAgainstSpec a -> a.name, a.ty, a.suite, a.gen, a.spec, Spec, a.tester, a.sampler
-    |TestSuite a -> a.name, a.ty, a.suite, 0, "", Suite, a.tester, ""
-  in
+  let name,ty,input,extra_alea,output,type_question,tester,sampler =
+    match question with
+    | TestAgainstSol a -> a.name, a.ty, a.suite, a.gen, "",
+                          Solution, a.tester, a.sampler
+    | TestAgainstSpec a -> a.name, a.ty, a.suite, a.gen, a.spec,
+                           Spec, a.tester, a.sampler
+    | TestSuite a -> a.name, a.ty, a.suite, 0, "", Suite, a.tester, "" in
   let tester = match tester with
     | "" -> "None"
     | s -> "Some ("^s^")" in

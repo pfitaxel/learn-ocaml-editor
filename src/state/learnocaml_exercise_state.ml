@@ -57,7 +57,7 @@ let index_state_enc = conv (fun {exos; mtime} -> (exos, mtime))
   (obj2 (req "exercises" (map_enc exercise_enc)) (dft "mtime" float 0.));;
 type type_question= Suite | Solution | Spec ;;
 
-(* previous version of storing questions may be useful  
+(* previous version of storing questions may be useful
 
 type type_question= Suite | Solution | Spec ;;
 
@@ -82,7 +82,8 @@ let question_state_enc =
     (obj7
        (req "name" string)
        (req "ty" string)
-       (req "type_question" ( string_enum ["suite",Suite;"spec",Spec;"solution",Solution] ) )
+       (req "type_question"
+         ( string_enum ["suite",Suite;"spec",Spec;"solution",Solution] ) )
        (req "input" string)
        (req "output" string)
        (req "extra_alea" int)
@@ -93,7 +94,7 @@ let question_state_enc =
 type test_qst_untyped =
   | TestAgainstSol of
       { name: string
-      ; ty: string 
+      ; ty: string
       ; gen: int
       ; suite: string
       ; tester: string
@@ -113,7 +114,7 @@ type test_qst_untyped =
         tester :string };;
 type a_sol =
   { name: string
-  ; ty: string 
+  ; ty: string
   ; gen: int
   ; suite: string
   ; tester: string
@@ -164,7 +165,7 @@ type suite=
   ; ty: string
   ; suite: string
   ; tester: string }
-      
+
 let test_suite_enc =
   conv
     (fun {name; ty; suite; tester}->
@@ -205,13 +206,13 @@ type test_state = {testml : string;
 
 
 let testhaut_enc = map_enc test_qst_untyped_enc
-                 
+
 let test_state_enc =conv
     (fun {testml; testhaut} -> (testml, testhaut))
     ( fun (testml, testhaut) -> {testml; testhaut})
     (obj2
        (req "testml" string)
-       (req "testhaut" (testhaut_enc) )
+       (req "testhaut" testhaut_enc)
     );;
 type metadata =
   { id : string;
@@ -232,7 +233,7 @@ let metadata_enc = conv
 type checkbox=
   { imperative : bool;
     undesirable : bool}
-  
+
 let checkbox_enc = conv
     (fun {imperative;undesirable} -> (imperative,undesirable) )
     (fun (imperative,undesirable) -> {imperative;undesirable} )
@@ -242,7 +243,7 @@ let checkbox_enc = conv
     )
 
 type editor_state =
-  { metadata : metadata;    
+  { metadata : metadata;
     prepare : string;
     solution : string ;
     question : string ;
@@ -254,12 +255,15 @@ type editor_state =
     mtime : float }
 
 let editor_state_enc =
-  
   conv
-    (fun {metadata; prepare; solution; question; template; test; prelude; incipit; checkbox; mtime } ->
-       (metadata, prepare, solution, question, template, test, prelude, incipit, checkbox, mtime))
-    (fun (metadata, prepare, solution, question, template, test, prelude, incipit, checkbox, mtime) ->
-       {metadata; prepare; solution; question; template; test; prelude; incipit; checkbox; mtime})
+    (fun {metadata; prepare; solution; question; template;
+          test; prelude; incipit; checkbox; mtime } ->
+      (metadata, prepare, solution, question, template,
+       test, prelude, incipit, checkbox, mtime))
+    (fun (metadata, prepare, solution, question, template,
+          test, prelude, incipit, checkbox, mtime) ->
+      {metadata; prepare; solution; question; template;
+       test; prelude; incipit; checkbox; mtime})
     (obj10
        (req "metadata" metadata_enc)
        (req "prepare" string)

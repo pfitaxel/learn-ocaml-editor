@@ -62,33 +62,28 @@ let fetch_exercise_index () =
     Learnocaml_index.exercise_index_enc
     Learnocaml_index.exercise_index_path
 
-open Learnocaml_exercise_state 
+open Learnocaml_exercise_state
 
 let fetch_index id=
   let open Learnocaml_exercise_state in
   let index=
-     Learnocaml_local_storage.(retrieve (index_state id)).exos
-  in
-   
-  
+    Learnocaml_local_storage.(retrieve (index_state id)).exos in
+
   let open Learnocaml_index in
   let json =
     Json_repr_browser.Json_encoding.construct
-     exercise_index_enc  (Learnocaml_exercises index)
-    in
-  try Lwt.return (Json_repr_browser.Json_encoding.destruct exercise_index_enc json) with exn ->
+      exercise_index_enc  (Learnocaml_exercises index) in
+    try Lwt.return (Json_repr_browser.Json_encoding.destruct
+                      exercise_index_enc json) with exn ->
     let msg =
       Format.asprintf "bad structure for %s@.%a"
         "index"
         (fun ppf -> Json_encoding.print_error ppf) exn in
-    Lwt.fail (Cannot_fetch msg)
-;;
+    Lwt.fail (Cannot_fetch msg);;
 
-let fetch_editor_index () =fetch_index "index";;
+let fetch_editor_index () = fetch_index "index";;
 
-    
 
-    
 let fetch_exercise id =
   fetch_and_decode_json
     Learnocaml_exercise.enc

@@ -47,12 +47,15 @@ let description = getElementById_coerce "description" CoerceTo.textarea
 let difficulty = getElementById_coerce "difficulty" CoerceTo.select
 let incipit = ""
 let checkbox = {undesirable = false; imperative = false}
-let solution, question, template, test, previous_title, previous_diff, prelude, prepare =
+let solution, question, template, test,
+    previous_title, previous_diff, prelude, prepare =
   match Learnocaml_local_storage.(retrieve (editor_state previous_id)) with
-  | exception Not_found -> "", "", "", {testml = ""; testhaut = StringMap.empty}, "", 0., "", ""
+  | exception Not_found ->
+     "", "", "", {testml = ""; testhaut = StringMap.empty}, "", 0., "", ""
   | {Learnocaml_exercise_state.metadata;
-     solution; question; template; test; mtime; prelude; prepare}
-    -> solution, question, template, test, metadata.titre, metadata.diff, prelude, prepare
+     solution; question; template; test; mtime; prelude; prepare} ->
+     solution, question, template, test,
+     metadata.titre, metadata.diff, prelude, prepare
 
 
 let () = match identifier with
@@ -80,16 +83,17 @@ let () = match difficulty with
 let resultOptionToBool = function
   | None -> false
   | Some _ -> true
-let isIdCorrect s = resultOptionToBool (Regexp.string_match (Regexp.regexp "^[a-z0-9_-]+$") s 0)
-let isTitleCorrect s = (resultOptionToBool (Regexp.string_match (Regexp.regexp "^[^ \t]") s 0)) &&
-                       (resultOptionToBool (Regexp.string_match (Regexp.regexp ".*[^ \t]$") s 0))
+let isIdCorrect s =
+  resultOptionToBool (Regexp.string_match (Regexp.regexp "^[a-z0-9_-]+$") s 0)
+let isTitleCorrect s =
+  (resultOptionToBool (Regexp.string_match (Regexp.regexp "^[^ \t]") s 0)) &&
+    (resultOptionToBool (Regexp.string_match (Regexp.regexp ".*[^ \t]$") s 0))
 
 
 let store id titre description diff =
   let metadata = {id; titre; description; diff} in
-  if (previous_id <> "") then (
-    Learnocaml_local_storage.(delete (editor_state previous_id))
-  );
+  if previous_id <> "" then
+    Learnocaml_local_storage.(delete (editor_state previous_id));
   Learnocaml_local_storage.(store (editor_state id))
     {Learnocaml_exercise_state.metadata; solution; incipit; question; template;
      test; prelude; prepare; checkbox; mtime = gettimeofday ()};
@@ -112,24 +116,28 @@ let () = save##.onclick := handler (fun _ ->
   and title_correct = isTitleCorrect titre
   and title_unique = titleUnique titre in
   (if not id_correct then
-    setInnerHtml id_error [%i"Incorrect identifier: an identifier can't be empty, \
+    setInnerHtml id_error [%i"Incorrect identifier: an identifier \
+                              can't be empty, \
                               and only lower case letters, numerals, dashes \
                               and underscores are allowed"]
   else if not id_unique then
-    setInnerHtml id_error [%i"This identifier is already used, please choose another one"]
+    setInnerHtml id_error [%i"This identifier is already used, \
+                              please choose another one"]
   else
     setInnerHtml id_error "");
   (if not title_correct then
     setInnerHtml title_error [%i"Incorrect title: a title can't be empty, \
                                  or begin or end with a space or a tab"]
   else if not title_unique then
-    setInnerHtml title_error [%i"This title is already used, please choose another one"]
+     setInnerHtml title_error
+       [%i"This title is already used, please choose another one"]
   else
     setInnerHtml title_error "");
-  if id_correct && title_correct && id_unique && title_unique then (
-    store id titre description diff;
-    Dom_html.window##.location##assign
+  if id_correct && title_correct && id_unique && title_unique then
+    begin
+      store id titre description diff;
+      Dom_html.window##.location##assign
         (Js.string ("editor.html#id=" ^ id ^ "&action=open"));
-  );
+    end;
   Js._true
 )

@@ -13,9 +13,9 @@ val get_prepare : string -> string
 val get_imperative : string -> bool
 val get_undesirable : string -> bool
 val get_buffer : string -> string
-
 (** Getters of a question of an editor exercise
-  * @param exercise_id question_id *)
+ * @param exercise_id question_id *)
+val get_a_question : string -> Map.Make(String).key ->Learnocaml_exercise_state.test_qst_untyped
 val get_ty : string -> Map.Make(String).key -> string
 val get_name_question : string -> Map.Make(String).key -> string
 val get_type_question : string -> Map.Make(String).key -> Learnocaml_exercise_state.type_question
@@ -31,6 +31,8 @@ val compute_question_id : 'a Map.Make(String).t -> string
 (** Setter of testhaut
   * @param new_StringMap exercise_id *)  
 val save_testhaut : Learnocaml_exercise_state.test_qst_untyped Map.Make(String).t -> string -> unit
+
+val with_test_lib_prepare :string->string
 
 (** Remove an exercise from the local storage *)
 val remove_exo : Map.Make(String).key -> unit
@@ -56,9 +58,6 @@ val testhaut_init : [< Html_types.div ] Tyxml_js.Html5.elt -> string -> unit Lwt
 (** Remove extra_copies of a value in the list (each value of the list is unique now) *) 
 val redondance : 'a list -> 'a list
 
-(** Create the corresponding char list of a string (second parameter must be 0) *)
-val decomposition : string -> int -> char list
-
 (** Fragment of a test.ml code
   * @see definition *)
 val init : string
@@ -74,11 +73,24 @@ val string_of_char : char -> string
   * The first value is the type of the first val, etc. *)
 val get_all_val : char list -> char list list -> char list list
 
+(** Remove atomic values from a list of types
+  * @return a list of type of function (var function_name : type = <fun>)
+  * @param content_of_the_toplevel [[]] result_list  (second parameter must be []) *)
 val get_only_fct : char list -> char list -> char list
+
+(** Associate each function with its type
+  * @ return a list of couple (function_name, function_type)
+  * @ param content_of_the_toplevel result_list (second param must be []) *)
 val get_questions : char list list -> (string * string) list -> (string * string) list
+
+(** Create the corresponding char list of a string (second parameter must be 0) *)
 val decompositionSol : string -> int -> char list
+
+(** Create a list of couple : type parameter associate with a base type
+  * for example : 'a,int ; 'b,float ... *)
 val polymorph_detector : ('a * string) list -> ('a * string) list
 
+(** Create the template of the solution *)
 val genTemplate : string -> string
 
 (** Refacoring of typecheck functions *)
@@ -92,5 +104,6 @@ val exo_creator : string -> Learnocaml_exercise.t
 
 (** @return the output of toplevel buffer *) 
 val get_answer : Learnocaml_toplevel.t -> string
-
+val typecheck_dialog_box : string-> 'a Toploop_results.toplevel_result -> unit Lwt.t
+val test_prel :string 
 

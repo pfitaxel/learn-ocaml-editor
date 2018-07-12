@@ -493,3 +493,14 @@ body{
 #learnocaml-tab-suite-input .ace_selection { background: #e80; opacity: 0.4; }
 #learnocaml-tab-suite-input .ace_active-line { background: #acf; opacity: 0.2; }
 #learnocaml-tab-suite-input .ace_selected-word { background: #e80; opacity: 0.2; }
+
+
+/* --------------- check-answer -------------------------- */
+#check-anser {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+}
+#check-answer.loading,
+#check-anser.loaded {
+  background: rgba(200,200,200,0.9);
+}

@@ -6,11 +6,11 @@ open Js_utils
 open Tyxml_js.Html5
 open Dom_html
 
-module StringMap = Map.Make(String)
+module StringMap = Map.Make(String);;
 
 
 (* Internationalization *)
-let () = Translate.set_lang ()
+ Translate.set_lang ()
 
 
 let get_titre id =
@@ -39,45 +39,45 @@ let get_imperative id =
   Learnocaml_local_storage.(retrieve (editor_state id)).checkbox.imperative
 let get_undesirable id =
   Learnocaml_local_storage.(retrieve (editor_state id)).checkbox.undesirable
-let get_test_liste id =
-  Learnocaml_local_storage.(retrieve (editor_state id)).test.testhaut
-let get_test_string id =
-  Learnocaml_local_storage.(retrieve (editor_state id)).test.testml
 
+let get_a_question id idQuestion = let string_map = get_testhaut id in
+  StringMap.(find idQuestion string_map)
 
-let get_ty id idQuestion = let test_list = get_test_liste id in
+(* TODO refactor the following getters with get_a_question *)
+
+let get_ty id idQuestion = let test_list = get_testhaut id in
   match StringMap.(find idQuestion test_list) with
   | TestAgainstSol a -> a.ty
   | TestAgainstSpec a -> a.ty
   | TestSuite a -> a.ty
 
-let get_name_question id idQuestion = let test_list = get_test_liste id in
+let get_name_question id idQuestion= let test_list = get_testhaut id in
   match StringMap.(find idQuestion test_list) with
   | TestAgainstSol a -> a.name
   | TestAgainstSpec a -> a.name
   | TestSuite a -> a.name
-
+                    
 let get_type_question id idQuestion =
-  let test_list = get_test_liste id in
+  let test_list = get_testhaut id in
   match StringMap.(find idQuestion test_list) with
   | TestAgainstSol _ -> Solution
   | TestAgainstSpec _ -> Spec
   | TestSuite _ -> Suite
 
-let get_extra_alea id idQuestion = let test_list = get_test_liste id in
+let get_extra_alea id idQuestion =  let test_list = get_testhaut id in
   match StringMap.(find idQuestion test_list) with
   | TestAgainstSol a -> a.gen
   | TestAgainstSpec a -> a.gen
   | _ -> failwith "?"
-
+                    
 let get_input id idQuestion =
-  let test_list = get_test_liste id in
+  let test_list = get_testhaut id in
   match StringMap.(find idQuestion test_list) with
   | TestAgainstSol a -> a.suite
   | TestAgainstSpec a -> a.suite
   | TestSuite a -> a.suite
 
-let get_spec id idQuestion =  let test_list = get_test_liste id in
+let get_spec id idQuestion = let test_list = get_testhaut id in
   match StringMap.(find idQuestion test_list) with
   | TestAgainstSpec a -> a.spec
   | _ -> failwith ""
@@ -239,10 +239,13 @@ let checkbox_creator string cas id =
   Tyxml_js.Of_dom.of_input dom_chk
 
 
+let with_test_lib_prepare string =
+  "module Dummy_Functor (Introspection :\n                        Introspection_intf.INTROSPECTION) = struct\n  module Dummy_Params = struct\n    let results = ref None\n    let set_progress _ = ()\n    let timeout = None\n    module Introspection = Introspection            \n  end\n  module Test_lib = Test_lib.Make(Dummy_Params)\n  module Report = Learnocaml_report;;\n  let code_ast = (failwith \"WIP\" : Parsetree.structure);;\n\n "
+  ^ string ^ " end";;
+
 let typecheck_spec_aux set_class ace_t editor_t top string=
   Learnocaml_toplevel.check top
-      ("module Dummy_Functor (Introspection :\n                        Introspection_intf.INTROSPECTION) = struct\n  module Dummy_Params = struct\n    let results = ref None\n    let set_progress _ = ()\n    let timeout = None\n    module Introspection = Introspection            \n  end\n  module Test_lib = Test_lib.Make(Dummy_Params)\n  module Report = Learnocaml_report;;\n  let code_ast = (failwith \"WIP\" : Parsetree.structure);;\n\n "
-       ^ string ^ " end") >>= fun res ->
+      (with_test_lib_prepare string) >>= fun res ->
     let error, warnings =
       match res with
       | Toploop_results.Ok ((), warnings) -> None, warnings
@@ -268,6 +271,7 @@ let typecheck_spec set_class ace_t editor_t top =
   typecheck_spec_aux set_class ace_t editor_t top (Ace.get_contents ace_t)
 
 let rec testhaut_init content_div id =
+  let elt = find_div "learnocaml-loading" in
     fetch_test_index id >>= fun index ->
   let format_question_list all_question_states =
     let  format_contents acc contents =
@@ -392,14 +396,13 @@ let rec testhaut_init content_div id =
                        buttonDuplicate;
                   ]) ]
                   ::  a ~a:[ a_onclick (fun _ ->
-                  let elt = find_div "learnocaml-exo-loading" in
                   Manip.(addClass elt "loading-layer") ;
                   Manip.(removeClass elt "loaded") ;
                   Manip.(addClass elt "loading") ;
-                  Manip.replaceChildren elt [iframe_tyxml]  ;
-                  testhaut_iframe##.src := Js.string
-                    ("test.html#id=" ^ id ^ "&questionid=" ^
-                     question_id ^ "&action=open") ;
+                  Manip.replaceChildren elt [iframe_tyxml] ;
+                  testhaut_iframe##.src :=
+                    Js.string ("test.html#id=" ^ id ^ "&questionid=" ^
+                               question_id ^ "&action=open") ;
                   true) ;
                   a_class [ "exercise" ] ] [
                 div ~a:[ a_class [ "descr" ] ] [
@@ -420,7 +423,6 @@ let rec testhaut_init content_div id =
         ];]] @
        [a ~a:[ a_onclick
        (fun _ ->
-         let elt = find_div "learnocaml-exo-loading" in
          Manip.(addClass elt "loading-layer") ;
          Manip.(removeClass elt "loaded") ;
          Manip.(addClass elt "loading") ;
@@ -455,11 +457,6 @@ let rec redondanceAux liste elem= match liste with
 let rec redondance liste = match liste with
   | [] -> []
   | e :: s -> e :: (redondance (redondanceAux s e))
-
-
-let rec decomposition str n =
-  if n + 1 = String.length str then [(str.[n])]
-  else ((str.[n]) :: (decomposition str (n + 1)))
 
 let init = "let () =
             set_result @@
@@ -583,6 +580,12 @@ let rec decompositionSol str n =
   else if n + 1 = String.length str then [(str.[n])]
   else (str.[n])::(decompositionSol str (n+1))
 
+
+let rec decomposition str n = 
+  if str = "" then []
+  else if n + 1 = String.length str then [(str.[n])]
+  else (str.[n])::(decompositionSol str (n+1))
+                    
 (** @param listeChar a list of couples of char lists *)
 let rec polymorph_detector listeChar = match listeChar with
   | []-> []
@@ -712,3 +715,37 @@ let exo_creator proper_id =
 
 let get_answer top =
   Learnocaml_toplevel.execute_test top
+;;
+
+let typecheck_dialog_box div_id res =
+   let result = 
+     let open Toploop_results in
+     match res with
+       Ok _ -> "your question does typecheck \n"
+     | Error ((*err*)_,_) ->
+         "your question doesn't typecheck \n"(*^err.msg should be considered*) 
+   in
+   begin
+     let messages =Tyxml_js.Html5.ul [] in
+     let checked, check_message =
+       let t, u = Lwt.task () in
+       let btn_ok = Tyxml_js.Html5.(button [ pcdata [%i"Ok"] ]) in
+       Manip.Ev.onclick btn_ok ( fun _ ->
+           hide_loading ~id:div_id () ; true) ;
+       let div =
+         Tyxml_js.Html5.(div ~a: [ a_class [ "dialog" ] ]
+                           [ pcdata result ;
+                             btn_ok ;
+                           ]) in
+       Manip.SetCss.opacity div (Some "0") ;
+       t, div in
+     Manip.replaceChildren messages
+       Tyxml_js.Html5.[ li [ pcdata "" ] ] ;
+     show_loading ~id:div_id [ check_message ] ;
+     Manip.SetCss.opacity check_message (Some "1") 
+   end;      
+   Lwt.return ()
+;;
+
+(* keep sync with test-spec *)
+let test_prel = "open Test_lib\nopen Learnocaml_report\n\n\n(* sampler: (unit -> ('ar -> 'row, 'ar -> 'urow, 'ret) args) *)\n(*keep in sync with learnocaml_exercise_state.ml *)\ntype test_qst_untyped =\n  | TestAgainstSol of\n      { name: string\n      ; ty: string\n      ; gen: int\n      ; suite: string\n      ; tester: string\n      ; sampler: string}\n  | TestAgainstSpec of\n      { name: string\n      ; ty: string\n      ; gen: int\n      ; suite: string\n      ; spec : string\n      ; tester: string\n      ; sampler: string}\n  | TestSuite of\n      { name: string;\n        ty: string;\n        suite: string;\n        tester : string}\n;;\n\ntype outcome =\n  | Correct of string option\n  | Wrong of string option\n\n(* TODO val get_test_qst : test_qst_untyped -> test_qst_typed *)\n\ntype test_qst_typed =\n  | TestAgainstSol :\n      { name: string\n      ; prot: (('ar -> 'row) Ty.ty, 'ar -> 'urow, 'ret) prot\n      ; tester: 'ret tester option\n      ; sampler:(unit -> ('ar -> 'row, 'ar -> 'urow, 'ret) args) option\n      ; gen: int\n      ; suite: ('ar -> 'row, 'ar -> 'urow, 'ret) args list } -> test_qst_typed\n  | TestAgainstSpec :\n      { name: string\n      ; prot: (('ar -> 'row) Ty.ty, 'ar -> 'urow, 'ret) prot\n      ; tester: 'ret tester option  (* 'a tester option (base) mais probleme de type : 'a tester incompatible avec 'ret tester*)\n      ; sampler: (unit -> ('ar -> 'row, 'ar -> 'urow, 'ret) args) option\n      ; gen: int\n      ; suite: ('ar -> 'row, 'ar -> 'urow, 'ret) args list\n      ; spec : ('ar -> 'row) -> ('ar -> 'row, 'ar -> 'urow, 'ret) args -> 'ret -> outcome } -> test_qst_typed\n  | TestSuite :\n      { name: string\n      ; prot: (('ar -> 'row) Ty.ty, 'ar -> 'urow, 'ret) prot\n      ; tester: 'ret tester option\n      ; suite: (('ar -> 'row, 'ar -> 'urow, 'ret) args * (unit -> 'ret)) list } -> test_qst_typed\n\n(** Notation for TestAgainstSpec *)\nlet (~~) b = if b then Correct None else Wrong None\n(** Notations for TestSuite *)\nlet (==>) a b = (a, fun () -> b)\n(* let (=>) a b = (a, fun () -> Lazy.force b) (* needs module Lazy *) *)\n(** Notations for heterogeneous lists *)\nlet (@:) a l = arg a @@ l\nlet (!!) b = last b\nlet (@:!!) a b = a @: !! b\n\nlet local_dummy : 'a sampler = fun () -> failwith \"dummy sampler\"\n(* à n'utiliser que si on passe l'argument ~gen:0 (pas d'alea) *)\n                                               \nlet test_question (t : test_qst_typed) =\n  match t with\n  | TestAgainstSol t ->\n      let tester = match t.tester with\n        | None -> test\n        | Some s -> s in\n      if t.gen=0 then \n        (test_function_against\n           ~gen:t.gen ~sampler:local_dummy\n           ~test:tester (* could take into account exceptions/sorted lists/etc. *)\n           t.prot\n           (lookup_student (ty_of_prot t.prot) t.name)\n           (lookup_solution (ty_of_prot t.prot) t.name)\n           t.suite)\n      else\n        (match t.sampler with\n         | None -> (test_function_against\n                      ~gen:t.gen\n                      ~test:tester (* could take into account exceptions/sorted lists/etc. *)\n                      t.prot\n                      (lookup_student (ty_of_prot t.prot) t.name)\n                      (lookup_solution (ty_of_prot t.prot) t.name)\n                      t.suite)\n         | Some s -> (test_function_against\n                        ~gen:t.gen ~sampler:s\n                        ~test:tester (* could take into account exceptions/sorted lists/etc. *)\n                        t.prot\n                        (lookup_student (ty_of_prot t.prot) t.name)\n                        (lookup_solution (ty_of_prot t.prot) t.name)\n                        t.suite))\n  | TestAgainstSpec t ->\n      let to_string ty v = Format.asprintf \"%a\" (typed_printer ty) v in\n      let stud = lookup_student (ty_of_prot t.prot) t.name in\n      test_value stud @@ fun uf ->\n     (* no sampler for the moment *)\n      let open Learnocaml_report in\n      List.flatten @@ List.map (fun args ->\n          let code = Format.asprintf \"@[<hv 2>%s,%a@]\" t.name (print t.prot) args in\n          let ret_ty = get_ret_ty (ty_of_prot t.prot) args in\n          Message ([ Text \"Checking spec for\" ; Code code ], Informative) ::\n          let ret = apply uf args in\n          let value = to_string ret_ty ret in\n          let (text, note) = match t.spec uf args ret with\n            | Correct None -> (\"Correct spec\", Success 1)\n            | Correct (Some message) -> (message, Success 1)\n            | Wrong None -> (\"Wrong spec\", Failure)\n            | Wrong (Some message) -> (message, Failure) in\n          [Message ([Text \"Got value\"; Code value; Text (\": \" ^ text)], note)])\n        t.suite\n  | TestSuite t ->\n      let test = match t.tester with\n        | None -> test\n        | Some s -> s in\n      test_function\n        ~test:test (* could take into account exceptions/sorted lists/etc. *)\n        t.prot\n        (lookup_student (ty_of_prot t.prot) t.name)\n        t.suite\n"

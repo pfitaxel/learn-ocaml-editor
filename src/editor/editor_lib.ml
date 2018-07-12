@@ -26,44 +26,42 @@ let get_testhaut id = Learnocaml_local_storage.(retrieve (editor_state id)).test
 let get_prelude id = Learnocaml_local_storage.(retrieve (editor_state id)).prelude
 let get_prepare id = Learnocaml_local_storage.(retrieve (editor_state id)).prepare
 let get_imperative id =  Learnocaml_local_storage.(retrieve (editor_state id)).checkbox.imperative
-let get_undesirable id = Learnocaml_local_storage.(retrieve (editor_state id)).checkbox.undesirable
-let get_test_liste id = Learnocaml_local_storage.(retrieve (editor_state id)).test.testhaut
-let get_test_string id  = Learnocaml_local_storage.(retrieve (editor_state id)).test.testml                             
+let get_undesirable id = Learnocaml_local_storage.(retrieve (editor_state id)).checkbox.undesirable                           
 
 
-let get_ty id idQuestion= let test_list = get_test_liste id in
+let get_ty id idQuestion= let test_list = get_testhaut id in
   match StringMap.(find idQuestion test_list) with
   | TestAgainstSol a -> a.ty
   | TestAgainstSpec a -> a.ty
   |TestSuite a -> a.ty
                     
-let get_name_question id idQuestion= let test_list = get_test_liste id in
+let get_name_question id idQuestion= let test_list = get_testhaut id in
   match StringMap.(find idQuestion test_list) with
   | TestAgainstSol a -> a.name
   | TestAgainstSpec a -> a.name
   | TestSuite a -> a.name
                     
 let get_type_question id idQuestion=
-  let test_list = get_test_liste id in
+  let test_list = get_testhaut id in
   match StringMap.(find idQuestion test_list) with
   | TestAgainstSol _ -> Solution
   | TestAgainstSpec _ -> Spec
   | TestSuite _ -> Suite 
 
-let get_extra_alea id idQuestion=  let test_list = get_test_liste id in
+let get_extra_alea id idQuestion=  let test_list = get_testhaut id in
   match StringMap.(find idQuestion test_list) with
   | TestAgainstSol a -> a.gen
   | TestAgainstSpec a -> a.gen
   | _ -> failwith "?"
                     
 let get_input id idQuestion=
-  let test_list = get_test_liste id in
+  let test_list = get_testhaut id in
   match StringMap.(find idQuestion test_list) with
   | TestAgainstSol a -> a.suite
   | TestAgainstSpec a -> a.suite
   | TestSuite a -> a.suite
 
-let get_spec id idQuestion =  let test_list = get_test_liste id in
+let get_spec id idQuestion =  let test_list = get_testhaut id in
   match StringMap.(find idQuestion test_list) with  
   | TestAgainstSpec a -> a.spec
   | _ -> failwith ""
@@ -238,9 +236,10 @@ let typecheck_spec_aux set_class ace_t editor_t top string=
     Ace.focus ace_t ;
     Lwt.return () ;;
 
-let typecheck_spec set_class ace_t editor_t top  =typecheck_spec_aux set_class ace_t editor_t top (Ace.get_contents ace_t)
+let typecheck_spec set_class ace_t editor_t top = typecheck_spec_aux set_class ace_t editor_t top (Ace.get_contents ace_t)
 
-let rec testhaut_init content_div id =          
+let rec testhaut_init content_div id =
+  let elt = find_div "learnocaml-loading" in
     fetch_test_index id >>= fun index ->  
   let format_question_list all_question_states =
     let  format_contents acc contents =
@@ -347,11 +346,10 @@ let rec testhaut_init content_div id =
                        buttonDuplicate;
                   ]) ]  
                   ::  a ~a:[ a_onclick (fun _ ->
-                  let elt = find_div "learnocaml-exo-loading" in
                   Manip.(addClass elt "loading-layer") ;
                   Manip.(removeClass elt "loaded") ;
                   Manip.(addClass elt "loading") ;
-                  Manip.replaceChildren elt [iframe_tyxml]  ;
+                  Manip.replaceChildren elt [iframe_tyxml] ;
                   testhaut_iframe##.src:=Js.string ("test.html#id="^id^"&questionid="^question_id^"&action=open") ;       
                   true) ; 
                   a_class [ "exercise" ] ] [
@@ -373,7 +371,6 @@ let rec testhaut_init content_div id =
         ];]] @ 
        [a ~a:[ a_onclick
        (fun _ ->
-         let elt = find_div "learnocaml-exo-loading" in
          Manip.(addClass elt "loading-layer") ;
          Manip.(removeClass elt "loaded") ;
          Manip.(addClass elt "loading") ;
@@ -404,11 +401,6 @@ let rec redondanceAux liste elem= match liste with
 let rec redondance liste = match liste with
   | [] -> []
   | e :: s -> e :: (redondance (redondanceAux s e))
-
-
-let rec decomposition str n = 
-  if (n + 1 = String.length str) then [(str.[n])]
-  else ((str.[n]) :: (decomposition str (n + 1)))
 
 let init = "let () =
             set_result @@
@@ -522,6 +514,12 @@ let rec decompositionSol str n =
   else if n + 1 = String.length str then [(str.[n])]
   else (str.[n])::(decompositionSol str (n+1))
 
+
+let rec decomposition str n = 
+  if str = "" then []
+  else if n + 1 = String.length str then [(str.[n])]
+  else (str.[n])::(decompositionSol str (n+1))
+                    
 (** @param listeChar a list of couples of char lists *)
 let rec polymorph_detector listeChar = match listeChar with
   | []-> []

@@ -30,7 +30,6 @@
          Set to .loaded when initial loading finished.
          Set to .loading while loading, then to .loaded. -->
     <div id="learnocaml-exo-loading" class="loading-layer initial">
-      
       <div id="chamo"><img id="chamo-img" src="icons/tryocaml_loading_5.gif"></div>
       <div class="messages"><ul><li id="txt_preparing">Preparing the environment</li></ul></div>
     </div>
@@ -38,6 +37,8 @@
       var n = Math.floor (Math.random () * 9) + 1;
       document.getElementById('chamo-img').src = 'icons/tryocaml_loading_' + n + '.gif';
     </script>
+    <div id="learnocaml-loading" class="loading-layer loaded">
+    </div>
     <!-- Anything below could be recreated dynamically, but IDs must be kept. -->
     <div id="learnocaml-exo-toolbar">
       <a href="./">

@@ -573,6 +573,12 @@ let () =
         mtime = gettimeofday () } in
   recovering_callback:=recovering ;
   let ast_fonction () =
+    let quality = match getElementById_coerce "quality_box" CoerceTo.input with
+      | None -> failwith "unknown element quality_box"
+      | Some s -> s in
+    let imperative = match getElementById_coerce "imperative_box" CoerceTo.input with
+      | None -> failwith "unknown element imperative_box"
+      | Some s -> s in
     let fonction = if Js.to_bool(quality##.checked) then
                      quality_function
                    else
@@ -819,47 +825,47 @@ let () =
 
   let worker () = ref (Grading_jsoo.get_grade ~callback (exo_creator id)  ) in
   let grade () = let aborted, abort_message =
-      let t, u = Lwt.task () in
-      let btn = Tyxml_js.Html5.(button [ pcdata [%i "abort" ]]) in
-      Manip.Ev.onclick btn (fun _ -> Lwt.wakeup u () ; true) ;
-      let div =
-        Tyxml_js.Html5.(div ~a: [ a_class [ "dialog" ] ]
-                          [ pcdata [%i"Grading is taking a lot of time, "] ;
-                            btn ;
-                            pcdata "?" ]) in
-      Manip.SetCss.opacity div (Some "0") ;
-      t, div in
-    Manip.replaceChildren messages
-      Tyxml_js.Html5.[ li [ pcdata [%i"Launching the grader"] ] ] ;
-    show_loading ~id:"learnocaml-exo-loading" [ messages ; abort_message ];
-    Lwt_js.sleep 1. >>= fun () ->
-    let solution = Ace.get_contents ace in
-    Learnocaml_toplevel.check top solution >>= fun res ->
-    match res with
-    | Toploop_results.Ok ((), _) ->
-        let grading =
-          !(worker ()) solution >>= fun (report, _, _, _) ->
-          Lwt.return report in
-        let abortion =
-          Lwt_js.sleep 5. >>= fun () ->
-          Manip.SetCss.opacity abort_message (Some "1") ;
-          aborted >>= fun () ->
-          Lwt.return Learnocaml_report.[ Message ([ Text [%i"Grading aborted by user."] ], Failure) ] in
-        Lwt.pick [ grading ; abortion ] >>= fun report ->
-        let grade = display_report (exo_creator id) report in
-        (worker() ) := Grading_jsoo.get_grade ~callback (exo_creator id) ;
-        Learnocaml_local_storage.(store (exercise_state id))
-          { Learnocaml_exercise_state.grade = Some grade ; solution ; report = Some report ;
-            mtime = gettimeofday () } ;
-        select_tab "report" ;
-        Lwt_js.yield () >>= fun () ->
-        hide_loading ~id:"learnocaml-exo-loading" () ;
-        Lwt.return ()
-    | Toploop_results.Error _ ->
-        select_tab "report" ;
-        Lwt_js.yield () >>= fun () ->
-        hide_loading ~id:"learnocaml-exo-loading" () ;
-        typecheck true in
+                   let t, u = Lwt.task () in
+                   let btn = Tyxml_js.Html5.(button [ pcdata [%i "abort" ]]) in
+                   Manip.Ev.onclick btn (fun _ -> Lwt.wakeup u () ; true) ;
+                   let div =
+                     Tyxml_js.Html5.(div ~a: [ a_class [ "dialog" ] ]
+                                       [ pcdata [%i"Grading is taking a lot of time, "] ;
+                                         btn ;
+                                         pcdata "?" ]) in
+                   Manip.SetCss.opacity div (Some "0") ;
+                   t, div in
+                 Manip.replaceChildren messages
+                   Tyxml_js.Html5.[ li [ pcdata [%i"Launching the grader"] ] ] ;
+                 show_loading ~id:"learnocaml-exo-loading" [ messages ; abort_message ];
+                 Lwt_js.sleep 1. >>= fun () ->
+                 let solution = Ace.get_contents ace in
+                 Learnocaml_toplevel.check top solution >>= fun res ->
+                 match res with
+                 | Toploop_results.Ok ((), _) ->
+                    let grading =
+                      !(worker ()) solution >>= fun (report, _, _, _) ->
+                      Lwt.return report in
+                    let abortion =
+                      Lwt_js.sleep 5. >>= fun () ->
+                      Manip.SetCss.opacity abort_message (Some "1") ;
+                      aborted >>= fun () ->
+                      Lwt.return Learnocaml_report.[ Message ([ Text [%i"Grading aborted by user."] ], Failure) ] in
+                    Lwt.pick [ grading ; abortion ] >>= fun report ->
+                    let grade = display_report (exo_creator id) report in
+                    (worker() ) := Grading_jsoo.get_grade ~callback (exo_creator id) ;
+                    Learnocaml_local_storage.(store (exercise_state id))
+                      { Learnocaml_exercise_state.grade = Some grade ; solution ; report = Some report ;
+                        mtime = gettimeofday () } ;
+                    select_tab "report" ;
+                    Lwt_js.yield () >>= fun () ->
+                    hide_loading ~id:"learnocaml-exo-loading" () ;
+                    Lwt.return ()
+                 | Toploop_results.Error _ ->
+                    select_tab "report" ;
+                    Lwt_js.yield () >>= fun () ->
+                    hide_loading ~id:"learnocaml-exo-loading" () ;
+                    typecheck true in
   begin toolbar_button2
       ~icon: "reload" [%i"Grade!"] @@ fun () ->
     recovering () ;
@@ -874,18 +880,18 @@ let () =
           Manip.Ev.onclick btn_compile (fun _ ->
               recovering () ;
               compile ();
-              let _= grade () in (); true) ;
+              let _ = grade () in (); true) ;
           let btn_no = Tyxml_js.Html5.(button [ pcdata [%i"Grade without compiling Test"] ]) in
-          Manip.Ev.onclick btn_no (fun _ ->let _ = grade () in () ; true);
+          Manip.Ev.onclick btn_no (fun _ -> let _ = grade () in () ; true);
           let div =
             Tyxml_js.Html5.(div ~a: [ a_class [ "dialog" ] ]
-                              [ pcdata [%i"The Grade feature relies on the contents of Test.ml. \
-                              Do you want to compile the high-level tests and overwrite Test.ml?\n"] ;
-                                btn_compile ;
-                                pcdata " " ;
-                                btn_no ;
-                                pcdata " " ;
-                                btn_cancel ]) in
+                 [ pcdata [%i"The Grade feature relies on the contents of Test.ml. \
+                 Do you want to compile the high-level tests and overwrite Test.ml?\n"] ;
+                   btn_compile ;
+                   pcdata " " ;
+                   btn_no ;
+                   pcdata " " ;
+                   btn_cancel ]) in
           Manip.SetCss.opacity div (Some "0") ;
           t, div in 
         Manip.replaceChildren messages
@@ -905,7 +911,7 @@ let () =
     !grade_red ();
   (* ---- return -------------------------------------------------------- *)
   (* toplevel_launch >>= fun _ -> FIXME? SHOULD BE UNNECESSARY *)
-  (* typecheck false >>= fun () -> ? *)
+  (* typecheck false >>= fun () ->  ? *)
   hide_loading ~id:"learnocaml-exo-loading" () ;
   let () = Lwt.async @@ fun () ->
      let _ = Dom_html.window##setInterval (Js.wrap_callback (fun () -> onload ())) 200.; in

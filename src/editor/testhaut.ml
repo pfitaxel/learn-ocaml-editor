@@ -344,11 +344,11 @@ let name_correct s = s <> ""
 let type_correct s = s <> ""
 
 let close_frame () =
-  (* trick to get access to the container of the frame (learnocaml-exo-loading) *)
+  (* trick to get access to the container of the frame (learnocaml-loading) *)
   let window = Dom_html.window in
   let window = window##.parent in
   let document = window##.document in
-  let div = Js.Opt.case (document##getElementById (Js.string "learnocaml-exo-loading"))
+  let div = Js.Opt.case (document##getElementById (Js.string "learnocaml-loading"))
       (fun () -> failwith "titi")
       (fun node -> node) in
   let exo_list=Js.Opt.case (document##getElementById (Js.string "learnocaml-exo-testhaut-pane"))
@@ -373,27 +373,28 @@ let _ = save##.onclick := handler (fun _ ->
   let ty = Js.to_string ty##.value in
   let name_correct = name_correct name in
   let type_correct = type_correct ty in
-  (if not name_correct then
+  if not name_correct then
      setInnerHtml name_error [%i"Incorrect name: a name can't be empty"]
    else
-     setInnerHtml name_error "");
-  (if not type_correct then
+     setInnerHtml name_error "";
+  if not type_correct then
      setInnerHtml type_error [%i"Incorrect type: a type can't be empty"]
    else
-     setInnerHtml type_error "");
-  if name_correct && type_correct then (
-  	match arg "tab" with
-  	| "suite" -> save_suite ();
-  	| "solution" -> save_solution ();
-  	| "spec" -> save_spec ();
-  	| _ -> failwith "";
-  	close_frame ();
-  );
+     setInnerHtml type_error "";
+  if name_correct && type_correct then 
+     begin
+       (match arg "tab" with
+       | "suite" -> save_suite ()
+       | "solution" -> save_solution ()
+       | "spec" -> save_spec ()
+       | _ -> failwith "");
+       close_frame ();
+     end;
   Js._true
 )
 
 (* ---- Cancel button ---------------------------------------------------------- *)
 let cancel = getElementById "cancel"
 let () = cancel##.onclick := handler (fun _ ->
-  close_frame (); Js._true)
+  let _ = close_frame () in (); Js._true)
 

@@ -53,8 +53,7 @@ type test_qst_typed =
   | TestAgainstSpec :
       { name: string
       ; prot: (('ar -> 'row) Ty.ty, 'ar -> 'urow, 'ret) prot
-      ; tester: 'ret tester option 
-      (* 'a tester option (base) mais probleme de type : 'a tester incompatible avec 'ret tester *)
+      ; tester: 'ret tester option
       ; sampler: (unit -> ('ar -> 'row, 'ar -> 'urow, 'ret) args) option
       ; gen: int
       ; suite: ('ar -> 'row, 'ar -> 'urow, 'ret) args list
@@ -181,12 +180,7 @@ let test_question (t : test_qst_typed) =
 end
 
 open Editor_lib
- 
-(*
-let basic_types =
-  [ ['i';'n';'t'];['c';'h';'a';'r'];['f';'l';'o';'a';'t'];
-    ['s';'t';'r';'i';'n';'g'];['b';'o';'o';'l'] ] ;;
-*)
+
 let rec to_string_aux char_list =match char_list with
   | []-> ""
   | c::l -> (string_of_char c) ^ ( to_string_aux l)
@@ -194,7 +188,7 @@ let rec to_string_aux char_list =match char_list with
 let to_ty str = "(to_ty \""^str^"\" )"
 
 let parse_type string =
-  let char_list_ref = ref (List.rev (decomposition string 0)) in
+  let char_list_ref = ref (List.rev (decompositionSol string 0)) in
   let para_cpt =ref 0 in
   let esp_cpt= ref 0 in
   (* reverse char_list before using it *)
@@ -243,8 +237,6 @@ let parse_type string =
     acc:="arg_ty "^ty^" ("^(!acc)^")" ;
   done;
   !acc;;
-
-(* parse_type (string : ex: int -> int) ==> (string : prot) *)
 
 let question_typed question id_question = 
   let open Learnocaml_exercise_state in

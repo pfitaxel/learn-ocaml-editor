@@ -51,6 +51,7 @@ begin program "testhaut"
     "ocplib-json-typed.browser"
     "editor_lib"
     "translate"
+    "test-spec"
   ]
   files = [
     "testhaut.ml" ( comp = [ ppx_js ppx_ocplib_i18n]  )
@@ -60,9 +61,13 @@ begin program "testhaut"
       build_target = true
       sources = %byte_exe( p = "testhaut" )
       commands = [ {
-        "js_of_ocaml"
+	"js_of_ocaml"
            "+cstruct/cstruct.js"
-           "%{ace_FULL_SRC_DIR}%/ace_bindings.js"            
+           "+dynlink.js"
+ 	   "+toplevel.js"
+ 	   "--toplevel"
+ 	   "--nocmis"
+ 	   "%{ace_FULL_SRC_DIR}%/ace_bindings.js"
            %byte_exe( p = "testhaut" )
       } ]
     )

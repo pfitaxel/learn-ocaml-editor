@@ -721,9 +721,11 @@ let typecheck_dialog_box div_id res =
      let open Toploop_results in
      match res with
      | Ok _ ->  [%i"Your question does typecheck. "]
-     | Error ((*err*)_,_) ->
+     | Error (err,_) ->
          [%i"Your question does not typecheck. "]
-         (* err.msg should be considered*) in
+           ^ err.msg
+   in
+   
    begin
      let messages = Tyxml_js.Html5.ul [] in
      let checked, check_message =

@@ -3,26 +3,25 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1">
-    <title>Learn OCaml by OCamlPro - Exercise</title>
+    <title>Learn OCaml by OCamlPro - Editor</title>
         <link rel="icon" type="image/x-icon" href="icons/favicon.ico" />
     <!--[if IE]><link rel="shortcut icon" type="image/x-icon" href="icons/favicon.ico"     /><![endif]-->﻿
     <link rel="stylesheet" href="css/learnocaml_common.css">
-    <link rel="stylesheet" href="css/learnocaml_exercise.css">
+    <link rel="stylesheet" href="css/learnocaml_new_exercise.css">
     <link rel="stylesheet" href="css/learnocaml_report.css">
     <link rel="stylesheet" href="css/learnocaml_tryocaml.css">
     <script src="js/ace/ace.js" type="text/javascript" charset="utf-8" defer></script>
     <script language="JavaScript" src="js/new_exercise.js" defer></script>
   </head>
   <body>
-    <style type="text/css"> 
+    <style type="text/css">
       a:link
       {
       	text-decoration:none; 
       }
       input:invalid
       {
-      	border: 1px red;
-      	box-shadow: 0 0 2px 1px red;
+      	box-shadow: 0 0 1px 1px red;
   	  }
   	  .error
   	  {
@@ -42,9 +41,17 @@
         <span>Learn OCaml</span>
         <img src="icons/logo_ocp.svg">
       </div>
+      <div>
+      	<a href="index.html#activity=editor">
+      	  <button id="cancel" type="button" class="button">Cancel</button>
+      	</a>
+      	<button id="save" type="submit" class="button">Save</button>
+      </div>
     </div>
     <div style="margin: 0 5%;">
-      <h1 id="txt_new_exo">New Exercise</h1>
+      <div id="page_title">
+      	<h1 id="txt_new_exo">New Exercise</h1>
+      </div>
       <!--form-->
         <p>
           <label id="txt_id" for="identifier">Unique identifier:<br></label>
@@ -77,10 +84,6 @@
             <option value="4.">4</option>
           </select>
         </p>
-   		<a href="index.html#activity=editor">
-   	      <button id="cancel" type ="button" class="tabs">Cancel</button>
-   		</a>
-    	<button id="save" type="submit" class="tabs">Save</button>
       <!--/form-->
     </div>
   </body>

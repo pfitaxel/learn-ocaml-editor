@@ -33,6 +33,16 @@ button[disabled] {
   cursor: not-allowed;
 }
 /* -------------------- buttons ----------------------------------- */
+#toolbar{
+	height : 30px;
+}
+#button_delete{
+	position: absolute;
+}
+#button_download{
+	position: absolute;
+	left: 45px;  
+}
 button::before,
 button::after {
   position: absolute;

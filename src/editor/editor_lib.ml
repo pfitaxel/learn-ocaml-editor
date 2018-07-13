@@ -716,34 +716,44 @@ let exo_creator proper_id =
 let get_answer top =
   Learnocaml_toplevel.execute_test top
 
+(*TODO look for the record type of res to make the message more understandable*)
 let typecheck_dialog_box div_id res =
-   let result = 
-     let open Toploop_results in
-     match res with
-     | Ok _ ->  [%i"Your question does typecheck. "]
-     | Error ((*err*)_,_) ->
-         [%i"Your question does not typecheck. "]
-         (* err.msg should be considered*) in
-   begin
-     let messages = Tyxml_js.Html5.ul [] in
-     let checked, check_message =
-       let t, u = Lwt.task () in
-       let btn_ok = Tyxml_js.Html5.(button [ pcdata [%i"OK"] ]) in
-       Manip.Ev.onclick btn_ok ( fun _ ->
-           hide_loading ~id:div_id () ; true) ;
-       let div =
-         Tyxml_js.Html5.(div ~a: [ a_class [ "dialog" ] ]
-                           [ pcdata result ;
-                             btn_ok ;
-                           ]) in
-       Manip.SetCss.opacity div (Some "0") ;
-       t, div in
-     Manip.replaceChildren messages
-       Tyxml_js.Html5.[ li [ pcdata "" ] ] ;
-     show_loading ~id:div_id [ check_message ] ;
-     Manip.SetCss.opacity check_message (Some "1") 
-   end;      
-   Lwt.return ()
+  let result,ok = 
+    let open Toploop_results in
+    match res with
+    | Ok _ ->  [%i"Your question does typecheck. "],true
+    | Error (err,_) ->
+        [%i"Your question does not typecheck. "]
+        ^ err.msg ,false
+  in
+  if ok then
+    begin
+      let messages = Tyxml_js.Html5.ul [] in
+      let checked, check_message =
+        let t, u = Lwt.task () in
+        let btn_ok = Tyxml_js.Html5.(button [ pcdata [%i"OK"] ]) in
+        Manip.Ev.onclick btn_ok ( fun _ ->
+            hide_loading ~id:div_id () ; true) ;
+        let div =
+          Tyxml_js.Html5.(div ~a: [ a_class [ "dialog" ] ]
+                            [ pcdata result ;
+                              btn_ok ;
+                            ]) in
+        Manip.SetCss.opacity div (Some "0") ;
+        t, div in
+      Manip.replaceChildren messages
+        Tyxml_js.Html5.[ li [ pcdata "" ] ] ;
+      show_loading ~id:div_id [ check_message ] ;
+      Manip.SetCss.opacity check_message (Some "1");
+       Lwt.return ();
+    end
+  else
+    begin
+      hide_loading ~id:div_id (); 
+      Dom_html.window##alert (Js.string result);
+       Lwt.return ();
+    end
+     
 ;;
 
 (* keep sync with test-spec *)

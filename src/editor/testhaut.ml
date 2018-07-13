@@ -430,26 +430,29 @@ let () = cancel##.onclick := handler (fun _ ->
 let check = getElementById "check" ;;
 let container_div = find_component "check-answer";; 
 
-
 let after_init top =
-  begin 
+  begin (* TODO: try to simplify this small hack *)
     Lwt.return true
   end >>= fun r1 ->
-  if not r1  then failwith [%i"unexpected error"];
+  if not r1 then failwith [%i"unexpected error"];
   Learnocaml_toplevel_worker_caller.set_checking_environment top >>= fun _ ->
-  Lwt.return () in
-    Learnocaml_toplevel_worker_caller.create ~after_init ()
-    >>= ( fun top->
-          hide_loading ~id:"check-answer" ();
-          check##.onclick := handler (fun _ ->
-           let _ = save_handler ( fun ()->() ) () in ();
-           show_loading ~id:"check-answer"
-          Tyxml_js.Html5.[ ul [ li [ pcdata [%i"Checking the question"] ] ] ] ;
-        let str=with_test_lib_prepare
-            (test_prel^"\n"^
-               ( Test_spec.question_typed
-                   ( get_a_question id question_id ) question_id )) in
-        Learnocaml_toplevel_worker_caller.check top str >>= (fun res ->
-          typecheck_dialog_box "check-answer" res); Js._true);
-          Lwt.return () )
-  
+  Lwt.return_unit
+
+let () =
+  Lwt.async @@ fun () ->
+  Learnocaml_toplevel_worker_caller.create ~after_init ()
+  >>= fun top->
+  hide_loading ~id:"check-answer" ();
+  check##.onclick := handler (fun _ ->
+      let _ = save_handler ( fun ()->() ) () in ();
+      show_loading ~id:"check-answer"
+        Tyxml_js.Html5.[ ul [ li [ pcdata [%i"Checking the question"] ] ] ] ;
+      let str=with_test_lib_prepare
+          (test_prel^"\n"^( get_buffer id)^"\n"^
+           ( Test_spec.question_typed
+               ( get_a_question id question_id ) question_id )) in
+      Lwt.async (fun () ->
+          Learnocaml_toplevel_worker_caller.check top str >>= fun res ->
+          typecheck_dialog_box "check-answer" res);
+      Js._true);
+  Lwt.return_unit

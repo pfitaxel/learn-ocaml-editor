@@ -658,7 +658,7 @@ let () =
       ~group: toplevel_buttons_group
       ~icon: "typecheck" [%i"Check"] @@ fun () ->
     show_loading ~id:"learnocaml-exo-loading"
-      Tyxml_js.Html5.[ ul [ li [ pcdata "checking" ] ] ] ;
+      Tyxml_js.Html5.[ ul [ li [ pcdata [%i"Checking"] ] ] ] ;
     let str = with_test_lib_prepare (compile_aux () )
     in
     Learnocaml_toplevel.check top str >>= fun res-> 

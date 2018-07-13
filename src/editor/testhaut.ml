@@ -17,7 +17,7 @@ show_loading ~id:"check-answer"
  Tyxml_js.Html5.[ ul [ li [ pcdata [%i"Loading"] ] ] ] ;
 
 (* Internationalization *)
- Translate.set_lang ()
+let () = Translate.set_lang ()
 let () =
   let translations = [
     "check", [%i"Check"];

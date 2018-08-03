@@ -13,12 +13,12 @@ open Tyxml_js.Html5
 
 module StringMap = Map.Make (String);;
 
-show_loading ~id:"check-answer"
- Tyxml_js.Html5.[ ul [ li [ pcdata [%i"Loading"] ] ] ] ;
-
-(* Internationalization *)
-let () = Translate.set_lang ()
 let () =
+  show_loading ~id:"check-answer"
+    Tyxml_js.Html5.[ ul [ li [ pcdata [%i"Loading"] ] ] ];
+  
+  Translate.set_lang ();
+  
   let translations = [
     "check", [%i"Check"];
     "cancel", [%i"Cancel"];

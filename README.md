@@ -1,18 +1,15 @@
-Learn-OCaml
-===========
+Learn-OCaml Editor
+==================
 
-This is Learn OCaml, a Web platform for learning the OCaml language,
-featuring a Web toplevel, an exercise environment, and a directory of
-lessons and tutorials.
+[![Build Status](https://travis-ci.com/pfitaxel/learn-ocaml-editor.svg?branch=develop)](https://travis-ci.com/pfitaxel/learn-ocaml-editor)
+
+This is Learn-OCaml Editor, an online editor for teachers using the
+[Learn-OCaml](https://github.com/ocaml-sf/learn-ocaml) Web application
+for learning the OCaml language.
 
 This software is still under development, no public announcement has been made yet.
 
-A demo is available at: [http://try.ocamlpro.com/learn-ocaml-demo/].
-
-The exercises and lessons are in another github repository:
-[learn-ocaml-repository](https://github.com/OCamlPro/learn-ocaml-repository).
-
-![Build status logo](https://travis-ci.org/OCamlPro/learn-ocaml.svg)
+A demo is available at: <https://pfitaxel.github.io/pfitaxel-demo/>
 
 Howtos
 ------

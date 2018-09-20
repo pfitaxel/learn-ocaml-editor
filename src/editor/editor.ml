@@ -636,8 +636,8 @@ let () =
         "" in
     fonction in
   let compile_aux () =
-    let tests=test_prel^(ast_fonction ()) in
-    let tests=tests^" \n "^(get_buffer id)^" \n" in
+    let tests=test_prel ^ (ast_fonction ()) in
+    let tests=tests ^ "\n" ^ (get_buffer id) ^ "\n" in
     let tests=
       StringMap.fold (fun qid -> fun quest -> fun str ->
                       str ^ (Test_spec.question_typed quest qid)^" \n")
@@ -650,7 +650,7 @@ let () =
             | TestAgainstSpec a ->a.name
             | TestSuite a -> a.name in
           (* refactor what it's up in editor_lib *)
-          str ^ (section name ("test_question question"^qid ) ))
+          str ^ (section name ("question" ^ qid ) ))
         (get_testhaut id) tests in
     tests^ (ast_code ()) ^ " ]"
   in

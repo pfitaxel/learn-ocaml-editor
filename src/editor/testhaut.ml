@@ -448,9 +448,9 @@ let () =
       show_loading ~id:"check-answer"
         Tyxml_js.Html5.[ ul [ li [ pcdata [%i"Checking the question"] ] ] ] ;
       let str=with_test_lib_prepare
-          (test_prel^"\n"^( get_buffer id)^"\n"^
-           ( Test_spec.question_typed
-               ( get_a_question id question_id ) question_id )) in
+          (test_prel ^ (get_buffer id) ^ "\n" ^
+             (Test_spec.question_typed
+                (get_a_question id question_id) question_id)) in
       Lwt.async (fun () ->
           Learnocaml_toplevel_worker_caller.check top str >>= fun res ->
           typecheck_dialog_box "check-answer" res);

@@ -72,7 +72,7 @@ let imperative_function = "let ast_imperative_check ast =\n
     ast_check_structure\n
       ~on_expression:chk_expr\n
       ast |> List.sort_uniq compare in\n
-  if snd (Learnocaml_report.result_of_report imperative_report) then\n
+  if snd (Learnocaml_report.result imperative_report) then\n
     imperative_report\n
   else\n
     []\n"
@@ -155,7 +155,7 @@ let init_tabs, select_tab =
 
 
 let display_report exo report =
-  (* let score, failed = Learnocaml_report.result_of_report report in *)
+  (* let score, failed = Learnocaml_report.result report in *)
   let report_button = find_component "learnocaml-exo-button-report" in
   Manip.removeClass report_button "success" ;
   Manip.removeClass report_button "failure" ;
@@ -636,8 +636,8 @@ let () =
         "" in
     fonction in
   let compile_aux () =
-    let tests=test_prel^(ast_fonction ()) in
-    let tests=tests^" \n "^(get_buffer id)^" \n" in
+    let tests=test_prel ^ (ast_fonction ()) in
+    let tests=tests ^ "\n" ^ (get_buffer id) ^ "\n" in
     let tests=
       StringMap.fold (fun qid -> fun quest -> fun str ->
                       str ^ (Test_spec.question_typed quest qid)^" \n")
@@ -650,7 +650,7 @@ let () =
             | TestAgainstSpec a ->a.name
             | TestSuite a -> a.name in
           (* refactor what it's up in editor_lib *)
-          str ^ (section name ("test_question question"^qid ) ))
+          str ^ (section name ("question" ^ qid ) ))
         (get_testhaut id) tests in
     tests^ (ast_code ()) ^ " ]"
   in
@@ -835,7 +835,7 @@ let () =
            ([ Text [%i"Grading aborted by user."] ], Failure) ] in
     Lwt.pick [ grading ; abortion ] >>= fun report_correction ->
     let score_maxi, failed2 =
-      Learnocaml_report.result_of_report report_correction in
+      Learnocaml_report.result report_correction in
     Dom_html.window##.location##assign
       (Js.string ("exercise.html#id=." ^ id ^ "&score=" ^
                     (string_of_int score_maxi) ^ "&action=open"));

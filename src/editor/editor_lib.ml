@@ -448,15 +448,9 @@ let rec testhaut_init content_div id =
 
 (* ---------- Functions for generate test -> Compile ---------- *)
 
-let rec redondanceAux liste elem= match liste with
-  | [] -> []
-  | e :: s -> if e = elem then (redondanceAux s elem)
-              else (e :: (redondanceAux s elem))
-
-
 let rec redondance liste = match liste with
   | [] -> []
-  | e :: s -> e :: (redondance (redondanceAux s e))
+  | e :: s -> e :: redondance (List.filter ((<>) e) s)
 
 let init = "let () =
             set_result @@

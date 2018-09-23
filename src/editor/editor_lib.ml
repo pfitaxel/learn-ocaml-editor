@@ -448,9 +448,12 @@ let rec testhaut_init content_div id =
 
 (* ---------- Functions for generate test -> Compile ---------- *)
 
+(* Unused:
+
 let rec redondance liste = match liste with
   | [] -> []
   | e :: s -> e :: redondance (List.filter ((<>) e) s)
+ *)
 
 let init = "let () =
             set_result @@
@@ -579,15 +582,30 @@ let rec decomposition str n =
   else if n + 1 = String.length str then [(str.[n])]
   else (str.[n])::(decompositionSol str (n+1))
 
+let extra_alea_poly = 5
+and extra_alea_mono = 10
+
 (* TODO: Refactor this implementation to avoid "char list"! *)
 (** @param listeChar a list of couples of char lists *)
 let rec polymorph_detector listeChar = match listeChar with
   | []-> []
-  | (listeNom,listeType)::tail -> (listeNom,concatenation
-    (polymorph_detector_aux (decompositionSol listeType 0)
-    [] (['s';'t';'r';'i';'n';'g'])))::(listeNom,concatenation
-    (polymorph_detector_aux (decompositionSol listeType 0)
-    [] (['i';'n';'t'])))::(polymorph_detector tail)
+  | (listeNom,listeType)::tail ->
+     if String.contains listeType '\'' then
+       (listeNom, extra_alea_poly,
+        concatenation
+          (polymorph_detector_aux (decompositionSol listeType 0)
+             [] (['s';'t';'r';'i';'n';'g']))) ::
+         (listeNom, extra_alea_poly,
+          concatenation
+            (polymorph_detector_aux (decompositionSol listeType 0)
+               [] (['i';'n';'t']))) ::
+           polymorph_detector tail
+     else
+       (listeNom, extra_alea_mono,
+        concatenation
+            (polymorph_detector_aux (decompositionSol listeType 0)
+               [] (['s';'t';'r';'i';'n';'g']))) :: (* should be simplified *)
+         polymorph_detector tail
 
 (* Test to experiment the code’s semantics:
 

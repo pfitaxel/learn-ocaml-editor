@@ -87,11 +87,10 @@ let id = arg "id"
 
 let rec save_questions listeQuestions id = match listeQuestions with
   | [] -> ()
-  | (nom, string_type) :: suite ->
+  | (nom, extra_alea, string_type) :: suite ->
     let name = nom in
     let ty = string_type in
     let input = "[]" in
-    let extra_alea = 10 in
     let question = TestAgainstSol
                      {name; ty; suite = input; gen = extra_alea;
                       tester = ""; sampler = ""} in
@@ -555,8 +554,8 @@ let () =
           if ok then
             let res_aux = decompositionSol (get_answer top) 0 in
             (*Avec prise en compte des types polymorphes :*)
-            let res = redondance (polymorph_detector (get_questions
-                   (get_all_val (get_only_fct  res_aux []) []) [] )) in
+            let res = polymorph_detector (get_questions
+                   (get_all_val (get_only_fct  res_aux []) []) [] ) in
             save_questions res id;
             Manip.removeChildren
               (find_component "learnocaml-exo-testhaut-pane");

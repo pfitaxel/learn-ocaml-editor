@@ -25,14 +25,14 @@ open Dom_html
 
 module StringMap = Map.Make (String)
 
-let quality_function = "\nlet avoid_thentrue = let already = ref false in fun _ ->\n  if !already then [] else begin\n    already := true ;\n    Learnocaml_report.[ Message ([ Text \"* Don't write any of the following code:\";\n                                   Code \"[if ... then true else ...;\n if ... then false else ...;\n if ... then ... else true;\n if ... then ... else false]\"; Text \"\nInstead, use the Boolean operators (&&), (||), not.\"], Success ~-4) ]\n  end\n\nlet check_thentrue e =\n    Parsetree.(\n      match e with\n      | {pexp_desc = Pexp_ifthenelse (_, e1, (Some e2))} ->\n         begin\n           match e1 with\n           | {pexp_desc = Pexp_construct ({Asttypes.txt = (Longident.Lident \"false\")}, None)}\n           | {pexp_desc = Pexp_construct ({Asttypes.txt = (Longident.Lident \"true\")}, None)} ->\n              avoid_thentrue e1\n           | _ -> []\n         end @ begin\n           match e2 with\n           | {pexp_desc = Pexp_construct ({Asttypes.txt = (Longident.Lident \"false\")}, None)}\n           | {pexp_desc = Pexp_construct ({Asttypes.txt = (Longident.Lident \"true\")}, None)} ->\n             avoid_thentrue e2\n           | _ -> []\n          end\n      | _ -> [])\n\nlet avoid_list1app = let already = ref false in fun _ ->\n  if !already then [] else begin\n    already := true ;\n    Learnocaml_report.[ Message ([ Text \"* Don't write:\";\n                                   Code \"[x] @ l\";\n                                   Text \". Write instead:\";\n                                   Code \"x :: l\";\n                                   Text \".\"], Success ~-4) ]\n  end\n\nlet check_list1app e =\n  Parsetree.(\n    match e.pexp_desc with\n    | Pexp_apply (app0, [(_, lst1); _]) ->\n       (match app0.pexp_desc, lst1.pexp_desc with\n        | Pexp_ident {Asttypes.txt = app0'},\n          Pexp_construct ({Asttypes.txt = (Longident.Lident \"::\")}, Some lst1')\n             when List.mem (Longident.flatten app0') [[\"List\"; \"append\"]; [\"@\"]] ->\n           (match lst1'.pexp_desc with\n            | Pexp_tuple [_; nil0] ->\n               (match nil0.pexp_desc with\n                | Pexp_construct ({Asttypes.txt = (Longident.Lident \"[]\")}, None) ->\n                   avoid_list1app e\n                | _ -> [])\n            | _ -> [])\n        | _ -> [])\n    | _ -> [])
+let quality_function = "\nlet avoid_thentrue = let already = ref false in fun _ ->\n  if !already then [] else begin\n    already := true ;\n    Learnocaml_report.[ Message ([ Text \"* N'écrivez pas les motifs de code suivants:\";\n                                   Code \"[if ... then true else ...;\n if ... then false else ...;\n if ... then ... else true;\n if ... then ... else false]\"; Text \"\nUtilisez de préférence les opérateurs booléens (&&), (||), not.\"], Success ~-4) ]\n  end\n\nlet check_thentrue e =\n    Parsetree.(\n      match e with\n      | {pexp_desc = Pexp_ifthenelse (_, e1, (Some e2))} ->\n         begin\n           match e1 with\n           | {pexp_desc = Pexp_construct ({Asttypes.txt = (Longident.Lident \"false\")}, None)}\n           | {pexp_desc = Pexp_construct ({Asttypes.txt = (Longident.Lident \"true\")}, None)} ->\n              avoid_thentrue e1\n           | _ -> []\n         end @ begin\n           match e2 with\n           | {pexp_desc = Pexp_construct ({Asttypes.txt = (Longident.Lident \"false\")}, None)}\n           | {pexp_desc = Pexp_construct ({Asttypes.txt = (Longident.Lident \"true\")}, None)} ->\n             avoid_thentrue e2\n           | _ -> []\n          end\n      | _ -> [])\n\nlet avoid_list1app = let already = ref false in fun _ ->\n  if !already then [] else begin\n    already := true ;\n    Learnocaml_report.[ Message ([ Text \"* N'écrivez pas:\";\n                                   Code \"[x] @ l\";\n                                   Text \". Écrivez de préférence:\";\n                                   Code \"x :: l\";\n                                   Text \".\"], Success ~-4) ]\n  end\n\nlet check_list1app e =\n  Parsetree.(\n    match e.pexp_desc with\n    | Pexp_apply (app0, [(_, lst1); _]) ->\n       (match app0.pexp_desc, lst1.pexp_desc with\n        | Pexp_ident {Asttypes.txt = app0'},\n          Pexp_construct ({Asttypes.txt = (Longident.Lident \"::\")}, Some lst1')\n             when List.mem (Longident.flatten app0') [[\"List\"; \"append\"]; [\"@\"]] ->\n           (match lst1'.pexp_desc with\n            | Pexp_tuple [_; nil0] ->\n               (match nil0.pexp_desc with\n                | Pexp_construct ({Asttypes.txt = (Longident.Lident \"[]\")}, None) ->\n                   avoid_list1app e\n                | _ -> [])\n            | _ -> [])\n        | _ -> [])\n    | _ -> [])
 
 let avoid_eqphy = let already = ref false in fun _ ->
   if !already then [] else begin
     already := true ;
-    Learnocaml_report.[ Message ([ Text \"* Don't use the physical equality\";
+    Learnocaml_report.[ Message ([ Text \"* Pour PFITA, n'utilisez pas l'égalité physique\";
                                    Code \"(==)\";
-                                   Text \". Instead, use the structural equality\";
+                                   Text \". Utilisez de préférence l'égalité structurelle\";
                                    Code \"(=)\";
                                    Text \".\"], Success ~-1) ]
   end
@@ -40,9 +40,9 @@ let avoid_eqphy = let already = ref false in fun _ ->
 let avoid_neqphy = let already = ref false in fun _ ->
   if !already then [] else begin
     already := true ;
-    Learnocaml_report.[ Message ([ Text \"* Don't use the physical inequality\";
+    Learnocaml_report.[ Message ([ Text \"* Pour PFITA, n'utilisez pas l'inégalité physique\";
                                    Code \"(!=)\";
-                                   Text \". Instead, use the structural inequality\";
+                                   Text \". Utilisez de préférence l'inégalité structurelle\";
                                    Code \"(<>)\";
                                    Text \".\"], Success ~-1) ]
   end
@@ -597,7 +597,7 @@ let () =
                     let tempReport = ast_imperative_check ast in \n
                     if tempReport = [] then []\n
                     else (Message\n
-                    ([ Text \"Some imperative features were detected:\" ],\n
+                    ([ Text \"Des traits impératifs ont été détectés:\" ],\n
                     Success ~-4)) :: tempReport\n"
       else
         fonction ^ " let imperative_report = []\n" in
@@ -612,11 +612,11 @@ let () =
                     in\n
                     if tempReport = [] then []\n
                     else (Message\n
-                    ([Text \"Some undesirable code patterns were detected:\"],\n
+                    ([Text \"Des motifs de code indésirables ont été détectés:\"],\n
                     Failure)) :: tempReport\n"
       else fonction ^ " and report = []\n" in
     let fonction = fonction ^ "in if imperative_report = [] && report = [] then
-       [ Message ([ Text \"OK (no forbidden construct detected)\"], Success 0) ]
+       [ Message ([ Text \"OK (pas de construction interdite détectée)\"], Success 0) ]
                                else imperative_report @ report;;" in
     fonction in
   let ast_code () =
@@ -630,7 +630,7 @@ let () =
       | Some s -> s in
     let fonction =
       if Js.to_bool(quality##.checked) || Js.to_bool(imperative##.checked) then
-        "Section ([Text \"Code quality:\" ], ast_quality code_ast)"
+        "Section ([Text \"Qualité de code:\" ], ast_quality code_ast)"
       else
         "" in
     fonction in

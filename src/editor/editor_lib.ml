@@ -460,7 +460,7 @@ let init = "let () =
             ast_sanity_check code_ast @@ fun () ->\n"
 
 let section name report = "Section
-  ([ Text \"Function:\" ; Code \""^name^"\" ], " ^ report ^ " );\n"
+  ([ Text \"Fonction:\" ; Code \""^name^"\" ], " ^ report ^ " );\n"
 
 
 (*_____________________Functions for the Generate button_____________________*)

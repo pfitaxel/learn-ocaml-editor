@@ -128,7 +128,9 @@ let rec to_string_aux char_list =match char_list with
   | []-> ""
   | c::l -> (string_of_char c) ^ ( to_string_aux l)
 
-let to_ty str = "[%ty: " ^ str ^ "]"
+(* FIXME: it seems "str" always starts (and sometimes ends) with a space.
+   This should be fix so that the space comes from [to_ty] itself. *)
+let to_ty str = "[%ty:" ^ str ^ "]"
 
 let parse_type string =
   let char_list_ref = ref (List.rev (decompositionSol string 0)) in

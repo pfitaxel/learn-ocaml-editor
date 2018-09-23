@@ -576,12 +576,6 @@ let rec decompositionSol str n =
   else if n + 1 = String.length str then [(str.[n])]
   else (str.[n])::(decompositionSol str (n+1))
 
-
-let rec decomposition str n = 
-  if str = "" then []
-  else if n + 1 = String.length str then [(str.[n])]
-  else (str.[n])::(decompositionSol str (n+1))
-
 let extra_alea_poly = 5
 and extra_alea_mono = 10
 
@@ -621,7 +615,10 @@ polymorph_detector
 (* ____Functions for generate template______________________________________ *)
 
 let failchar =
-  [' ';'f';'a';'i';'l';'w';'i';'t';'h';' ';'"';'T';'O';'D';'O';'"';'\n']
+  decompositionSol {|
+  "Remplacez cette chaine par votre code."
+
+|} 0
 
 let tail l = match l with
   | [] -> []

@@ -528,10 +528,11 @@ let first (a,b,c) = a
 let second (a,b,c) = b
 let third (a,b,c) = c
 
+(* TODO: Refactor this implementation to avoid "char list"! *)
 let maj_mono val_next_mono = match val_next_mono with
-  | 'i'::'n'::'t'::[]->'c'::'h'::'a'::'r'::[]
-  | 'c'::'h'::'a'::'r'::[]->'b'::'o'::'o'::'l'::[]
-  | 'b'::'o'::'o'::'l'::[] -> 's'::'t'::'r'::'i'::'n'::'g'::[]
+  | 'i'::'n'::'t'::[]->'b'::'o'::'o'::'l'::[]
+  | 'b'::'o'::'o'::'l'::[]->'c'::'h'::'a'::'r'::[]
+  | 'c'::'h'::'a'::'r'::[] -> 's'::'t'::'r'::'i'::'n'::'g'::[]
   | 's'::'t'::'r'::'i'::'n'::'g'::[] -> 'i'::'n'::'t'::[]
   | _ -> failwith "error monomorphic type"
 
@@ -562,11 +563,9 @@ let rec polymorph_detector_aux listeType listeCouple val_next_mono =
   | '\''::suite -> let ch,tail = getC suite in
                    let v = (get_association
                               listeCouple ch listeCouple val_next_mono) in
-                   if third v
-                   then (second v) @ (polymorph_detector_aux tail
-                                        (first v) (second v))
-                   else (second v) @ (polymorph_detector_aux tail
-                                        (first v) (val_next_mono))
+                   let res = if third v then polymorph_detector_aux tail (first v) (second v)
+                             else polymorph_detector_aux tail (first v) (val_next_mono)
+                   in if res = [] then second v else second v @ ' ' :: res
   | ch::tail -> ch::(polymorph_detector_aux tail listeCouple val_next_mono)
 
 let rec decompositionSol str n =
@@ -579,16 +578,27 @@ let rec decomposition str n =
   if str = "" then []
   else if n + 1 = String.length str then [(str.[n])]
   else (str.[n])::(decompositionSol str (n+1))
-                    
+
+(* TODO: Refactor this implementation to avoid "char list"! *)
 (** @param listeChar a list of couples of char lists *)
 let rec polymorph_detector listeChar = match listeChar with
   | []-> []
   | (listeNom,listeType)::tail -> (listeNom,concatenation
     (polymorph_detector_aux (decompositionSol listeType 0)
-    [] ('c'::'h'::'a'::'r'::[])))::(listeNom,concatenation
+    [] (['s';'t';'r';'i';'n';'g'])))::(listeNom,concatenation
     (polymorph_detector_aux (decompositionSol listeType 0)
-    [] ('i'::'n'::'t'::[])))::(polymorph_detector tail)
+    [] (['i';'n';'t'])))::(polymorph_detector tail)
 
+(* Test to experiment the code’s semantics:
+
+let s =
+  (decompositionSol
+    "'aa -> 'b -> 'c -> 'd -> 'e -> 'f -> 'g -> 'h" 0)
+in polymorph_detector_aux s [] (['s';'t';'r';'i';'n';'g']);;
+
+polymorph_detector
+  [(), "'aa -> 'b -> 'c -> 'd -> 'e -> 'f -> 'g -> 'h"];;
+ *)
 
 (* ____Functions for generate template______________________________________ *)
 

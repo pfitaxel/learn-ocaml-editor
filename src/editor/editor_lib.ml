@@ -459,8 +459,8 @@ let init = "let () =
             set_result @@
             ast_sanity_check code_ast @@ fun () ->\n"
 
-let section name report = "Section
-  ([ Text \"Fonction:\" ; Code \""^name^"\" ], " ^ report ^ " );\n"
+let section name report = {|Section ([ Text "Fonction:" ; Code "|}
+                          ^ name ^ {|" ], |} ^ report ^ " );\n"
 
 
 (*_____________________Functions for the Generate button_____________________*)

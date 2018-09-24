@@ -2,6 +2,7 @@ Learn-OCaml Editor
 ==================
 
 [![Build Status](https://travis-ci.com/pfitaxel/learn-ocaml-editor.svg?branch=develop)](https://travis-ci.com/pfitaxel/learn-ocaml-editor)
+[![HitCount](http://hits.dwyl.io/pfitaxel/learn-ocaml-editor.svg)](http://hits.dwyl.io/pfitaxel/learn-ocaml-editor)
 
 This is Learn-OCaml Editor, an online editor for teachers using the
 [Learn-OCaml](https://github.com/ocaml-sf/learn-ocaml) Web application

@@ -14,6 +14,38 @@ This software is still under development, no public announcement has been made y
 
 A demo is available at: <https://pfitaxel.github.io/pfitaxel-demo/>
 
+Installing the dependencies
+---------------------------
+
+Clone this Git repo,
+install [opam 2](http://opam.ocaml.org/doc/Install.html), then run:
+
+```bash
+cd …/learn-ocaml-editor
+opam switch create . --deps-only --locked
+eval $(opam env)
+opam install opam-installer merlin
+```
+
+Building learn-ocaml-editor
+---------------------------
+
+To build and locally run learn-ocaml-editor, you should just have to type:
+
+```bash
+make
+make opaminstall
+learn-ocaml build --repo=./demo-repository
+learn-ocaml serve -p 8080
+```
+
+As learn-ocaml-editor is only a client-side (JavaScript) application,
+you can also replace the last command above `learn-ocaml serve …` with
+
+```bash
+( cd www ; python3 -m http.server 8080 )
+```
+
 Howtos
 ------
 

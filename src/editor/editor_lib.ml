@@ -6,8 +6,7 @@ open Js_utils
 open Tyxml_js.Html5
 open Dom_html
 
-module StringMap = Map.Make(String);;
-
+module StringMap = Map.Make(String)
 
 (* Internationalization *)
 let () = Translate.set_lang ()
@@ -40,45 +39,46 @@ let get_imperative id =
 let get_undesirable id =
   Learnocaml_local_storage.(retrieve (editor_state id)).checkbox.undesirable
 
-let get_a_question id idQuestion = let string_map = get_testhaut id in
-  StringMap.(find idQuestion string_map)
+let get_a_question id (idQuestion : int) =
+  let int_map = get_testhaut id in
+  IntMap.(find idQuestion int_map)
 
 (* TODO refactor the following getters with get_a_question *)
 
 let get_ty id idQuestion = let test_list = get_testhaut id in
-  match StringMap.(find idQuestion test_list) with
+  match IntMap.(find idQuestion test_list) with
   | TestAgainstSol a -> a.ty
   | TestAgainstSpec a -> a.ty
   | TestSuite a -> a.ty
 
 let get_name_question id idQuestion= let test_list = get_testhaut id in
-  match StringMap.(find idQuestion test_list) with
+  match IntMap.(find idQuestion test_list) with
   | TestAgainstSol a -> a.name
   | TestAgainstSpec a -> a.name
   | TestSuite a -> a.name
                     
 let get_type_question id idQuestion =
   let test_list = get_testhaut id in
-  match StringMap.(find idQuestion test_list) with
+  match IntMap.(find idQuestion test_list) with
   | TestAgainstSol _ -> Solution
   | TestAgainstSpec _ -> Spec
   | TestSuite _ -> Suite
 
 let get_extra_alea id idQuestion =  let test_list = get_testhaut id in
-  match StringMap.(find idQuestion test_list) with
+  match IntMap.(find idQuestion test_list) with
   | TestAgainstSol a -> a.gen
   | TestAgainstSpec a -> a.gen
   | _ -> failwith "?"
                     
 let get_input id idQuestion =
   let test_list = get_testhaut id in
-  match StringMap.(find idQuestion test_list) with
+  match IntMap.(find idQuestion test_list) with
   | TestAgainstSol a -> a.suite
   | TestAgainstSpec a -> a.suite
   | TestSuite a -> a.suite
 
 let get_spec id idQuestion = let test_list = get_testhaut id in
-  match StringMap.(find idQuestion test_list) with
+  match IntMap.(find idQuestion test_list) with
   | TestAgainstSpec a -> a.spec
   | _ -> failwith ""
 
@@ -86,14 +86,13 @@ let get_buffer id =
   Learnocaml_local_storage.(retrieve (editor_state id)).incipit
 
 let compute_question_id test_haut =
-  let key_list = List.map (fun (a,b) -> int_of_string a)
-                   (StringMap.bindings test_haut) in
+  let key_list = List.map fst (IntMap.bindings test_haut) in
   let mi neighbor_color =
     let rec aux c n=match c with
       | [] -> n
       | x :: l -> if x <> n then aux l n else aux neighbor_color (n + 1)
     in aux neighbor_color 1
-  in string_of_int (mi key_list)
+  in (mi key_list)
 
 let save_testhaut testhaut id =
   match Learnocaml_local_storage.(retrieve (editor_state id)) with
@@ -104,16 +103,6 @@ let save_testhaut testhaut id =
     let new_exo = {metadata;incipit;prepare;solution;question;
                    template;test;prelude;checkbox;mtime} in
     Learnocaml_local_storage.(store (editor_state id)) new_exo
-
-
-let fetch_test_index id =
-  let index = get_testhaut id in
-  let json =
-    Json_repr_browser.Json_encoding.construct
-      testhaut_enc index in
-  try Lwt.return (Json_repr_browser.Json_encoding.destruct testhaut_enc json)
-  with exn ->
-    Lwt.fail (failwith "")
 
 let testhaut_iframe = Dom_html.createIframe Dom_html.document
 let iframe_tyxml = Tyxml_js.Of_dom.of_iFrame testhaut_iframe
@@ -272,10 +261,10 @@ let typecheck_spec set_class ace_t editor_t top =
 
 let rec testhaut_init content_div id =
   let elt = find_div "learnocaml-loading" in
-    fetch_test_index id >>= fun index ->
+  let index = get_testhaut id in (* TODO: add validation? *)
   let format_question_list all_question_states =
     let  format_contents acc contents =
-          StringMap.fold
+          IntMap.fold
             (fun question_id quest acc ->
                let name,ty=match quest with
                  | TestAgainstSol a -> a.name,a.ty
@@ -283,7 +272,7 @@ let rec testhaut_init content_div id =
                  | TestSuite a -> a.name,a.ty in
                  div ~a:[a_id "toolbar"; a_class ["button"]] [
               (div ~a:[a_id "button_delete"] [
-                  let button = button ~a:[a_id question_id]
+                  let button = button ~a:[a_id (string_of_int question_id)]
                                  [img ~src:"icons/icon_cleanup_dark.svg"
                                     ~alt:"" () ; pcdata ""] in
                   Manip.Ev.onclick button
@@ -302,7 +291,7 @@ let rec testhaut_init content_div id =
                            Manip.Ev.onclick btn_yes (fun _ ->
                                let rmv = get_testhaut id in
                                let testhaut =
-                                 StringMap.remove question_id rmv in
+                                 IntMap.remove question_id rmv in
                                save_testhaut testhaut id ;
                                hide_load "learnocaml-main-loading";
                                Manip.removeChildren content_div;
@@ -333,16 +322,15 @@ let rec testhaut_init content_div id =
                          begin
                            let qid = question_id in
                            let testhaut = get_testhaut id in
-                            let question = StringMap.find qid testhaut in
-                            let suivant = string_of_int
-                                            ((int_of_string qid) + 1) in
+                            let question = IntMap.find qid testhaut in
+                            let suivant = qid + 1 in
                             let testhaut =
-                              match StringMap.find suivant testhaut with
+                              match IntMap.find suivant testhaut with
                               | exception Not_found -> testhaut
                               | qsuivante ->
                                  let map =
-                                   StringMap.add qid qsuivante testhaut in
-                                 StringMap.add suivant question map in
+                                   IntMap.add qid qsuivante testhaut in
+                                 IntMap.add suivant question map in
                             save_testhaut testhaut id;
                             Manip.removeChildren content_div;
                             let _ = testhaut_init content_div id in ()
@@ -359,16 +347,16 @@ let rec testhaut_init content_div id =
                          begin
                            let qid = question_id in
                            let testhaut = get_testhaut id in
-                           let question = StringMap.find qid testhaut in
-                           let intp = (int_of_string qid) -1 in
-                           let prec = string_of_int
-                                        (if intp = 0 then 1 else intp ) in
+                           let question = IntMap.find qid testhaut in
+                           let intp = qid - 1 in
+                           let prec = if intp = 0 then 1 else intp in
+                           (* TODO: further optimize *)
                            let testhaut =
-                             match StringMap.find prec testhaut with
+                             match IntMap.find prec testhaut with
                               | exception Not_found -> testhaut
                               | qprec ->
-                                 let map = StringMap.add qid qprec testhaut in
-                                 StringMap.add prec question map in
+                                 let map = IntMap.add qid qprec testhaut in
+                                 IntMap.add prec question map in
                             save_testhaut testhaut id;
                             Manip.removeChildren content_div;
                             let _ = testhaut_init content_div id in ()
@@ -385,10 +373,10 @@ let rec testhaut_init content_div id =
                            begin
                              let testhaut = get_testhaut id in
                              let question =
-                               StringMap.find question_id testhaut in
+                               IntMap.find question_id testhaut in
                              let qid = compute_question_id testhaut in
                              let testhaut =
-                               StringMap.add qid question testhaut in
+                               IntMap.add qid question testhaut in
                              save_testhaut testhaut id;
                              Manip.removeChildren content_div;
                              let _ = testhaut_init content_div id in ()
@@ -402,7 +390,7 @@ let rec testhaut_init content_div id =
                   Manip.replaceChildren elt [iframe_tyxml] ;
                   testhaut_iframe##.src :=
                     Js.string ("test.html#id=" ^ id ^ "&questionid=" ^
-                               question_id ^ "&action=open") ;
+                                 string_of_int question_id ^ "&action=open") ;
                   true) ;
                   a_class [ "exercise" ] ] [
                 div ~a:[ a_class [ "descr" ] ] [

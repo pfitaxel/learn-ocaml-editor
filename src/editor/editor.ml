@@ -23,7 +23,6 @@ open Js_of_ocaml
 open Editor_lib
 open Dom_html
 
-module StringMap = Map.Make (String)
 
 let quality_function = {|
 let avoid_thentrue = let already = ref false in fun _ ->
@@ -154,7 +153,7 @@ let rec save_questions listeQuestions id = match listeQuestions with
                       tester = ""; sampler = ""} in
     let testhaut =  get_testhaut id in
     let question_id = compute_question_id testhaut in
-    let new_testhaut = StringMap.add question_id question testhaut in
+    let new_testhaut = IntMap.add question_id question testhaut in
     let () = save_testhaut new_testhaut id in
     save_questions suite id
 
@@ -700,18 +699,18 @@ in if imperative_report = [] && report = []
     let tests=test_prel ^ (ast_fonction ()) in
     let tests=tests ^ "\n" ^ (get_buffer id) ^ "\n" in
     let tests=
-      StringMap.fold (fun qid -> fun quest -> fun str ->
+      IntMap.fold (fun qid -> fun quest -> fun str ->
                       str ^ (Test_spec.question_typed quest qid)^" \n")
         (get_testhaut id) tests in
     let tests=tests^init^"[ \n " in
     let tests=
-      StringMap.fold (fun qid->fun quest-> fun str ->
+      IntMap.fold (fun qid->fun quest-> fun str ->
           let name=match quest with
             | TestAgainstSol a->a.name
             | TestAgainstSpec a ->a.name
             | TestSuite a -> a.name in
           (* refactor what it's up in editor_lib *)
-          str ^ (section name ("question" ^ qid ) ))
+          str ^ (section name ("question" ^ string_of_int qid ) ))
         (get_testhaut id) tests in
     tests^ (ast_code ()) ^ " ]"
   in
@@ -792,7 +791,7 @@ in if imperative_report = [] && report = []
           ~group: toplevel_buttons_group
           ~icon: "cleanup" [%i "Delete all"] @@ fun () ->
     let delete_all_questions () =
-      save_testhaut StringMap.empty id;
+      save_testhaut IntMap.empty id;
       Manip.removeChildren (find_component "learnocaml-exo-testhaut-pane");
       let _ = testhaut_init
                 (find_component "learnocaml-exo-testhaut-pane") id in () in

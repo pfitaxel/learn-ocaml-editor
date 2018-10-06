@@ -1,5 +1,7 @@
+open Learnocaml_exercise_state
+
 (** Getters of an editor exercise
-  * @param the id *) 
+  * @param the id *)
 val get_titre : string -> string
 val get_description : string -> string
 val get_diff : string -> float
@@ -7,7 +9,7 @@ val get_solution : string -> string
 val get_question : string -> string
 val get_template : string -> string
 val get_testml : string -> string
-val get_testhaut : string -> Learnocaml_exercise_state.test_qst_untyped Map.Make(String).t
+val get_testhaut : string -> Learnocaml_exercise_state.test_qst_untyped IntMap.t
 val get_prelude : string -> string
 val get_prepare : string -> string
 val get_imperative : string -> bool
@@ -15,22 +17,22 @@ val get_undesirable : string -> bool
 val get_buffer : string -> string
 (** Getters of a question of an editor exercise
  * @param exercise_id question_id *)
-val get_a_question : string -> Map.Make(String).key ->Learnocaml_exercise_state.test_qst_untyped
-val get_ty : string -> Map.Make(String).key -> string
-val get_name_question : string -> Map.Make(String).key -> string
-val get_type_question : string -> Map.Make(String).key -> Learnocaml_exercise_state.type_question
-val get_extra_alea : string -> Map.Make(String).key -> int
-val get_input : string -> Map.Make(String).key -> string
-val get_spec : string -> Map.Make(String).key -> string
+val get_a_question : string -> int -> Learnocaml_exercise_state.test_qst_untyped
+val get_ty : string -> int -> string
+val get_name_question : string -> IntMap.key -> string
+val get_type_question : string -> IntMap.key -> Learnocaml_exercise_state.type_question
+val get_extra_alea : string -> IntMap.key -> int
+val get_input : string -> IntMap.key -> string
+val get_spec : string -> IntMap.key -> string
 
 (** Question ids are integers stored in strings *)
 
-(** Compute the smallest integer not used yet *)                             
-val compute_question_id : 'a Map.Make(String).t -> string
+(** Compute the smallest integer not used yet *)
+val compute_question_id : 'a IntMap.t -> int
 
 (** Setter of testhaut
-  * @param new_StringMap exercise_id *)  
-val save_testhaut : Learnocaml_exercise_state.test_qst_untyped Map.Make(String).t -> string -> unit
+  * @param new_StringMap exercise_id *)
+val save_testhaut : Learnocaml_exercise_state.test_qst_untyped IntMap.t -> string -> unit
 
 val with_test_lib_prepare :string->string
 

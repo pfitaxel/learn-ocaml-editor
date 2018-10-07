@@ -453,15 +453,41 @@ let section name report = {|Section ([ Text "Fonction:" ; Code "|}
 
 (*_____________________Functions for the Generate button_____________________*)
 
-(* we get "val f : int -> int -> int = <fun>" *)
+(* Remove duplicates *)
+let rec undup_keep_latest = function
+  | [] -> []
+  | (f, ty) :: l -> if List.mem_assoc f l then undup_keep_latest l
+                    else (f, ty) :: undup_keep_latest l
 
+(* Minor bug: if the file contains 2 definitions of a same identifier
+   and only one of them is a function, this function will be selected
+   even if it is defined before the non-function expression. *)
+let extract_functions s =
+  (* Remove module/module_types as their signature could contain val items *)
+  let s = Regexp.(global_replace (regexp "module type\s\w+\s=\ssig\s[^]+?\send\s*") s "") in
+  let s = Regexp.(global_replace (regexp "module type\s\w+\s=\s\w+\s*") s "") in
+  let s = Regexp.(global_replace (regexp "module\s\w+\s:\ssig\s[^]+?\send\s*") s "") in
+  let s = Regexp.(global_replace (regexp "module\s\w+\s:\s\w+\s*") s "") in
+  let rec process i acci =
+    match Regexp.(search (regexp "val\s(\S+)\s:\s([^:]+?)\s=\s<fun>") s i) with
+    | None -> List.rev acci
+    | Some (i, result) ->
+       match Regexp.(matched_group result 1, matched_group result 2) with
+       | Some func, Some ty -> process (i + 1) ((func, ty) :: acci)
+       | _ -> process (i + 1) acci
+  in undup_keep_latest (process 0 [])
+
+let monomorph_generator l =
+  List.map (fun (func, ty) -> (func, [(10, ty)])) l
+
+(* TODO: Refactor and delete concatenation *)
 let string_of_char ch = String.make 1 ch
 
 let rec concatenation listech = match listech with
   | [] -> ""
   | c :: l -> (string_of_char c) ^ (concatenation l)
 
-
+(*
 let rec get_equal listeChar = match listeChar with
   | [] -> []
   | '=' :: l -> []
@@ -558,12 +584,14 @@ let rec polymorph_detector_aux listeType listeCouple val_next_mono =
                              else polymorph_detector_aux tail (first v) (val_next_mono)
                    in if res = [] then second v else second v @ ' ' :: res
   | ch::tail -> ch::(polymorph_detector_aux tail listeCouple val_next_mono)
+ *)
 
 let rec decompositionSol str n =
   if str = "" then []
   else if n + 1 = String.length str then [(str.[n])]
   else (str.[n])::(decompositionSol str (n+1))
 
+(*
 let extra_alea_poly = 5
 and extra_alea_mono = 10
 
@@ -598,6 +626,7 @@ in polymorph_detector_aux s [] (['s';'t';'r';'i';'n';'g']);;
 
 polymorph_detector
   [(), "'aa -> 'b -> 'c -> 'd -> 'e -> 'f -> 'g -> 'h"];;
+ *)
  *)
 
 (* ____Functions for generate template______________________________________ *)

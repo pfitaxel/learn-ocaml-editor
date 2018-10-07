@@ -6,6 +6,7 @@ module type TYPING = sig
   val ty_of : string -> 'a Ty.ty
 end
 
+(*
 module Make(Test_lib : Test_lib.S) (Typing : TYPING) = struct
 
 open Test_lib
@@ -121,6 +122,7 @@ let example_constr_suite =
     }
 *)
 end
+ *)
 
 open Editor_lib
 

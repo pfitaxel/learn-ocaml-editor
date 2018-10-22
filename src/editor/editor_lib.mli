@@ -67,6 +67,7 @@ val section : string -> string -> string
 
 val string_of_char : char -> string
 
+(* TODO: Remove commented code
 (** @param content_of_the_toplevel [[]]
   * @return a list
   * The first value is the type of the first val, etc. *)
@@ -81,14 +82,17 @@ val get_only_fct : char list -> char list -> char list
   * @ return a list of couple (function_name, function_type)
   * @ param content_of_the_toplevel result_list (second param must be []) *)
 val get_questions : char list list -> (string * string) list -> (string * string) list
+ *)
 
 (** Create the corresponding char list of a string (second parameter must be 0) *)
 val decompositionSol : string -> int -> char list
 
+(*
 (** Create a list of triples (key, alea, "monorphic type"):
     polymorph_detector [("f", "'a -> 'b"); ("p", "int -> int")] =
     [("f", 5, "int -> bool"); ("f", 5, "bool -> char"); ("p", 10, "int -> int")] *)
 val polymorph_detector : ('a * string) list -> ('a * int * string) list
+ *)
 
 (** Create the template of the solution *)
 val genTemplate : string -> string
@@ -107,3 +111,11 @@ val get_answer : Learnocaml_toplevel.t -> string
 val typecheck_dialog_box : string-> 'a Toploop_results.toplevel_result -> unit Lwt.t
 val test_prel :string 
 
+
+(** Extract the function definitions from a toplevel output
+    @return the list of their (name, type) *)
+val extract_functions : string -> (string * string) list
+
+(** Generate monomorphic test specifications
+    @return a list of ("function_name", [(alea, "monomorphic type")]) *)
+val monomorph_generator : (string * string) list -> (string * (int * string) list) list

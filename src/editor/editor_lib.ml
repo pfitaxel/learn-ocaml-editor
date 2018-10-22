@@ -453,15 +453,74 @@ let section name report = {|Section ([ Text "Fonction:" ; Code "|}
 
 (*_____________________Functions for the Generate button_____________________*)
 
-(* we get "val f : int -> int -> int = <fun>" *)
+(* Remove duplicates; keep the latest occurence *)
+let rec undup_assoc = function
+  | [] -> []
+  | (f, ty) :: l -> if List.mem_assoc f l then undup_assoc l
+                    else (f, ty) :: undup_assoc l
 
+(* Minor bug: if the file contains 2 definitions of a same identifier
+   and only one of them is a function, this function will be selected
+   even if it is defined before the non-function expression. *)
+let extract_functions s =
+  (* Remove module/module_types as their signature could contain val items *)
+  let s = Regexp.(global_replace (regexp "module type\s\w+\s=\ssig\s[^]+?\send\s*") s "") in
+  let s = Regexp.(global_replace (regexp "module type\s\w+\s=\s\w+\s*") s "") in
+  let s = Regexp.(global_replace (regexp "module\s\w+\s:\ssig\s[^]+?\send\s*") s "") in
+  let s = Regexp.(global_replace (regexp "module\s\w+\s:\s\w+\s*") s "") in
+  let rec process i acci =
+    match Regexp.(search (regexp "val\s(\S+)\s:\s([^:]+?)\s=\s<fun>") s i) with
+    | None -> List.rev acci
+    | Some (i, result) ->
+       match Regexp.(matched_group result 1, matched_group result 2) with
+       | Some func, Some ty -> process (i + 1) ((func, ty) :: acci)
+       | _ -> process (i + 1) acci
+  in undup_assoc (process 0 [])
+
+let find_all r s =
+  let rec process i acci =
+    match Regexp.(search r s i) with
+    | None -> List.rev acci
+    | Some (i, result) ->
+       match Regexp.(matched_group result 0) with
+       | Some s -> process (i + 1) (s :: acci)
+       | _ -> Dom_html.window##alert (Js.string "Error in editor_lib.ml: this should not occur");
+              List.rev acci
+  in process 0 []
+
+let replace_all map s =
+  List.fold_left (fun res (e, by) ->
+      Regexp.(global_replace (regexp_string e) res by))
+  s map
+
+let base = ["int"; "bool"; "char"; "string"]
+let gen1 i = List.nth base (i mod 4)
+let gen2 i =
+  let q, r = (i / 4) mod 3, i mod 4 in
+  if q + 1 = r then List.nth base 0
+  else List.nth base (q + 1)
+
+let monomorph_generator l =
+  let f ty =
+    let vars =
+      List.sort_uniq compare
+      @@ find_all (Regexp.regexp "'[A-Za-z](?:\w[A-Za-z0-9_']*)?") ty
+    in
+    if vars = [] then [(10, ty)]
+    else let t1 = replace_all (List.mapi (fun i e -> (e, gen1 i)) vars) ty
+         and t2 = replace_all (List.mapi (fun i e -> (e, gen2 i)) vars) ty
+         in [(5, t1); (5, t2)]
+  in
+  List.map (fun (func, ty) -> (func, f ty)) l
+
+(* TODO: Refactor and delete concatenation *)
 let string_of_char ch = String.make 1 ch
 
 let rec concatenation listech = match listech with
   | [] -> ""
   | c :: l -> (string_of_char c) ^ (concatenation l)
 
-
+(*
 let rec get_equal listeChar = match listeChar with
   | [] -> []
   | '=' :: l -> []
@@ -558,12 +617,14 @@ let rec polymorph_detector_aux listeType listeCouple val_next_mono =
                              else polymorph_detector_aux tail (first v) (val_next_mono)
                    in if res = [] then second v else second v @ ' ' :: res
   | ch::tail -> ch::(polymorph_detector_aux tail listeCouple val_next_mono)
+ *)
 
 let rec decompositionSol str n =
   if str = "" then []
   else if n + 1 = String.length str then [(str.[n])]
   else (str.[n])::(decompositionSol str (n+1))
 
+(*
 let extra_alea_poly = 5
 and extra_alea_mono = 10
 
@@ -598,6 +659,7 @@ in polymorph_detector_aux s [] (['s';'t';'r';'i';'n';'g']);;
 
 polymorph_detector
   [(), "'aa -> 'b -> 'c -> 'd -> 'e -> 'f -> 'g -> 'h"];;
+ *)
  *)
 
 (* ____Functions for generate template______________________________________ *)

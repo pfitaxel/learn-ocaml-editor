@@ -144,17 +144,16 @@ let id = arg "id"
 
 let rec save_questions listeQuestions id = match listeQuestions with
   | [] -> ()
-  | (nom, extra_alea, string_type) :: suite ->
-    let name = nom in
-    let ty = string_type in
-    let input = "[]" in
-    let question = TestAgainstSol
-                     {name; ty; suite = input; gen = extra_alea;
-                      tester = ""; sampler = ""} in
-    let testhaut =  get_testhaut id in
-    let question_id = compute_question_id testhaut in
-    let new_testhaut = IntMap.add question_id question testhaut in
-    let () = save_testhaut new_testhaut id in
+  | (name, list_mono) :: suite ->
+     let () = List.iter (fun (gen, ty) ->
+                  let question = TestAgainstSol
+                                   {name; ty; suite = "[]"; gen;
+                                    tester = ""; sampler = ""} in
+                  let testhaut =  get_testhaut id in (* FIXME: do this once *)
+                  let question_id = compute_question_id testhaut in
+                  let new_testhaut = IntMap.add question_id question testhaut in
+                  save_testhaut new_testhaut id)
+                list_mono in
     save_questions suite id
 
 (*----------------------------------------------------------------------*)
@@ -609,10 +608,7 @@ let () =
         Learnocaml_toplevel.execute_phrase top (Ace.get_contents ace) >>=
           fun ok ->
           if ok then
-            let res_aux = decompositionSol (get_answer top) 0 in
-            (*Avec prise en compte des types polymorphes :*)
-            let res = polymorph_detector (get_questions
-                   (get_all_val (get_only_fct  res_aux []) []) [] ) in
+            let res = monomorph_generator (extract_functions (get_answer top)) in
             save_questions res id;
             Manip.removeChildren
               (find_component "learnocaml-exo-testhaut-pane");

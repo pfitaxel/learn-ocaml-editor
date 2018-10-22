@@ -277,41 +277,13 @@ let rec testhaut_init content_div id =
                                     ~alt:"" () ; pcdata ""] in
                   Manip.Ev.onclick button
                     (fun _ ->
-                       begin
-                         let messages = Tyxml_js.Html5.ul [] in
-                         let aborted, abort_message =
-                           let t, u = Lwt.task () in
-                           let btn_no =
-                             Tyxml_js.Html5.(button [ pcdata [%i"No"] ]) in
-                           Manip.Ev.onclick btn_no ( fun _ ->
-                               hide_load "learnocaml-main-loading" ;
-                               true) ;
-                           let btn_yes =
-                             Tyxml_js.Html5.(button [ pcdata [%i"Yes"] ]) in
-                           Manip.Ev.onclick btn_yes (fun _ ->
                                let rmv = get_testhaut id in
                                let testhaut =
                                  IntMap.remove question_id rmv in
                                save_testhaut testhaut id ;
-                               hide_load "learnocaml-main-loading";
                                Manip.removeChildren content_div;
                                let _ = testhaut_init content_div id in
-                               () ; true) ;
-                           let div =
-                             Tyxml_js.Html5.(div ~a: [ a_class [ "dialog" ] ]
-                             [ pcdata [%i"Are you sure you want to delete \
-                                          this question?\n"] ;
-                               btn_yes ;
-                               pcdata " " ;
-                               btn_no ]) in
-                           Manip.SetCss.opacity div (Some "0") ;
-                           t, div in
-                         Manip.replaceChildren messages
-                           Tyxml_js.Html5.[ li [ pcdata "" ] ] ;
-                         show_load "learnocaml-main-loading" [ abort_message ] ;
-                         Manip.SetCss.opacity abort_message (Some "1") ;
-                       end ;
-                       true) ; button
+                               () ; true) ; button
               ] );
                     (div ~a:[a_id "up"] [
                      let buttonUp = button ~a:[]

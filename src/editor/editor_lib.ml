@@ -436,12 +436,12 @@ let rec undup_assoc = function
    even if it is defined before the non-function expression. *)
 let extract_functions s =
   (* Remove module/module_types as their signature could contain val items *)
-  let s = Regexp.(global_replace (regexp "module type\s\w+\s=\ssig\s[^]+?\send\s*") s "") in
-  let s = Regexp.(global_replace (regexp "module type\s\w+\s=\s\w+\s*") s "") in
-  let s = Regexp.(global_replace (regexp "module\s\w+\s:\ssig\s[^]+?\send\s*") s "") in
-  let s = Regexp.(global_replace (regexp "module\s\w+\s:\s\w+\s*") s "") in
+  let s = Regexp.(global_replace (regexp "module type\\\s\\w+\\s=\\ssig\\s[^]+?\\send\\s*") s "") in
+  let s = Regexp.(global_replace (regexp "module type\\s\\w+\\s=\\s\\w+\\s*") s "") in
+  let s = Regexp.(global_replace (regexp "module\\s\\w+\\s:\\ssig\\s[^]+?\\send\\s*") s "") in
+  let s = Regexp.(global_replace (regexp "module\\s\\w+\\s:\\s\\w+\\s*") s "") in
   let rec process i acci =
-    match Regexp.(search (regexp "val\s(\S+)\s:\s([^:]+?)\s=\s<fun>") s i) with
+    match Regexp.(search (regexp "val\\s(\\S+)\\s:\\s([^:]+?)\\s=\\s<fun>") s i) with
     | None -> List.rev acci
     | Some (i, result) ->
        match Regexp.(matched_group result 1, matched_group result 2) with
@@ -476,7 +476,7 @@ let monomorph_generator l =
   let f ty =
     let vars =
       List.sort_uniq compare
-      @@ find_all (Regexp.regexp "'[A-Za-z](?:\w[A-Za-z0-9_']*)?") ty
+      @@ find_all (Regexp.regexp "'[A-Za-z](?:\\w[A-Za-z0-9_']*)?") ty
     in
     if vars = [] then [(10, ty)]
     else let t1 = replace_all (List.mapi (fun i e -> (e, gen1 i)) vars) ty

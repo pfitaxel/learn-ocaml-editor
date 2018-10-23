@@ -227,10 +227,22 @@ let checkbox_creator string cas id =
       Learnocaml_local_storage.(store (editor_state id) new_e); Js._true);
   Tyxml_js.Of_dom.of_input dom_chk
 
+let test_lib_prepare =
+{|module Dummy_Functor (Introspection : Introspection_intf.INTROSPECTION) =
+  struct
+  module Dummy_Params = struct
+    let results = ref None
+    let set_progress _ = ()
+    let timeout = None
+    module Introspection = Introspection
+    end
+  module Test_lib = Test_lib.Make(Dummy_Params)
+  module Report = Learnocaml_report;;
+  open Dummy_Params
+  let code_ast = (failwith "WIP" : Parsetree.structure);;
+|}
 
-let with_test_lib_prepare string =
-  "module Dummy_Functor (Introspection :\n                        Introspection_intf.INTROSPECTION) = struct\n  module Dummy_Params = struct\n    let results = ref None\n    let set_progress _ = ()\n    let timeout = None\n    module Introspection = Introspection            \n  end\n  module Test_lib = Test_lib.Make(Dummy_Params)\n  module Report = Learnocaml_report;;\n  let code_ast = (failwith \"WIP\" : Parsetree.structure);;\n\n "
-  ^ string ^ " end";;
+let with_test_lib_prepare string = test_lib_prepare ^ string ^ " end";;
 
 let typecheck_spec_aux set_class ace_t editor_t top string=
   Learnocaml_toplevel.check ~ppx_meta:true top

@@ -233,7 +233,7 @@ let with_test_lib_prepare string =
   ^ string ^ " end";;
 
 let typecheck_spec_aux set_class ace_t editor_t top string=
-  Learnocaml_toplevel.check top
+  Learnocaml_toplevel.check ~ppx_meta:true top
       (with_test_lib_prepare string) >>= fun res ->
     let error, warnings =
       match res with

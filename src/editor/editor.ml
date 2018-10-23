@@ -717,8 +717,8 @@ in if imperative_report = [] && report = []
       Tyxml_js.Html5.[ ul [ li [ pcdata [%i"Checking"] ] ] ] ;
     let str = with_test_lib_prepare (compile_aux () )
     in
-    Learnocaml_toplevel.check top str >>= fun res-> 
-    typecheck_dialog_box "learnocaml-exo-loading" res 
+    Learnocaml_toplevel.check ~ppx_meta:true top str >>= fun res->
+    typecheck_dialog_box "learnocaml-exo-loading" res
   end ;
 
   let recovering () =

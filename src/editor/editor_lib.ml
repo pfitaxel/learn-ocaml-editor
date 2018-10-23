@@ -227,20 +227,42 @@ let checkbox_creator string cas id =
       Learnocaml_local_storage.(store (editor_state id) new_e); Js._true);
   Tyxml_js.Of_dom.of_input dom_chk
 
+let test_lib_prepare =
+{|module Wrapper (Introspection : Introspection_intf.INTROSPECTION) =
+  struct
+  module Mock = struct
+    let results = ref None
+    let set_progress _ = ()
+    let timeout = None
+    module Introspection = Introspection
+    end
+  module Test_lib = Test_lib.Make(Mock)
+  module Report = Learnocaml_report;;
+  open Mock
+  let code_ast = (failwith "WIP" : Parsetree.structure);;
+|}
 
-let with_test_lib_prepare string =
-  "module Dummy_Functor (Introspection :\n                        Introspection_intf.INTROSPECTION) = struct\n  module Dummy_Params = struct\n    let results = ref None\n    let set_progress _ = ()\n    let timeout = None\n    module Introspection = Introspection            \n  end\n  module Test_lib = Test_lib.Make(Dummy_Params)\n  module Report = Learnocaml_report;;\n  let code_ast = (failwith \"WIP\" : Parsetree.structure);;\n\n "
-  ^ string ^ " end";;
+let offset_test_lib_prepare =
+  let rec num_occs s i c num_acc =
+    if i > String.length s then num_acc
+    else match String.index_from_opt s (i + 1) c with
+         | None -> num_acc
+         | Some i -> num_occs s i c (num_acc + 1)
+  in num_occs test_lib_prepare (-1) '\n' 0
+
+let with_test_lib_prepare string = test_lib_prepare ^ string ^ " end";;
 
 let typecheck_spec_aux set_class ace_t editor_t top string=
-  Learnocaml_toplevel.check top
+  Learnocaml_toplevel.check ~ppx_meta:true top
       (with_test_lib_prepare string) >>= fun res ->
     let error, warnings =
       match res with
       | Toploop_results.Ok ((), warnings) -> None, warnings
       | Toploop_results.Error (err, warnings) -> Some err, warnings in
+    let shift_loc (l, c) = (l - offset_test_lib_prepare, c) in
     let transl_loc { Toploop_results.loc_start ; loc_end } =
-      { Ocaml_mode.loc_start ; loc_end } in
+      { Ocaml_mode.loc_start = shift_loc loc_start ;
+        Ocaml_mode.loc_end = shift_loc loc_end } in
     let error = match error with
       | None -> None
       | Some { Toploop_results.locs ; msg ; if_highlight } ->

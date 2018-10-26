@@ -463,7 +463,7 @@ let extract_functions s =
   let s = Regexp.(global_replace (regexp "module\\s\\w+\\s:\\ssig\\s[^]+?\\send\\s*") s "") in
   let s = Regexp.(global_replace (regexp "module\\s\\w+\\s:\\s\\w+\\s*") s "") in
   let rec process i acci =
-    match Regexp.(search (regexp "val\\s(\\S+)\\s:\\s([^:]+?)\\s=\\s<fun>") s i) with
+    match Regexp.(search (regexp "val\\s(\\S+)\\s:\\s([^:]+?)\\s+=\\s+<fun>") s i) with
     | None -> List.rev acci
     | Some (i, result) ->
        match Regexp.(matched_group result 1, matched_group result 2) with

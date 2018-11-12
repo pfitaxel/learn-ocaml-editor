@@ -953,8 +953,9 @@ in if imperative_report = [] && report = []
       Tyxml_js.Html5.[ li [ pcdata [%i"Launching the grader"] ] ] ;
     show_loading ~id:"learnocaml-exo-loading" [ messages ; abort_message ];
     Lwt_js.sleep 1. >>= fun () ->
+    let prelprep = (Ace.get_contents ace_prel ^ "\n" ^ Ace.get_contents ace_prep ^ "\n") in
     let solution = Ace.get_contents ace in
-    Learnocaml_toplevel.check top solution >>= fun res ->
+    Learnocaml_toplevel.check top (prelprep ^ solution) >>= fun res ->
     match res with
     | Toploop_results.Ok ((), _) ->
        let grading =
@@ -981,6 +982,9 @@ in if imperative_report = [] && report = []
        Lwt_js.yield () >>= fun () ->
        hide_loading ~id:"learnocaml-exo-loading" () ;
        typecheck true in
+  (* FIXME: take into account (Ace.get_contents ace_prel ^ "\n" ^
+                               Ace.get_contents ace_prep ^ "\n")
+     in all checks involving solution, and in the "Eval code" feat. *)
   begin toolbar_button2
      ~icon: "reload" [%i"Grade!"] @@ fun () ->
      recovering ();

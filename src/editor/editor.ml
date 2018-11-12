@@ -687,7 +687,8 @@ in if imperative_report = [] && report = []
       | Some s -> s in
     let fonction =
       if Js.to_bool(quality##.checked) || Js.to_bool(imperative##.checked) then
-        {|Section ([Text "Qualité de code:" ], ast_quality code_ast)|}
+        {|Section ([ Text "Qualité de code:" ], ast_quality code_ast);
+|}
       else
         "" in
     fonction in
@@ -698,7 +699,7 @@ in if imperative_report = [] && report = []
       IntMap.fold (fun qid -> fun quest -> fun str ->
                       str ^ (Test_spec.question_typed quest qid)^" \n")
         (get_testhaut id) tests in
-    let tests=tests^init^"[ \n " in
+    let tests=tests ^ init ^ "[\n" ^ ast_code () in
     let tests=
       IntMap.fold (fun qid->fun quest-> fun str ->
           let name=match quest with
@@ -708,7 +709,7 @@ in if imperative_report = [] && report = []
           (* refactor what it's up in editor_lib *)
           str ^ (section name ("question" ^ string_of_int qid ) ))
         (get_testhaut id) tests in
-    tests^ (ast_code ()) ^ " ]"
+    tests ^ " ]"
   in
   begin testhaut_button
       ~group: toplevel_buttons_group

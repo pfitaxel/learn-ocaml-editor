@@ -99,7 +99,7 @@ val genTemplate : string -> string
 
 (** Refacoring of typecheck functions *)
 val typecheck : bool -> 'a Ace.editor -> Ocaml_mode.editor -> Learnocaml_toplevel.t -> unit Lwt.t
-val typecheck_spec : bool -> 'a Ace.editor -> Ocaml_mode.editor -> Learnocaml_toplevel.t -> unit Lwt.t
+val typecheck_spec : bool -> 'a Ace.editor -> Ocaml_mode.editor -> Learnocaml_toplevel.t -> 'a Ace.editor -> 'a Ace.editor -> unit Lwt.t
 
 
 (** Create an exercise with the data of the local storage

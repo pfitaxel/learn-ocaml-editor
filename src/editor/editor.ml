@@ -363,6 +363,53 @@ let () =
     Lwt.return ()
   end ;
 
+  (* ---- prelude pane --------------------------------------------------- *)
+
+  let editor_prelude = find_component "learnocaml-exo-prelude-pane" in
+  let editor_prel = Ocaml_mode.create_ocaml_editor
+                      (Tyxml_js.To_dom.of_div editor_prelude) in
+  let ace_prel = Ocaml_mode.get_editor editor_prel in
+  let contents=
+    let a = get_prelude id in
+    if a = "" then
+      [%i"(* Local definitions the student\n\
+          will be able to see *)\n"]
+    else
+      a in
+  Ace.set_contents ace_prel contents ;
+  Ace.set_font_size ace_prel 18;
+
+  let typecheck set_class = typecheck set_class ace_prel editor_prel top in
+  begin prelude_button
+      ~group: toplevel_buttons_group
+      ~icon: "typecheck" [%i"Check"] @@ fun () ->
+    typecheck true
+  end;
+
+  (* ---- prepare pane --------------------------------------------------- *)
+
+  let editor_prepare = find_component "learnocaml-exo-prepare-pane" in
+  let editor_prep = Ocaml_mode.create_ocaml_editor
+                      (Tyxml_js.To_dom.of_div editor_prepare) in
+  let ace_prep = Ocaml_mode.get_editor editor_prep in
+  let contents=
+    let a= get_prepare id in
+    if a = "" then
+      [%i"(* Local definitions the student\n\
+          won't be able to see *)\n"]
+    else
+      a in
+  Ace.set_contents ace_prep contents ;
+  Ace.set_font_size ace_prep 18;
+
+  let typecheck set_class =
+    Editor_lib.typecheck set_class ace_prep editor_prep top in
+  begin prepare_button
+      ~group: toplevel_buttons_group
+      ~icon: "typecheck" [%i"Check"] @@ fun () ->
+    typecheck true
+  end ;
+
   (* ---- test pane --------------------------------------------------- *)
 
   let editor_test = find_component "learnocaml-exo-test-pane" in
@@ -383,7 +430,7 @@ let () =
   begin test_button
       ~group: toplevel_buttons_group
       ~icon: "typecheck" [%i"Check"] @@ fun () ->
-    typecheck_spec true ace_t editor_t top
+    typecheck_spec true ace_t editor_t top ace_prel ace_prep
   end ;
 
   (*-------question pane  -------------------------------------------------*)
@@ -458,53 +505,6 @@ let () =
        old_text := text
         end in
    dyn_preview; () in
-
-  (* ---- prelude pane --------------------------------------------------- *)
-
-  let editor_prelude = find_component "learnocaml-exo-prelude-pane" in
-  let editor_prel = Ocaml_mode.create_ocaml_editor
-                      (Tyxml_js.To_dom.of_div editor_prelude) in
-  let ace_prel = Ocaml_mode.get_editor editor_prel in
-  let contents=
-    let a = get_prelude id in
-    if a = "" then
-      [%i"(* Local definitions the student\n\
-          will be able to see *)\n"]
-    else
-      a in
-  Ace.set_contents ace_prel contents ;
-  Ace.set_font_size ace_prel 18;
-
-  let typecheck set_class = typecheck set_class ace_prel editor_prel top in
-  begin prelude_button
-      ~group: toplevel_buttons_group
-      ~icon: "typecheck" [%i"Check"] @@ fun () ->
-    typecheck true
-  end;
-
-  (* ---- prepare pane --------------------------------------------------- *)
-
-  let editor_prepare = find_component "learnocaml-exo-prepare-pane" in
-  let editor_prep = Ocaml_mode.create_ocaml_editor
-                      (Tyxml_js.To_dom.of_div editor_prepare) in
-  let ace_prep = Ocaml_mode.get_editor editor_prep in
-  let contents=
-    let a= get_prepare id in
-    if a = "" then
-      [%i"(* Local definitions the student\n\
-          won't be able to see *)\n"]
-    else
-      a in
-  Ace.set_contents ace_prep contents ;
-  Ace.set_font_size ace_prep 18;
-
-  let typecheck set_class =
-    Editor_lib.typecheck set_class ace_prep editor_prep top in
-  begin prepare_button
-      ~group: toplevel_buttons_group
-      ~icon: "typecheck" [%i"Check"] @@ fun () ->
-    typecheck true
-  end ;
 
   (* ---- editor pane --------------------------------------------------- *)
 

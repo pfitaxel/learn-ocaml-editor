@@ -242,24 +242,25 @@ let test_lib_prepare =
   let code_ast = (failwith "WIP" : Parsetree.structure);;
 |}
 
+let rec num_occs s i c num_acc =
+  if i > String.length s then num_acc
+  else match String.index_from_opt s (i + 1) c with
+       | None -> num_acc
+       | Some i -> num_occs s i c (num_acc + 1)
 let offset_test_lib_prepare =
-  let rec num_occs s i c num_acc =
-    if i > String.length s then num_acc
-    else match String.index_from_opt s (i + 1) c with
-         | None -> num_acc
-         | Some i -> num_occs s i c (num_acc + 1)
-  in num_occs test_lib_prepare (-1) '\n' 0
+  num_occs test_lib_prepare (-1) '\n' 0
 
 let with_test_lib_prepare string = test_lib_prepare ^ string ^ " end";;
 
-let typecheck_spec_aux set_class ace_t editor_t top string=
+let typecheck_spec_aux set_class ace_t editor_t top prelprep string =
+  let offset_prelprep = num_occs prelprep (-1) '\n' 0 in
   Learnocaml_toplevel.check ~ppx_meta:true top
-      (with_test_lib_prepare string) >>= fun res ->
+      (prelprep ^ with_test_lib_prepare string) >>= fun res ->
     let error, warnings =
       match res with
       | Toploop_results.Ok ((), warnings) -> None, warnings
       | Toploop_results.Error (err, warnings) -> Some err, warnings in
-    let shift_loc (l, c) = (l - offset_test_lib_prepare, c) in
+    let shift_loc (l, c) = (l - offset_test_lib_prepare - offset_prelprep, c) in
     let transl_loc { Toploop_results.loc_start ; loc_end } =
       { Ocaml_mode.loc_start = shift_loc loc_start ;
         Ocaml_mode.loc_end = shift_loc loc_end } in
@@ -278,8 +279,10 @@ let typecheck_spec_aux set_class ace_t editor_t top string=
     Ace.focus ace_t ;
     Lwt.return () ;;
 
-let typecheck_spec set_class ace_t editor_t top =
-  typecheck_spec_aux set_class ace_t editor_t top (Ace.get_contents ace_t)
+let typecheck_spec set_class ace_t editor_t top ace_prel ace_prep =
+  typecheck_spec_aux set_class ace_t editor_t top
+    (Ace.get_contents ace_prel ^ "\n" ^ Ace.get_contents ace_prep ^ "\n")
+    (Ace.get_contents ace_t)
 
 let rec testhaut_init content_div id =
   let elt = find_div "learnocaml-loading" in

@@ -379,11 +379,10 @@ let () =
   Ace.set_contents ace_prel contents ;
   Ace.set_font_size ace_prel 18;
 
-  let typecheck set_class = typecheck set_class ace_prel editor_prel top in
   begin prelude_button
       ~group: toplevel_buttons_group
       ~icon: "typecheck" [%i"Check"] @@ fun () ->
-    typecheck true
+      Editor_lib.typecheck true ace_prel editor_prel top "" (Ace.get_contents ace_prel)
   end;
 
   (* ---- prepare pane --------------------------------------------------- *)
@@ -402,13 +401,12 @@ let () =
   Ace.set_contents ace_prep contents ;
   Ace.set_font_size ace_prep 18;
 
-  let typecheck set_class =
-    Editor_lib.typecheck set_class ace_prep editor_prep top in
   begin prepare_button
       ~group: toplevel_buttons_group
       ~icon: "typecheck" [%i"Check"] @@ fun () ->
-    typecheck true
-  end ;
+      let prel = Ace.get_contents ace_prel ^ "\n" in
+      Editor_lib.typecheck true ace_prep editor_prep top prel (Ace.get_contents ace_prep)
+  end;
 
   (* ---- test pane --------------------------------------------------- *)
 
@@ -430,8 +428,10 @@ let () =
   begin test_button
       ~group: toplevel_buttons_group
       ~icon: "typecheck" [%i"Check"] @@ fun () ->
-    typecheck_spec true ace_t editor_t top ace_prel ace_prep
-  end ;
+      let prelprep = (Ace.get_contents ace_prel ^ "\n"
+                      ^ Ace.get_contents ace_prep ^ "\n") in
+      Editor_lib.typecheck true ace_t editor_t top prelprep ~mock:true (Ace.get_contents ace_t)
+  end;
 
   (*-------question pane  -------------------------------------------------*)
   let editor_question = find_component "learnocaml-exo-question-mark" in
@@ -571,13 +571,13 @@ let () =
       end;
     Lwt.return ()
   end ;
-  let typecheck set_class =
-    Editor_lib.typecheck set_class ace_temp editor_temp top in
   begin template_button
       ~group: toplevel_buttons_group
       ~icon: "typecheck" [%i"Check"] @@ fun () ->
-    typecheck true
-  end ;
+      let prelprep = (Ace.get_contents ace_prel ^ "\n"
+                      ^ Ace.get_contents ace_prep ^ "\n") in
+      Editor_lib.typecheck true ace_temp editor_temp top prelprep (Ace.get_contents ace_temp)
+  end;
 
   (* ---- testhaut pane --------------------------------------------------- *)
 
@@ -837,18 +837,22 @@ in if imperative_report = [] && report = []
     Lwt.return ()
   end ;
 
-  let typecheck set_class = Editor_lib.typecheck set_class ace editor top in
+  let typecheck_editor () =
+    let prelprep = (Ace.get_contents ace_prel ^ "\n"
+                    ^ Ace.get_contents ace_prep ^ "\n") in
+    Editor_lib.typecheck true ace editor top prelprep (Ace.get_contents ace) in
   begin editor_button
       ~group: toplevel_buttons_group
-      ~icon: "typecheck" [%i"Check"] @@ fun () ->
-    typecheck true
-  end ;
+      ~icon: "typecheck" [%i"Check"] @@ typecheck_editor
+  end;
   begin toplevel_button
       ~group: toplevel_buttons_group
       ~icon: "run" [%i"Eval code"] @@ fun () ->
-    Learnocaml_toplevel.execute_phrase top (Ace.get_contents ace) >>= fun _ ->
-    Lwt.return ()
-  end ;
+      let prelprep = (Ace.get_contents ace_prel ^ "\n"
+                      ^ Ace.get_contents ace_prep ^ "\n") in
+      Learnocaml_toplevel.execute_phrase top (prelprep ^ Ace.get_contents ace)
+      >>= fun _ -> Lwt.return ()
+  end;
 
   (* ---- main toolbar -------------------------------------------------- *)
 
@@ -981,10 +985,7 @@ in if imperative_report = [] && report = []
        select_tab "report" ;
        Lwt_js.yield () >>= fun () ->
        hide_loading ~id:"learnocaml-exo-loading" () ;
-       typecheck true in
-  (* FIXME: take into account (Ace.get_contents ace_prel ^ "\n" ^
-                               Ace.get_contents ace_prep ^ "\n")
-     in all checks involving solution, and in the "Eval code" feat. *)
+       typecheck_editor () in
   begin toolbar_button2
      ~icon: "reload" [%i"Grade!"] @@ fun () ->
      recovering ();

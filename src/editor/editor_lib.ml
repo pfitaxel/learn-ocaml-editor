@@ -252,15 +252,19 @@ let offset_test_lib_prepare =
 
 let with_test_lib_prepare string = test_lib_prepare ^ string ^ " end";;
 
-let typecheck_spec_aux set_class ace_t editor_t top prelprep string =
+let typecheck set_class ace_t editor_t top prelprep ?(mock = false) string =
   let offset_prelprep = num_occs prelprep (-1) '\n' 0 in
-  Learnocaml_toplevel.check ~ppx_meta:true top
-      (prelprep ^ with_test_lib_prepare string) >>= fun res ->
+  let code = prelprep ^ if mock then with_test_lib_prepare string
+                       else string
+  and ppx_meta = mock in
+  Learnocaml_toplevel.check ~ppx_meta top code >>= fun res ->
     let error, warnings =
       match res with
       | Toploop_results.Ok ((), warnings) -> None, warnings
       | Toploop_results.Error (err, warnings) -> Some err, warnings in
-    let shift_loc (l, c) = (l - offset_test_lib_prepare - offset_prelprep, c) in
+    let shift_loc (l, c) =
+      (l - (if mock then offset_test_lib_prepare else 0)
+       - offset_prelprep, c) in
     let transl_loc { Toploop_results.loc_start ; loc_end } =
       { Ocaml_mode.loc_start = shift_loc loc_start ;
         Ocaml_mode.loc_end = shift_loc loc_end } in
@@ -278,11 +282,6 @@ let typecheck_spec_aux set_class ace_t editor_t top prelprep string =
     Ocaml_mode.report_error ~set_class editor_t error warnings  >>= fun () ->
     Ace.focus ace_t ;
     Lwt.return () ;;
-
-let typecheck_spec set_class ace_t editor_t top ace_prel ace_prep =
-  typecheck_spec_aux set_class ace_t editor_t top
-    (Ace.get_contents ace_prel ^ "\n" ^ Ace.get_contents ace_prep ^ "\n")
-    (Ace.get_contents ace_t)
 
 let rec testhaut_init content_div id =
   let elt = find_div "learnocaml-loading" in
@@ -735,32 +734,6 @@ let rec genLet listech =
 let rec genTemplate chaine =
   if chaine = "" then ""
   else concatenation (genLet (decompositionSol chaine 0))
-
-
-(*_________ Check _________________________________________*)
-
-let typecheck set_class ace editor top =
-    Learnocaml_toplevel.check top (Ace.get_contents ace) >>= fun res ->
-    let error, warnings =
-      match res with
-      | Toploop_results.Ok ((), warnings) -> None, warnings
-      | Toploop_results.Error (err, warnings) -> Some err, warnings in
-    let transl_loc { Toploop_results.loc_start ; loc_end } =
-      { Ocaml_mode.loc_start ; loc_end } in
-    let error = match error with
-      | None -> None
-      | Some { Toploop_results.locs ; msg ; if_highlight } ->
-          Some { Ocaml_mode.locs = List.map transl_loc locs ;
-                 msg = (if if_highlight <> "" then if_highlight else msg) } in
-    let warnings =
-      List.map
-        (fun { Toploop_results.locs ; msg ; if_highlight } ->
-           { Ocaml_mode.loc = transl_loc (List.hd locs) ;
-             msg = (if if_highlight <> "" then if_highlight else msg) })
-        warnings in
-    Ocaml_mode.report_error ~set_class editor error warnings  >>= fun () ->
-    Ace.focus ace ;
-    Lwt.return ()
 
 (* ---- create an exo ------------------------------------------------------- *)
 

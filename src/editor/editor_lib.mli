@@ -97,10 +97,15 @@ val polymorph_detector : ('a * string) list -> ('a * int * string) list
 (** Create the template of the solution *)
 val genTemplate : string -> string
 
-(** Refacoring of typecheck functions *)
-val typecheck : bool -> 'a Ace.editor -> Ocaml_mode.editor -> Learnocaml_toplevel.t -> unit Lwt.t
-val typecheck_spec : bool -> 'a Ace.editor -> Ocaml_mode.editor -> Learnocaml_toplevel.t -> 'a Ace.editor -> 'a Ace.editor -> unit Lwt.t
-
+(** [typecheck set_class ace editor top prelprep ?(mock=false) code]:
+    check if [code] (taken from buffer [ace, editor], with [prelprep]
+    prepended and with test_lib mock code if [mock=true]) compiles,
+    using toplevel [top]. Raise a CSS class if [set_class=true] (among
+    "ocaml-check-success", "ocaml-check-warn", "ocaml-check-error").
+*)
+val typecheck :
+  bool -> 'a Ace.editor -> Ocaml_mode.editor -> Learnocaml_toplevel.t ->
+  string -> ?mock:bool -> string -> unit Lwt.t
 
 (** Create an exercise with the data of the local storage
   * @param editor_exercise_id *)

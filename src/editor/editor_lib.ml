@@ -252,7 +252,7 @@ let offset_test_lib_prepare =
 
 let with_test_lib_prepare string = test_lib_prepare ^ string ^ " end";;
 
-let typecheck set_class ace_t editor_t top prelprep ?(mock = false) string =
+let typecheck set_class ace_t editor_t top prelprep ?(mock = false) ?onpasterr string =
   let offset_prelprep = num_occs prelprep (-1) '\n' 0 in
   let code = prelprep ^ if mock then with_test_lib_prepare string
                        else string
@@ -279,9 +279,19 @@ let typecheck set_class ace_t editor_t top prelprep ?(mock = false) string =
            { Ocaml_mode.loc = transl_loc (List.hd locs) ;
              msg = (if if_highlight <> "" then if_highlight else msg) })
         warnings in
-    Ocaml_mode.report_error ~set_class editor_t error warnings  >>= fun () ->
-    Ace.focus ace_t ;
-    Lwt.return () ;;
+    let pasterr =
+      match error with
+      | None -> false
+      | Some {Ocaml_mode.locs; _} ->
+         List.exists (fun { Ocaml_mode.loc_start = (m, _);
+                            Ocaml_mode.loc_end = (n, _) } -> (m <= 0 || n <= 0))
+           locs in
+    match onpasterr, pasterr with
+    | Some onpasterr, true -> onpasterr ()
+    | None, _ | _, false ->
+       Ocaml_mode.report_error ~set_class editor_t error warnings >>= fun () ->
+       Ace.focus ace_t;
+       Lwt.return ()
 
 let rec testhaut_init content_div id =
   let elt = find_div "learnocaml-loading" in

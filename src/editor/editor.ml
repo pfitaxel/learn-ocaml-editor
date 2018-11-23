@@ -379,10 +379,11 @@ let () =
   Ace.set_contents ace_prel contents ;
   Ace.set_font_size ace_prel 18;
 
+  let typecheck_prelude () =
+    Editor_lib.typecheck true ace_prel editor_prel top "" (Ace.get_contents ace_prel) in
   begin prelude_button
       ~group: toplevel_buttons_group
-      ~icon: "typecheck" [%i"Check"] @@ fun () ->
-      Editor_lib.typecheck true ace_prel editor_prel top "" (Ace.get_contents ace_prel)
+      ~icon: "typecheck" [%i"Check"] @@ typecheck_prelude
   end;
 
   (* ---- prepare pane --------------------------------------------------- *)
@@ -401,11 +402,14 @@ let () =
   Ace.set_contents ace_prep contents ;
   Ace.set_font_size ace_prep 18;
 
+  let typecheck_prepare () =
+    let prel = Ace.get_contents ace_prel ^ "\n" in
+    Editor_lib.typecheck true ace_prep editor_prep top prel
+      ~onpasterr:(fun () -> select_tab "prelude"; typecheck_prelude ())
+      (Ace.get_contents ace_prep) in
   begin prepare_button
       ~group: toplevel_buttons_group
-      ~icon: "typecheck" [%i"Check"] @@ fun () ->
-      let prel = Ace.get_contents ace_prel ^ "\n" in
-      Editor_lib.typecheck true ace_prep editor_prep top prel (Ace.get_contents ace_prep)
+      ~icon: "typecheck" [%i"Check"] @@ typecheck_prepare
   end;
 
   (* ---- test pane --------------------------------------------------- *)
@@ -425,12 +429,15 @@ let () =
   Ace.set_font_size ace_t 18;
 
 
+  let typecheck_testml () =
+    let prelprep = (Ace.get_contents ace_prel ^ "\n"
+                    ^ Ace.get_contents ace_prep ^ "\n") in
+    Editor_lib.typecheck true ace_t editor_t top prelprep ~mock:true
+      ~onpasterr:(fun () -> select_tab "prepare"; typecheck_prepare ())
+      (Ace.get_contents ace_t) in
   begin test_button
       ~group: toplevel_buttons_group
-      ~icon: "typecheck" [%i"Check"] @@ fun () ->
-      let prelprep = (Ace.get_contents ace_prel ^ "\n"
-                      ^ Ace.get_contents ace_prep ^ "\n") in
-      Editor_lib.typecheck true ace_t editor_t top prelprep ~mock:true (Ace.get_contents ace_t)
+      ~icon: "typecheck" [%i"Check"] @@ typecheck_testml
   end;
 
   (*-------question pane  -------------------------------------------------*)
@@ -571,12 +578,16 @@ let () =
       end;
     Lwt.return ()
   end ;
+
+  let typecheck_template () =
+    let prelprep = (Ace.get_contents ace_prel ^ "\n"
+                    ^ Ace.get_contents ace_prep ^ "\n") in
+    Editor_lib.typecheck true ace_temp editor_temp top prelprep
+      ~onpasterr:(fun () -> select_tab "prepare"; typecheck_prepare ())
+      (Ace.get_contents ace_temp) in
   begin template_button
       ~group: toplevel_buttons_group
-      ~icon: "typecheck" [%i"Check"] @@ fun () ->
-      let prelprep = (Ace.get_contents ace_prel ^ "\n"
-                      ^ Ace.get_contents ace_prep ^ "\n") in
-      Editor_lib.typecheck true ace_temp editor_temp top prelprep (Ace.get_contents ace_temp)
+      ~icon: "typecheck" [%i"Check"] @@ typecheck_template
   end;
 
   (* ---- testhaut pane --------------------------------------------------- *)
@@ -840,7 +851,9 @@ in if imperative_report = [] && report = []
   let typecheck_editor () =
     let prelprep = (Ace.get_contents ace_prel ^ "\n"
                     ^ Ace.get_contents ace_prep ^ "\n") in
-    Editor_lib.typecheck true ace editor top prelprep (Ace.get_contents ace) in
+    Editor_lib.typecheck true ace editor top prelprep
+      ~onpasterr:(fun () -> select_tab "prepare"; typecheck_prepare ())
+      (Ace.get_contents ace) in
   begin editor_button
       ~group: toplevel_buttons_group
       ~icon: "typecheck" [%i"Check"] @@ typecheck_editor

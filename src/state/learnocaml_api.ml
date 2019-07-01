@@ -337,6 +337,8 @@ module Server (Json: JSON_CODEC) (Rh: REQUEST_HANDLER) = struct
         ( ["index.html"]
         | ["exercise.html"]
         | ["student-view.html"]
+        | ["new_exercise.html"]
+        | ["editor.html"]
         | ("js"|"fonts"|"icons"|"css"|"static") :: _ as path),
         _ ->
           Static path |> k
@@ -344,6 +346,7 @@ module Server (Json: JSON_CODEC) (Rh: REQUEST_HANDLER) = struct
       | `GET, ["favicon.ico"], _ ->
           Static ["icons"; "favicon.ico"] |> k
 
+          
       | meth, path, _ ->
           Invalid_request
             (Printf.sprintf "%s /%s%s"

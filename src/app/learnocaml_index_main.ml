@@ -582,6 +582,11 @@ let teacher_tab token a b () =
   Learnocaml_teacher_tab.teacher_tab token a b () >>= fun div ->
   Lwt.return div
 
+let editor_tab token a b () =
+  show_loading[%i"Loading Editor"] @@ fun () ->
+  Learnocaml_editor_tab.editor_tab token a b () >>= fun div ->
+  Lwt.return div                                    
+ 
 let get_stored_token () =
   Learnocaml_local_storage.(retrieve sync_token)
 
@@ -768,8 +773,9 @@ let () =
        then [ "toplevel", ([%i"Toplevel"], toplevel_tab) ] else []) @
       (match token with
        | Some t when Token.is_teacher t ->
-           [ "teacher", ([%i"Teach"], teacher_tab t) ]
-       | _ -> [])
+          [ "teacher", ([%i"Teach"], teacher_tab t);"editor",([%i"Editor"], editor_tab t)]
+       | _ -> []) 
+        
     in
     let container = El.tab_buttons_container in
     let current_btn = ref None in

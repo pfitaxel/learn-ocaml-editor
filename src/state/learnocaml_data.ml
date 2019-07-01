@@ -1180,3 +1180,83 @@ module Tutorial = struct
   end
 
 end
+
+
+
+module Editor = struct
+  
+ 
+  type type_question= Suite | Solution | Spec ;;
+  
+  
+  type test_qst_untyped =
+    | TestAgainstSol of
+        { name: string
+        ; ty: string
+        ; gen: int
+        ; suite: string
+        ; tester: string
+        ; sampler : string }
+    | TestAgainstSpec of
+        { name: string
+        ; ty: string
+        ; gen: int
+        ; suite: string
+        ; spec : string
+        ; tester: string
+        ; sampler: string }
+    | TestSuite of
+        { name: string;
+          ty: string;
+          suite: string;
+          tester :string };;
+  
+
+
+type exercise =
+  { id : string ;
+    prelude : string ;
+    template : string ;
+    descr : string ;
+    prepare : string ;
+    test : string ;
+    solution : string ;
+    max_score : int ;
+  }
+  
+  
+  let exercise_encoding =
+  let open Json_encoding in
+  conv
+    (fun { id; prelude; template; descr; prepare; test; solution; max_score } ->
+       id, prelude, template, descr, prepare, test, solution, max_score)
+    (fun (id, prelude, template, descr, prepare, test, solution, max_score) ->
+       { id ; prelude ; template ; descr ; prepare ; test ; solution ; max_score })
+    (obj8
+       (req "id" string)
+       (req "prelude" string)
+       (req "template" string)
+       (req "descr" string)
+       (req "prepare" string)
+       (req "test" string)
+       (req "solution" string)
+       (req "max-score" int))
+
+
+
+  type editor_state =
+    { exercise : exercise;
+      metadata : Exercise.Meta.t;}
+
+  let editor_state_enc =
+    J.conv
+      (fun {exercise; metadata } ->
+        (exercise, metadata))
+      (fun (exercise, metadata) ->
+        {exercise; metadata })
+      (J.obj2
+         (J.req "exercise" exercise_encoding)
+         (J.req "metadata" Exercise.Meta.enc))
+
+end
+

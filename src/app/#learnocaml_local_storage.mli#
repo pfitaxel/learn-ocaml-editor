@@ -46,5 +46,4 @@ val sync_token : Token.t storage_key
 
 val nickname : string storage_key
 
-val editor_index : Editor.editor_state SMap.t storage_key
-  
+                 

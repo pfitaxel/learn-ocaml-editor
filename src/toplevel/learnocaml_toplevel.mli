@@ -166,3 +166,5 @@ val go_backward: t -> unit
 (** Go forward in the input's history.
     This is equivalent to pressing [Down] when the toplevel is focused. *)
 val go_forward: t -> unit
+                    
+val execute_test: t -> string

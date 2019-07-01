@@ -35,7 +35,8 @@
             learnocaml_app_common
             learnocaml_toplevel
             js_of_ocaml.ppx
-            ocplib_i18n)
+            ocplib_i18n
+	    learnocaml_editor_tab)
  (modules Learnocaml_teacher_tab
           Learnocaml_index_main)
  (preprocess (pps ppx_ocplib_i18n js_of_ocaml.ppx))
@@ -82,6 +83,7 @@
   (flags :standard +cstruct/cstruct.js)
   (javascript_files ../ace-lib/ace_bindings.js))
 )
+
 
 (install
  (section share)

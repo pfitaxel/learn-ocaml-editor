@@ -200,6 +200,10 @@ let execute_phrase top ?timeout content =
 let execute top =
   Learnocaml_toplevel_input.execute top.input
 
+let execute_test top =
+  Learnocaml_toplevel_output.get_blocks top.output
+  
+
 let go_backward top =
   Learnocaml_toplevel_input.go_backward top.input
 

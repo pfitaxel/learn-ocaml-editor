@@ -41,17 +41,6 @@ let get_prelude id =
 let get_prepare id =
     (get_editor_state id).exercise.prepare
 
-let find_div id =
-  match Manip.by_id id with
-  | Some div -> div
-  | None -> let window=Dom_html.window in
-            let window=window##.parent in
-            let document=window##.document in
-            Tyxml_js.Of_dom.of_element (Js.Opt.case
-                                          (document##getElementById (Js.string id))
-                                          (fun () -> raise Not_found)
-                                          (fun node -> node))
-
 
 let remove_exo exercise_id =
   let old_index= Learnocaml_local_storage.(retrieve editor_index) in
@@ -87,31 +76,12 @@ let new_state (metadata:Exercise.Meta.t) =
 let setInnerHtml elt s =
   elt##.innerHTML := Js.string s
 
-let hide_load id =
-  let elt_lml=match find_div id with
-    | exception Not_found ->
-       let div = Tyxml_js.Html.(div ~a:[ a_id id ]) [] in
-       let window=Dom_html.window in
-       let window=window##.parent in
-       let document=window##.document in
-       Manip.(appendChild (Tyxml_js.Of_dom.of_body document##.body) ) div;
-       div
-    | div -> div
-  in
-  Manip.(removeClass elt_lml "initial") ;
-  Manip.(removeClass elt_lml "loading") ;
-  Manip.(addClass elt_lml "loaded")
-
 let show_load id contents =
-  let elt =  match find_div id with
-    | exception Not_found ->
-       let div = Tyxml_js.Html.(div ~a:[ a_id id ]) [] in
-       let window=Dom_html.window in
-       let window=window##.parent in
-       let document=window##.document in
-       Manip.(appendChild (Tyxml_js.Of_dom.of_body document##.body) ) div;
-       div
-    | div -> div in
+  let elt = match Manip.by_id id with
+      None -> failwith "Element not found"
+    | Some e -> e
+  in
+  
   Manip.(addClass elt "loading-layer") ;
   Manip.(removeClass elt "loaded") ;
   Manip.(addClass elt "loading") ;
@@ -122,8 +92,6 @@ let show_load id contents =
       div ~a: [ a_id "chamo" ] [ img ~alt: "loading" ~src: chamo_src () ] ;
       div ~a: [ a_class [ "messages" ] ] contents
   ]
-
-let recovering_callback = ref (fun () -> ())
 
 
 let test_lib_prepare =
@@ -150,14 +118,12 @@ let offset_test_lib_prepare =
   num_occs test_lib_prepare (-1) '\n' 0
 
 let with_test_lib_prepare string = test_lib_prepare ^ string ^ " end";;
-
 let typecheck set_class ace_t editor_t top prelprep ?(mock = false) ?onpasterr string =
   let offset_prelprep = num_occs prelprep (-1) '\n' 0 in
   let code = prelprep ^ if mock then with_test_lib_prepare string
                         else string
-  in
-  
-  Learnocaml_toplevel.check  top code >>= fun res ->
+  and ppx_meta = mock in
+  Learnocaml_toplevel.check ~ppx_meta top code >>= fun res ->
   let error, warnings =
     match res with
     | Toploop_results.Ok ((), warnings) -> None, warnings
@@ -192,8 +158,9 @@ let typecheck set_class ace_t editor_t top prelprep ?(mock = false) ?onpasterr s
      Ocaml_mode.report_error ~set_class editor_t error warnings >>= fun () ->
      Ace.focus ace_t;
      Lwt.return ()
+     
 
-
+     
 
 (* ---------- Functions for generate test -> Compile ---------- *)
 
@@ -214,6 +181,7 @@ let section name report = {|Section ([ Text "Fonction:" ; Code "|}
 
 (*_____________________Functions for the Generate button_____________________*)
 
+              
 (* Remove duplicates; keep the latest occurence *)
 let rec undup_assoc = function
   | [] -> []
@@ -273,7 +241,17 @@ let monomorph_generator l =
          in [(5, t1); (5, t2)]
   in
   List.map (fun (func, ty) -> (func, f ty)) l
+  |> List.map  (fun (name, list_mono)  ->
+         List.fold_left  (fun acc (gen, ty) ->
+             TestAgainstSol
+               {name; ty; suite = "[]"; gen;
+                tester = ""; sampler = ""}::acc)
+           []
+           list_mono)
+|>List.flatten
 
+  
+  
 (* TODO: Refactor and delete concatenation *)
 let string_of_char ch = String.make 1 ch
 
@@ -427,7 +405,7 @@ polymorph_detector
 
 let failchar =
   decompositionSol {|
-                    "Remplacez cette chaine par votre code."
+                    "Change this string for you code."
 
                     |} 0
 
@@ -562,5 +540,3 @@ let typecheck_dialog_box div_id res =
       Lwt.return ();
     end;;
 
-(* keep sync with test-spec *)
-let test_prel = "open Test_lib\nopen Learnocaml_report;;\n"

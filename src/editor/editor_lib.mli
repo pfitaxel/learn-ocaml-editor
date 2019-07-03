@@ -30,9 +30,6 @@ val new_state : Exercise.Meta.t -> editor_state
 val setInnerHtml : < innerHTML : < set : Js.js_string Js.t -> unit; .. >
                    Js_of_ocaml.Js.gen_prop; .. > Js_of_ocaml.Js.t -> string -> unit
 
-(** Trick to call the recovering function outside of it definition enveroniment *)
-val recovering_callback : (unit -> unit) ref
-
 (** Fragment of a test.ml code
   * @see definition *)
 val init : string
@@ -92,7 +89,6 @@ val typecheck :
 (** @return the output of toplevel buffer *) 
 val get_answer : Learnocaml_toplevel.t -> string
 val typecheck_dialog_box : string-> 'a Toploop_results.toplevel_result -> unit Lwt.t
-val test_prel :string 
 
 
 (** Extract the function definitions from a toplevel output
@@ -101,10 +97,8 @@ val extract_functions : string -> (string * string) list
 
 (** Generate monomorphic test specifications
     @return a list of ("function_name", [(alea, "monomorphic type")]) *)
-val monomorph_generator : (string * string) list -> (string * (int * string) list) list
+val monomorph_generator : (string * string) list -> Editor.test_qst_untyped list
 
 val show_load : Html_types.text Tyxml_js.Html.wrap ->
 [< Html_types.div_content_fun ] Tyxml_js.Html.elt Tyxml_js.Html.list_wrap ->
 unit                                                      
-
-val hide_load : Html_types.text Tyxml_js.Html.wrap -> unit  

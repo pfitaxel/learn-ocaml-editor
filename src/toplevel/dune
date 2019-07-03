@@ -20,9 +20,11 @@
             toploop_results
             ocplib-ocamlres.runtime
             embedded_cmis
+	    learnocaml_ppx_metaquot
+            learnocaml_ppx_metaquot_lib
             learnocaml_toplevel_worker_messages)
  (modules Learnocaml_toplevel_worker_main)
- (preprocess (pps js_of_ocaml.ppx))
+ (preprocess (pps learnocaml_ppx_metaquot js_of_ocaml.ppx ))
  (js_of_ocaml (flags :standard +dynlink.js +toplevel.js
                      --toplevel --nocmis))
 )

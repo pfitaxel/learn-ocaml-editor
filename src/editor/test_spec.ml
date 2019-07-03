@@ -196,7 +196,7 @@ let question_typed question id_question =
   match question with
   | TestAgainstSpec a ->
      (* FIXME *)
-     "(* Question #" ^ string_of_int id_question ^ " about " ^ a.name ^ " was not translated\n"
+     "(* Question #" ^ " about " ^ a.name ^ " was not translated\n"
      ^ "(TestAgainstSpec not currently supported by the learn-ocaml runtime) *)"
   | TestSuite a ->
      let name, prot, tester, suite =
@@ -221,3 +221,192 @@ let question_typed question id_question =
                      \"%s\"@.  \
                      %s;;@."
      id_question prot gen sampler tester name suite
+
+(***************************************************************************************************)
+(*** compile       stuff        ********************************************************************)
+open Learnocaml_data.Editor
+   
+let test_prel = "open Test_lib\nopen Learnocaml_report;;\n"
+
+
+let quality_function = {|
+let avoid_thentrue = let already = ref false in fun _ ->
+  if !already then [] else begin
+    already := true ;
+    Learnocaml_report.[ Message ([ Text "* N'écrivez pas les motifs de code suivants:";
+                                   Code "[if ... then true else ...;
+ if ... then false else ...;
+ if ... then ... else true;
+ if ... then ... else false]"; Text "
+Utilisez de préférence les opérateurs booléens (&&), (||), not."], Success ~-4) ]
+  end
+
+let check_thentrue e =
+    Parsetree.(
+      match e with
+      | {pexp_desc = Pexp_ifthenelse (_, e1, (Some e2))} ->
+         begin
+           match e1 with
+           | {pexp_desc = Pexp_construct ({Asttypes.txt = (Longident.Lident "false")}, None)}
+           | {pexp_desc = Pexp_construct ({Asttypes.txt = (Longident.Lident "true")}, None)} ->
+              avoid_thentrue e1
+           | _ -> []
+         end @ begin
+           match e2 with
+           | {pexp_desc = Pexp_construct ({Asttypes.txt = (Longident.Lident "false")}, None)}
+           | {pexp_desc = Pexp_construct ({Asttypes.txt = (Longident.Lident "true")}, None)} ->
+             avoid_thentrue e2
+           | _ -> []
+          end
+      | _ -> [])
+
+let avoid_list1app = let already = ref false in fun _ ->
+  if !already then [] else begin
+    already := true ;
+    Learnocaml_report.[ Message ([ Text "* N'écrivez pas:";
+                                   Code "[x] @ l";
+                                   Text ". Écrivez de préférence:";
+                                   Code "x :: l";
+                                   Text "."], Success ~-4) ]
+  end
+
+let check_list1app e =
+  Parsetree.(
+    match e.pexp_desc with
+    | Pexp_apply (app0, [(_, lst1); _]) ->
+       (match app0.pexp_desc, lst1.pexp_desc with
+        | Pexp_ident {Asttypes.txt = app0'},
+          Pexp_construct ({Asttypes.txt = (Longident.Lident "::")}, Some lst1')
+             when List.mem (Longident.flatten app0') [["List"; "append"]; ["@"]] ->
+           (match lst1'.pexp_desc with
+            | Pexp_tuple [_; nil0] ->
+               (match nil0.pexp_desc with
+                | Pexp_construct ({Asttypes.txt = (Longident.Lident "[]")}, None) ->
+                   avoid_list1app e
+                | _ -> [])
+            | _ -> [])
+        | _ -> [])
+    | _ -> [])
+
+let avoid_eqphy = let already = ref false in fun _ ->
+  if !already then [] else begin
+    already := true ;
+    Learnocaml_report.[ Message ([ Text "* Pour PFITA, n'utilisez pas l'égalité physique";
+                                   Code "(==)";
+                                   Text ". Utilisez de préférence l'égalité structurelle";
+                                   Code "(=)";
+                                   Text "."], Success ~-1) ]
+  end
+
+let avoid_neqphy = let already = ref false in fun _ ->
+  if !already then [] else begin
+    already := true ;
+    Learnocaml_report.[ Message ([ Text "* Pour PFITA, n'utilisez pas l'inégalité physique";
+                                   Code "(!=)";
+                                   Text ". Utilisez de préférence l'inégalité structurelle";
+                                   Code "(<>)";
+                                   Text "."], Success ~-1) ]
+  end
+
+let check_eqphy e =
+  Parsetree.(
+    match e.pexp_desc with
+    | Pexp_ident {Asttypes.txt = Longident.Lident "=="} -> avoid_eqphy e
+    | _ -> [])
+
+let check_neqphy e =
+  Parsetree.(
+    match e.pexp_desc with
+    | Pexp_ident {Asttypes.txt = Longident.Lident "!="} -> avoid_neqphy e
+    | _ -> [])
+|}
+
+let imperative_function = {|let ast_imperative_check ast =
+  let chk_expr e =
+    Parsetree.(
+      match e with
+      | {pexp_desc = Pexp_sequence _} -> forbid_syntax ";" e
+      | {pexp_desc = Pexp_while _} -> forbid_syntax "while" e
+      | {pexp_desc = Pexp_for _} -> forbid_syntax "for" e
+      | {pexp_desc = Pexp_array _} -> forbid_syntax "array" e
+      | _ -> [] ) in
+  let imperative_report =
+    ast_check_structure
+      ~on_expression:chk_expr
+      ast |> List.sort_uniq compare in
+  if snd (Learnocaml_report.result imperative_report) then
+    imperative_report
+  else
+    []|}
+
+
+let ast_fonction quality imperative  =
+  
+  let fonction = if quality then
+                   quality_function
+                 else
+                   "" in
+  let fonction = if imperative then
+                   fonction ^ imperative_function
+                 else
+                   fonction ^ "" in
+  let fonction = fonction ^ "\n\nlet ast_quality ast =" in
+  let fonction =
+    if imperative then
+      fonction ^ {|
+                  let imperative_report =
+                  let tempReport = ast_imperative_check ast in
+                  if tempReport = [] then []
+                  else (Message ([ Text "Des traits impératifs ont été détectés:" ],
+                  Success ~-4)) :: tempReport
+                  |}
+    else
+      fonction ^ {|
+                  let imperative_report = []
+                  |} in
+  let fonction =
+    if quality then
+      fonction ^ {|
+                  and report =
+                  let tempReport = ast_check_structure
+                  ~on_expression:(check_thentrue @@@ check_list1app @@@
+                  check_eqphy @@@ check_neqphy)
+                  ast |> List.sort_uniq compare in
+                  if tempReport = [] then []
+                  else (Message ([Text "Des motifs de code indésirables ont été détectés:"],
+                  Failure)) :: tempReport
+                  |}
+    else fonction ^ " and report = []" in
+  let fonction = fonction ^ {|
+                             in if imperative_report = [] && report = []
+                             then [ Message ([ Text "OK (pas de construction interdite détectée)"], Success 0) ]
+                             else imperative_report @ report;;
+                             |} in
+  fonction
+ 
+let ast_code quality imperative = 
+let fonction =
+    if quality || imperative then
+      {|Section ([ Text "Qualité de code:" ], ast_quality code_ast);
+       |}
+    else
+      "" in
+  fonction
+  
+  let compile indexed_list =
+    let tests=test_prel ^ (ast_fonction true true) in
+  
+    let tests= List.fold_left (fun acc (qid,quest) ->
+          acc ^ (question_typed quest qid)^" \n")
+         tests indexed_list in
+    let tests=tests ^ init ^ "[\n" ^ ast_code true true in
+    let tests=
+      List.fold_left (fun acc (qid, quest) ->
+          let name=match quest with
+            | TestAgainstSol a->a.name
+            | TestAgainstSpec a ->a.name
+            | TestSuite a -> a.name in
+          acc ^ (section name ("question" ^ string_of_int qid ) ))
+         tests indexed_list in
+    tests ^ " ]" 
+  

@@ -11,7 +11,8 @@
     learnocaml_app_common
     learnocaml_ppx_metaquot
     learnocaml_ppx_metaquot_lib
-    omd)
+    omd
+    grading)
  (modules Editor_lib)
  (preprocess (pps learnocaml_ppx_metaquot ppx_ocplib_i18n js_of_ocaml.ppx ))
 )
@@ -28,6 +29,7 @@
    learnocaml_ppx_metaquot
    learnocaml_ppx_metaquot_lib
    ocplib-json-typed
+   learnocaml_data
    learnocaml_repository
    testing
    ocplib_i18n
@@ -59,6 +61,7 @@
 (executable
  (name new_exercise)
  (flags :standard -warn-error -6-9-27-33-39)
+ (modes byte)
  (libraries
 	ezjsonm
          grading_jsoo

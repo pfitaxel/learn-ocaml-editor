@@ -399,7 +399,7 @@ let () =
   let typecheck_testml () =
     let prelprep = (Ace.get_contents ace_prel ^ "\n"
                     ^ Ace.get_contents ace_prep ^ "\n") in
-    Editor_lib.typecheck true ace_t editor_t top prelprep ~mock:false
+    Editor_lib.typecheck true ace_t editor_t top prelprep ~mock:true
       ~onpasterr:(fun () -> select_tab "prelude"; typecheck_prepare ())
       (Ace.get_contents ace_t) in
   begin test_button

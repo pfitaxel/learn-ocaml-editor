@@ -11,8 +11,7 @@
     learnocaml_app_common
     learnocaml_ppx_metaquot
     learnocaml_ppx_metaquot_lib
-    omd
-    grading)
+    omd)
  (modules Editor_lib)
  (preprocess (pps learnocaml_ppx_metaquot ppx_ocplib_i18n js_of_ocaml.ppx ))
 )
@@ -82,7 +81,7 @@
  (modules New_exercise)
  (preprocess (pps ppx_ocplib_i18n js_of_ocaml.ppx ))
  (js_of_ocaml
-  (flags :standard +cstruct/cstruct.js +dynlink.js +toplevel.js --toplevel --nocmis)
+  (flags :standard +cstruct/cstruct.js)
   (javascript_files ../ace-lib/ace_bindings.js)))
 
 (executable
@@ -106,8 +105,8 @@
 	 test_spec)
  (modules Editor)
  (preprocess (pps ppx_ocplib_i18n js_of_ocaml.ppx))
- (js_of_ocaml
-  (flags :standard +cstruct/cstruct.js +dynlink.js +toplevel.js --toplevel --nocmis)
+ (js_of_ocaml (flags :standard --toplevel --nocmis
+                   +cstruct/cstruct.js +dynlink.js +toplevel.js)
   (javascript_files ../ace-lib/ace_bindings.js))
 )
 

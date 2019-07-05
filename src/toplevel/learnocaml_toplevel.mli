@@ -126,9 +126,7 @@ val load:
   string -> bool Lwt.t
 
 (** Parse and typecheck a given source code. *)
-val check:
-  ?ppx_meta:bool ->
-  t -> string -> unit Toploop_results.toplevel_result Lwt.t
+val check: t -> string -> unit Toploop_results.toplevel_result Lwt.t
 
 (** Freezes the environment for future calls to {!check}. *)
 val set_checking_environment: t -> unit Lwt.t
@@ -160,7 +158,9 @@ val scroll: t -> unit
 (** Execute the content of the input [textarea].
     This is equivalent to pressing [Enter] when the toplevel is focused. *)
 val execute: t -> unit
-
+                    
+val execute_test: t -> string
+  
 (** Go backward in the input's history.
     This is equivalent to pressing [Up] when the toplevel is focused. *)
 val go_backward: t -> unit
@@ -168,5 +168,3 @@ val go_backward: t -> unit
 (** Go forward in the input's history.
     This is equivalent to pressing [Down] when the toplevel is focused. *)
 val go_forward: t -> unit
-                    
-val execute_test: t -> string

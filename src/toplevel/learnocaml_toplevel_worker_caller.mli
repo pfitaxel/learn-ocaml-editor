@@ -47,9 +47,8 @@ val create:
             where [err] contains the error message otherwise.
 
 *)
-val check :
-  ?ppx_meta:bool ->
-  t -> string -> unit Toploop_results.toplevel_result Lwt.t
+val check: t -> string -> unit toplevel_result Lwt.t
+
 
 (** Execute a given source code. The evaluation stops after the first
     toplevel phrase (as terminated by ";;") that fails to compile or

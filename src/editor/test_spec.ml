@@ -233,12 +233,12 @@ let quality_function = {|
 let avoid_thentrue = let already = ref false in fun _ ->
   if !already then [] else begin
     already := true ;
-    Learnocaml_report.[ Message ([ Text "* N'écrivez pas les motifs de code suivants:";
+    Learnocaml_report.[ Message ([ Text "* Do not write the following code patterns:";
                                    Code "[if ... then true else ...;
  if ... then false else ...;
  if ... then ... else true;
  if ... then ... else false]"; Text "
-Utilisez de préférence les opérateurs booléens (&&), (||), not."], Success ~-4) ]
+Preferably use Boolean operators (&&), (||), not."], Success ~-4) ]
   end
 
 let check_thentrue e =
@@ -263,9 +263,9 @@ let check_thentrue e =
 let avoid_list1app = let already = ref false in fun _ ->
   if !already then [] else begin
     already := true ;
-    Learnocaml_report.[ Message ([ Text "* N'écrivez pas:";
+    Learnocaml_report.[ Message ([ Text "* Do not write:";
                                    Code "[x] @ l";
-                                   Text ". Écrivez de préférence:";
+                                   Text ". Preferably write:";
                                    Code "x :: l";
                                    Text "."], Success ~-4) ]
   end
@@ -291,9 +291,9 @@ let check_list1app e =
 let avoid_eqphy = let already = ref false in fun _ ->
   if !already then [] else begin
     already := true ;
-    Learnocaml_report.[ Message ([ Text "* Pour PFITA, n'utilisez pas l'égalité physique";
+    Learnocaml_report.[ Message ([ Text "*  Do not use physical equality";
                                    Code "(==)";
-                                   Text ". Utilisez de préférence l'égalité structurelle";
+                                   Text ". Preferably use structural equality";
                                    Code "(=)";
                                    Text "."], Success ~-1) ]
   end
@@ -301,9 +301,9 @@ let avoid_eqphy = let already = ref false in fun _ ->
 let avoid_neqphy = let already = ref false in fun _ ->
   if !already then [] else begin
     already := true ;
-    Learnocaml_report.[ Message ([ Text "* Pour PFITA, n'utilisez pas l'inégalité physique";
+    Learnocaml_report.[ Message ([ Text "* Do not use physical inequality";
                                    Code "(!=)";
-                                   Text ". Utilisez de préférence l'inégalité structurelle";
+                                   Text ". Preferably use structural inequality";
                                    Code "(<>)";
                                    Text "."], Success ~-1) ]
   end
@@ -357,7 +357,7 @@ let ast_fonction quality imperative  =
                   let imperative_report =
                   let tempReport = ast_imperative_check ast in
                   if tempReport = [] then []
-                  else (Message ([ Text "Des traits impératifs ont été détectés:" ],
+                  else (Message ([ Text "Imperative features have been detected:" ],
                   Success ~-4)) :: tempReport
                   |}
     else
@@ -373,13 +373,13 @@ let ast_fonction quality imperative  =
                   check_eqphy @@@ check_neqphy)
                   ast |> List.sort_uniq compare in
                   if tempReport = [] then []
-                  else (Message ([Text "Des motifs de code indésirables ont été détectés:"],
+                  else (Message ([Text "Unwanted code patterns have been detected:"],
                   Failure)) :: tempReport
                   |}
     else fonction ^ " and report = []" in
   let fonction = fonction ^ {|
                              in if imperative_report = [] && report = []
-                             then [ Message ([ Text "OK (pas de construction interdite détectée)"], Success 0) ]
+                             then [ Message ([ Text "OK (no prohibited construction detected)"], Success 0) ]
                              else imperative_report @ report;;
                              |} in
   fonction
@@ -387,7 +387,7 @@ let ast_fonction quality imperative  =
 let ast_code quality imperative = 
 let fonction =
     if quality || imperative then
-      {|Section ([ Text "Qualité de code:" ], ast_quality code_ast);
+      {|Section ([ Text "Code quality:" ], ast_quality code_ast);
        |}
     else
       "" in

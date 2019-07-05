@@ -84,7 +84,7 @@ val typecheck :
 
 (** Create an exercise with the data of the local storage
   * @param editor_exercise_id *)
-(*val exo_creator : string -> Learnocaml_exercise.t*)
+val exo_creator : string -> Learnocaml_exercise.t
 
 (** @return the output of toplevel buffer *) 
 val get_answer : Learnocaml_toplevel.t -> string

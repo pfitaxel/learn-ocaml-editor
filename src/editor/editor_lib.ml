@@ -123,7 +123,7 @@ let typecheck set_class ace_t editor_t top prelprep ?(mock = false) ?onpasterr s
   let code = prelprep ^ if mock then with_test_lib_prepare string
                         else string
   and ppx_meta = mock in
-  Learnocaml_toplevel.check (*~ppx_meta*) top code >>= fun res ->
+  Learnocaml_toplevel.check ~ppx_meta top code >>= fun res ->
   let error, warnings =
     match res with
     | Toploop_results.Ok ((), warnings) -> None, warnings
@@ -479,22 +479,27 @@ let rec genTemplate chaine =
   else concatenation (genLet (decompositionSol chaine 0))
 
 (* ---- create an exo ------------------------------------------------------- *)
-(* TODO : update with new exercise datatype)
 let exo_creator proper_id =
-  let titre = get_titre proper_id in
-  let question = get_question proper_id in
-  let question = Omd.to_html (Omd.of_string question) in
-  let open Learnocaml_exercise in
-  let exo1 = set id proper_id empty in
-  let exo2 = set title titre exo1 in
-  let exo3 = set max_score 80 exo2 in
-  let exo4 = set prepare (get_prepare proper_id) exo3 in
-  let exo5 = set prelude (get_prelude proper_id) exo4 in
-  let exo6 = set solution (get_solution proper_id) exo5 in
-  let exo7 = set test (get_testml proper_id) exo6 in
-  let exo8 = set template (get_template proper_id) exo7 in
-  set descr question exo8
- *)
+  let exercise = (get_editor_state proper_id).exercise in
+  let read_field field =
+    
+      match field with
+      | "id"-> Some exercise.id
+      | "prelude.ml" -> Some exercise.prelude
+      | "template.ml" -> Some exercise.template
+      | "descr.html" -> Some exercise.descr
+      | "prepare.ml" -> Some exercise.prepare
+      | "test.ml" -> Some exercise.test
+      | "solution.ml" -> Some exercise.solution
+      |  "max_score" -> Some (string_of_int exercise.max_score)
+      | _ -> None
+      
+  in
+  Learnocaml_exercise.read
+    ~read_field
+    ~id:proper_id  
+    ~decipher:false
+    ()
   
  
 

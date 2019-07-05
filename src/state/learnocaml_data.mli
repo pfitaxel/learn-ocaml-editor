@@ -122,10 +122,14 @@ end
 
 module Server : sig
   type config = {
-    secret : string option (* maybe a secret *)
+    secret : string option; (* maybe a secret *)
+    server_id : int (* random integer generated each building time *)
     }
 
-  val default : config
+  val default: ?secret:string -> unit -> config
+
+  (* only used in the building case to generate a random server_id *)
+  val enc_init: config Json_encoding.encoding
 
   val enc: config Json_encoding.encoding
 end
@@ -382,10 +386,41 @@ module Tutorial: sig
 
 end
 
+module Playground : sig
+  type id = string
+
+  type t =
+  { id : id ;
+    prelude : string ;
+    template : string ;
+  }
+
+  val enc: t Json_encoding.encoding
+
+  module Meta : sig
+    type t =
+      {
+        title: string;
+        short_description: string option;
+      }
+
+    val default : string -> t
+
+    val enc: t Json_encoding.encoding
+  end
+
+  module Index: sig
+
+    type t = (id * Meta.t) list
+
+    val enc: t Json_encoding.encoding
+
+  end
+
+end
                    
 module Editor : sig     
      
-
   type type_question = Suite | Solution | Spec
 
   type test_qst_untyped =
@@ -409,8 +444,6 @@ module Editor : sig
         ; ty: string
         ; suite: string
         ; tester: string } ;;
-
-
  
   type exercise =
     { id : string ;
@@ -422,13 +455,11 @@ module Editor : sig
       solution : string ;
       max_score : int ;
     }
-     
 
   type editor_state =
     { exercise : exercise;
       metadata : Exercise.Meta.t; }
 
   val editor_state_enc : editor_state Json_encoding.encoding
- 
-
+    
 end

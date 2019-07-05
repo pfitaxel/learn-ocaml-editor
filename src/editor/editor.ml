@@ -24,7 +24,6 @@ open Editor_lib
 open Dom_html
 open Test_spec
 
-
 let display_report exo report =
   let score, _failed = Report.result report in
   let report_button = find_component "learnocaml-exo-button-report" in
@@ -62,7 +61,6 @@ let get_grade =
     get_worker () >>= fun worker_js_file ->
     Grading_jsoo.get_grade ~worker_js_file ?callback ?timeout exercise
 
-  
 (*----------------------------------------------------------------------*)
 
 let init_tabs, select_tab =
@@ -118,7 +116,7 @@ let set_string_translations () =
       "learnocaml-exo-button-prepare", [%i"Prepare"];
       "learnocaml-exo-button-toplevel", [%i"Toplevel"];
       "learnocaml-exo-button-question", [%i"Question"];
-      "learnocaml-exo-button-test", [%i"Test.ml"];
+      "learnocaml-exo-button-test", [%i"Test"];
       "learnocaml-exo-button-report", [%i"Report"];
       "learnocaml-exo-editor-pane", [%i"Editor"];
       "txt_grade_report", [%i"Click the Grade! button to test your solution"];
@@ -152,7 +150,6 @@ let () =
   (match Js_utils.get_lang() with Some l -> Ocplib_i18n.set_lang l | None -> ());
   Lwt.async @@ fun () ->
                (*set_string_translations ();*)
-               
   Learnocaml_local_storage.init () ;
 
   (* ---- launch everything --------------------------------------------- *)
@@ -242,7 +239,7 @@ let () =
                       (Tyxml_js.To_dom.of_div editor_prelude) in
   let ace_prel = Ocaml_mode.get_editor editor_prel in
   let contents= get_prelude id in
-    
+
   Ace.set_contents ace_prel contents ;
   Ace.set_font_size ace_prel 18;
 
@@ -379,7 +376,6 @@ let () =
   Ace.set_contents ace_t contents;
   Ace.set_font_size ace_t 18;
 
-  
   begin test_button
           ~group: toplevel_buttons_group
           ~icon: "sync" [%i"Generate"] @@ fun () ->
@@ -413,7 +409,7 @@ let () =
       ~group: toplevel_buttons_group
       ~icon: "typecheck" [%i"Check"] @@ typecheck_testml
   end;
-  
+
   (* ---- template pane --------------------------------------------------- *)
 
   let editor_template = find_component "learnocaml-exo-template-pane" in
@@ -469,30 +465,26 @@ let () =
       ~icon: "typecheck" [%i"Check"] @@ typecheck_template
   end;
 
-  
   let recovering () =
     let solution = Ace.get_contents ace in
-    
     let descr = Ace.get_contents ace_quest in
     let template = Ace.get_contents ace_temp in
     let test = Ace.get_contents ace_t in
     let prepare= Ace.get_contents ace_prep in
-    let prelude = Ace.get_contents ace_prel in 
-    let open Learnocaml_data.Editor in 
+    let prelude = Ace.get_contents ace_prel in
+    let open Learnocaml_data.Editor in
     let exercise =
       {id;prelude;template;descr;prepare;test;solution;max_score=0}
     in
     let old_state = get_editor_state id in
     let new_state = {metadata=old_state.metadata;exercise} in
     update_index new_state in
-                      
   begin editor_button
       ~icon: "save" [%i"Save"] @@ fun () ->
-    recovering (); 
+    recovering ();
     Lwt.return ()
   end ;
 
-  
   begin editor_button
       ~icon: "download" [%i"Download"] @@ fun () ->
      recovering () ;
@@ -541,14 +533,14 @@ let () =
   end;
   begin toolbar_button
       ~icon: "list" [%i"Exercises"] @@ fun () ->
-    let aborted, abort_message =
-      let t, u = Lwt.task () in
+    let _aborted, abort_message =
+      let t, _u = Lwt.task () in
       let btn_cancel = Tyxml_js.Html5.(button [ pcdata [%i"Cancel"] ]) in
       Manip.Ev.onclick btn_cancel ( fun _ ->
         hide_loading ~id:"learnocaml-exo-loading" () ; true) ;
       let btn_yes = Tyxml_js.Html5.(button [ pcdata [%i"Yes"] ]) in
       Manip.Ev.onclick btn_yes (fun _ ->
-          recovering (); 
+          recovering ();
       Dom_html.window##.location##assign
         (Js.string "index.html#activity=editor") ; true) ;
       let btn_no = Tyxml_js.Html5.(button [ pcdata [%i"No"] ]) in
@@ -586,7 +578,7 @@ let () =
                             btn ;
                             pcdata "?" ]) in
      Manip.SetCss.opacity div (Some "0") ;
-     t, div in 
+     t, div in
   let worker = ref (Grading_jsoo.get_grade (exo_creator id)) in
   let correction =
     Learnocaml_exercise.get Learnocaml_exercise.solution (exo_creator id) in
@@ -609,11 +601,9 @@ let () =
   end;
  *)
   let messages = Tyxml_js.Html5.ul [] in
-  
-  let messages = Tyxml_js.Html5.ul [] in
   let callback text =
-    Manip.appendChild messages Tyxml_js.Html5.(li [ pcdata text ]) in 
-  
+    Manip.appendChild messages Tyxml_js.Html5.(li [ pcdata text ]) in
+
   let worker () = ref (Grading_jsoo.get_grade ~callback (exo_creator id)  ) in
   let grade () =
     let aborted, abort_message =
@@ -671,10 +661,10 @@ let () =
      ~icon: "reload" [%i"Grade!"] @@ fun () ->
                                      recovering ();
                                      grade ()
-  end ; 
+  end ;
   (* ---- return -------------------------------------------------------- *)
-  (* toplevel_launch >>= fun _ -> FIXME? SHOULD BE UNNECESSARY *)
-  (* typecheck false >>= fun () ->  ? *)
+  (* toplevel_launch >>= fun _ -> should be unnecessary? *)
+  (* typecheck false >>= fun () -> *)
   hide_loading ~id:"learnocaml-exo-loading" () ;
   let () = Lwt.async @@ fun () ->
        let _ = Dom_html.window##setInterval
@@ -682,13 +672,3 @@ let () =
        Lwt.return () in
 
   Lwt.return ();;
-(*
-(* Automatic save *)
-let () = Lwt.async @@ fun ()->
-    let _ =
-      let auto_save_interval = 120. (* in seconds *) in
-      Dom_html.window##setInterval
-          (Js.wrap_callback (fun () -> !recovering_callback ()))
-    (auto_save_interval *. 1000.) in
-    Lwt.return_unit ;;
- *)

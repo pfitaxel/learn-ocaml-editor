@@ -11,7 +11,7 @@ open Exercise.Meta
 
 let get_editor_state id=
     (SMap.find id Learnocaml_local_storage.(retrieve editor_index))
-let update_index  editor_state = 
+let update_index editor_state =
     let old_index=
       Learnocaml_local_storage.(retrieve editor_index)
     in
@@ -19,7 +19,7 @@ let update_index  editor_state =
       SMap.add editor_state.exercise.id editor_state old_index
     in
     Learnocaml_local_storage.(store editor_index) new_index
-  
+
 let get_titre id =
   (get_editor_state id).metadata.title
 let get_description id =
@@ -46,7 +46,7 @@ let remove_exo exercise_id =
   let old_index= Learnocaml_local_storage.(retrieve editor_index) in
   let new_index= SMap.remove exercise_id old_index in
   Learnocaml_local_storage.(store editor_index) new_index
-  
+
 let titleUnique title =
   let exos=Learnocaml_local_storage.(retrieve editor_index) in
   match SMap.find_first_opt
@@ -70,8 +70,6 @@ let new_state (metadata:Exercise.Meta.t) =
                   test="";solution="";max_score=0}
   in
   {exercise;metadata}
-  
-
 
 let setInnerHtml elt s =
   elt##.innerHTML := Js.string s
@@ -81,7 +79,6 @@ let show_load id contents =
       None -> failwith "Element not found"
     | Some e -> e
   in
-  
   Manip.(addClass elt "loading-layer") ;
   Manip.(removeClass elt "loaded") ;
   Manip.(addClass elt "loading") ;
@@ -158,9 +155,6 @@ let typecheck set_class ace_t editor_t top prelprep ?(mock = false) ?onpasterr s
      Ocaml_mode.report_error ~set_class editor_t error warnings >>= fun () ->
      Ace.focus ace_t;
      Lwt.return ()
-     
-
-     
 
 (* ---------- Functions for generate test -> Compile ---------- *)
 
@@ -181,7 +175,6 @@ let section name report = {|Section ([ Text "Fonction:" ; Code "|}
 
 (*_____________________Functions for the Generate button_____________________*)
 
-              
 (* Remove duplicates; keep the latest occurence *)
 let rec undup_assoc = function
   | [] -> []
@@ -248,160 +241,22 @@ let monomorph_generator l =
                 tester = ""; sampler = ""}::acc)
            []
            list_mono)
-|>List.flatten
+  |> List.flatten
 
-  
-  
-(* TODO: Refactor and delete concatenation *)
+(* ____Functions for generate template______________________________________ *)
+
+(* TODO: Refactor and delete concatenation that involves type (char list) *)
+
 let string_of_char ch = String.make 1 ch
 
 let rec concatenation listech = match listech with
   | [] -> ""
   | c :: l -> (string_of_char c) ^ (concatenation l)
 
-(*
-let rec get_equal listeChar = match listeChar with
-  | [] -> []
-  | '=' :: l -> []
-  | ch :: tail -> ch :: (get_equal tail)
-
-let rec get_val listeChar = match listeChar with
-  | [] -> []
-  | 'v' :: 'a' :: 'l' :: tail -> get_equal tail
-  | ch :: suite -> get_val suite
-
-let rec get_next_val listeChar = match listeChar with
-  | [] -> []
-  | 'v' :: 'a' :: 'l' :: tail -> tail
-  | ch :: suite -> get_next_val suite
-
-let rec get_all_val listeChar listeRes = match listeChar with
-  | [] -> listeRes
-  | _ -> if (get_val listeChar) <> []
-         then (get_all_val (get_next_val listeChar)
-                 ((get_val listeChar) :: listeRes))
-         else listeRes
-
-let rec get_only_fct listeChar listeFinale = match listeChar with
-  | [] -> listeFinale
-  | 'v'::'a'::'l'::suite -> listeFinale @ (isFct suite ['v';'a';'l'])
-  | ch::suite -> get_only_fct suite listeFinale
-and isFct listeChar listeAux = match listeChar with
-  | [] -> []
-  | 'v'::'a'::'l'::suite -> isFct suite ['v';'a';'l']
-  | '<'::'f'::'u'::'n'::'>'::suite ->
-     get_only_fct suite (listeAux @ ['<';'f';'u';'n';'>'])
-  | ch::suite -> isFct suite (listeAux @ [ch])
-
-let rec get_type_of_fct listeChar b = match listeChar with
-  | [] -> []
-  | ':'::tail -> get_type_of_fct tail true
-  | ch::tail -> if b then (ch::(get_type_of_fct tail b))
-                else (get_type_of_fct tail b)
-
-
-let rec get_nom listeChar nom = match listeChar with
-  | [] -> nom
-  | ' '::suite -> get_nom suite nom
-  | ch::' '::suite -> if ch <> ' ' then nom @ [ch] else get_nom suite nom
-  | ch::suite -> get_nom suite (nom@[ch])
-
-let rec get_questions listeChar name_and_type = match listeChar with
-  | [] -> name_and_type
-  | liste::suite -> get_questions suite name_and_type @
-                    [(concatenation (get_nom liste []),
-                      concatenation (get_type_of_fct liste false))]
-
-
-let first (a,b,c) = a
-let second (a,b,c) = b
-let third (a,b,c) = c
-
-(* TODO: Refactor this implementation to avoid "char list"! *)
-let maj_mono val_next_mono = match val_next_mono with
-  | 'i'::'n'::'t'::[]->'b'::'o'::'o'::'l'::[]
-  | 'b'::'o'::'o'::'l'::[]->'c'::'h'::'a'::'r'::[]
-  | 'c'::'h'::'a'::'r'::[] -> 's'::'t'::'r'::'i'::'n'::'g'::[]
-  | 's'::'t'::'r'::'i'::'n'::'g'::[] -> 'i'::'n'::'t'::[]
-  | _ -> failwith "error monomorphic type"
-
-(** Update the list of couples and then return this list
-  * and the monomorphic type that must be used *)
-let rec get_association listeCouple elt listeCouple2 val_next_mono =
-  match listeCouple with
-  | [] -> ((elt,maj_mono val_next_mono) ::
-             listeCouple2,maj_mono val_next_mono, true)
-  | (poly, mono) :: tail ->
-     if poly = elt then (listeCouple2,mono,false)
-     else (get_association tail elt listeCouple2 val_next_mono)
-
-let getC listeChar =
-  let rec before listeChar = match listeChar with
-  | [] -> []
-  | ' '::suite -> []
-  | ch::suite -> ch:: (before suite)
-  and after listeChar = match listeChar with
-    | [] -> []
-    | ' '::suite -> suite
-    | ch::suite -> after suite in
-  (before listeChar, after listeChar)
-(** Replace the 'a, 'b, ... by int || char || ... *)
-let rec polymorph_detector_aux listeType listeCouple val_next_mono =
-  match listeType with
-  | [] -> []
-  | '\''::suite -> let ch,tail = getC suite in
-                   let v = (get_association
-                              listeCouple ch listeCouple val_next_mono) in
-                   let res = if third v then polymorph_detector_aux tail (first v) (second v)
-                             else polymorph_detector_aux tail (first v) (val_next_mono)
-                   in if res = [] then second v else second v @ ' ' :: res
-  | ch::tail -> ch::(polymorph_detector_aux tail listeCouple val_next_mono)
- *)
-
 let rec decompositionSol str n =
   if str = "" then []
   else if n + 1 = String.length str then [(str.[n])]
   else (str.[n])::(decompositionSol str (n+1))
-
-(*
-let extra_alea_poly = 5
-and extra_alea_mono = 10
-
-(* TODO: Refactor this implementation to avoid "char list"! *)
-(** @param listeChar a list of couples of char lists *)
-let rec polymorph_detector listeChar = match listeChar with
-  | []-> []
-  | (listeNom,listeType)::tail ->
-     if String.contains listeType '\'' then
-       (listeNom, extra_alea_poly,
-        concatenation
-          (polymorph_detector_aux (decompositionSol listeType 0)
-             [] (['s';'t';'r';'i';'n';'g']))) ::
-         (listeNom, extra_alea_poly,
-          concatenation
-            (polymorph_detector_aux (decompositionSol listeType 0)
-               [] (['i';'n';'t']))) ::
-           polymorph_detector tail
-     else
-       (listeNom, extra_alea_mono,
-        concatenation
-            (polymorph_detector_aux (decompositionSol listeType 0)
-               [] (['s';'t';'r';'i';'n';'g']))) :: (* should be simplified *)
-         polymorph_detector tail
-
- (* Test to experiment the code’s semantics:
-
-let s =
-  (decompositionSol
-    "'aa -> 'b -> 'c -> 'd -> 'e -> 'f -> 'g -> 'h" 0)
-in polymorph_detector_aux s [] (['s';'t';'r';'i';'n';'g']);;
-
-polymorph_detector
-  [(), "'aa -> 'b -> 'c -> 'd -> 'e -> 'f -> 'g -> 'h"];;
- *)
- *)
-
-(* ____Functions for generate template______________________________________ *)
 
 let failchar =
   decompositionSol {|
@@ -474,7 +329,7 @@ let rec genLet listech =
   | [] -> []
   | _ -> (decomposition2 liste) @ failchar @ (genLet (tail liste))
 
-let rec genTemplate chaine =
+let genTemplate chaine =
   if chaine = "" then ""
   else concatenation (genLet (decompositionSol chaine 0))
 
@@ -482,7 +337,6 @@ let rec genTemplate chaine =
 let exo_creator proper_id =
   let exercise = (get_editor_state proper_id).exercise in
   let read_field field =
-    
       match field with
       | "id"-> Some exercise.id
       | "prelude.ml" -> Some exercise.prelude
@@ -493,24 +347,19 @@ let exo_creator proper_id =
       | "solution.ml" -> Some exercise.solution
       |  "max_score" -> Some (string_of_int exercise.max_score)
       | _ -> None
-      
   in
   Learnocaml_exercise.read
     ~read_field
-    ~id:proper_id  
+    ~id:proper_id
     ~decipher:false
     ()
-  
- 
-
-  
 
 let get_answer top =
   Learnocaml_toplevel.execute_test top
 
 (* TODO look for the record type of res to make the message more understandable *)
 let typecheck_dialog_box div_id res =
-  let result,ok = 
+  let result,ok =
     let open Toploop_results in
     match res with
     | Ok _ ->  [%i"Your question does typecheck. "],true
@@ -520,8 +369,8 @@ let typecheck_dialog_box div_id res =
   if ok then
     begin
       let messages = Tyxml_js.Html5.ul [] in
-      let checked, check_message =
-        let t, u = Lwt.task () in
+      let _checked, check_message =
+        let t, _u = Lwt.task () in
         let btn_ok = Tyxml_js.Html5.(button [ pcdata [%i"OK"] ]) in
         Manip.Ev.onclick btn_ok ( fun _ ->
                                   hide_loading ~id:div_id () ; true) ;
@@ -540,8 +389,7 @@ let typecheck_dialog_box div_id res =
     end
   else
     begin
-      hide_loading ~id:div_id (); 
+      hide_loading ~id:div_id ();
       Dom_html.window##alert (Js.string result);
       Lwt.return ();
-    end;;
-
+    end

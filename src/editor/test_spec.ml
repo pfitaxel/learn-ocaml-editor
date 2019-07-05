@@ -1,129 +1,3 @@
-(* Internationalization *)
-(*let () = Translate.set_lang ()*)
-(*
-module type TYPING = sig
-  (** Should return a representation of a type from its string serialisation *)
-  val ty_of : string -> 'a Ty.ty
-end
- *)
-(*
-module Make(Test_lib : Test_lib.S) (Typing : TYPING) = struct
-
-open Test_lib
-open Learnocaml_report
-
-
-(* sampler: (unit -> ('ar -> 'row, 'ar -> 'urow, 'ret) args) *)
-(* keep in sync with learnocaml_exercise_state.ml *)
-type test_qst_untyped =
-  | TestAgainstSol of
-      { name: string
-      ; ty: string
-      ; gen: int
-      ; suite: string
-      ; tester: string
-      ; sampler: string}
-  | TestAgainstSpec of
-      { name: string
-      ; ty: string
-      ; gen: int
-      ; suite: string
-      ; spec : string
-      ; tester: string
-      ; sampler: string}
-  | TestSuite of
-      { name: string;
-        ty: string;
-        suite: string;
-        tester : string}
-
-type outcome =
-  | Correct of string option
-  | Wrong of string option
-
-(* Old code
-(* val get_test_qst : test_qst_untyped -> test_qst_typed *)
-
-type test_qst_typed =
-  | TestAgainstSol :
-      { name: string
-      ; prot: (('ar -> 'row) Ty.ty, 'ar -> 'urow, 'ret) prot
-      ; tester: 'ret tester option
-      ; sampler:(unit -> ('ar -> 'row, 'ar -> 'urow, 'ret) args) option
-      ; gen: int
-      ; suite: ('ar -> 'row, 'ar -> 'urow, 'ret) args list } -> test_qst_typed
-  | TestAgainstSpec :
-      { name: string
-      ; prot: (('ar -> 'row) Ty.ty, 'ar -> 'urow, 'ret) prot
-      ; tester: 'ret tester option
-      ; sampler: (unit -> ('ar -> 'row, 'ar -> 'urow, 'ret) args) option
-      ; gen: int
-      ; suite: ('ar -> 'row, 'ar -> 'urow, 'ret) args list
-      ; spec : ('ar -> 'row) -> ('ar -> 'row, 'ar -> 'urow, 'ret) args ->
-               'ret -> outcome } -> test_qst_typed
-  | TestSuite :
-      { name: string
-      ; prot: (('ar -> 'row) Ty.ty, 'ar -> 'urow, 'ret) prot
-      ; tester: 'ret tester option
-      ; suite: (('ar -> 'row, 'ar -> 'urow, 'ret) args *
-                  (unit -> 'ret)) list } -> test_qst_typed
-
-(** Notation for TestAgainstSpec *)
-let (~~) b = if b then Correct None else Wrong None
-
-This is now in test_lib:
-(** Notations for TestSuite *)
-let (==>) a b = (a, fun () -> b)
-(* let (=>) a b = (a, fun () -> Lazy.force b) (* needs module Lazy *) *)
-(** Notations for heterogeneous lists *)
-let (@:) a l = arg a @@ l
-let (!!) b = last b
-let (@:!!) a b = a @: !! b
-(* Homogeneous case, for testing purposes
-let (@:) a l = a :: l
-let (!!) b = b :: []
-let (@:!!) a b = a @: !! b
-*)
-*)
-
-(* TODO missing: nth_arg *)
-
-(*
-let example_constr_sol =
-  TestAgainstSol
-    { name = "opp";
-      prot = (last_ty [%ty: int] [%ty: int] );
-      gen = 0;
-      suite = [!! 0; !! 1; !! 2; !! ~-1]
-    }
-*)
-
-(*
-let example_constr_spec =
-  TestAgainstSpec
-    { name = "idempotent";
-      prot = (last_ty [%ty: (int)] [%ty: int]);
-      gen = 0;
-      suite = [!! 0; !! 1; !! 2];
-      spec = fun f args ret -> (* ret = apply f args *)
-      (* Function f should be idempotent *)
-      ~~ (ret = apply f (!! ret))
-    }
-
-let example_constr_suite =
-  TestSuite
-    {
-      name = "xor";
-      prot = (arg_ty [%ty: bool] (last_ty [%ty: bool] [%ty: bool]));
-      suite = [false @:!! false ==> false;
-               false @:!! true ==> true;
-               true @:!! false ==> true;
-               true @:!! true ==> false]
-    }
-*)
-end
- *)
-
 open Editor_lib
 
 let rec to_string_aux char_list =match char_list with
@@ -222,10 +96,12 @@ let question_typed question id_question =
                      %s;;@."
      id_question prot gen sampler tester name suite
 
-(***************************************************************************************************)
-(*** compile       stuff        ********************************************************************)
+(*****************)
+(* compile stuff *)
+(*****************)
+
 open Learnocaml_data.Editor
-   
+
 let test_prel = "open Test_lib\nopen Learnocaml_report;;\n"
 
 
@@ -341,7 +217,6 @@ let imperative_function = {|let ast_imperative_check ast =
 
 
 let ast_fonction quality imperative  =
-  
   let fonction = if quality then
                    quality_function
                  else
@@ -381,10 +256,11 @@ let ast_fonction quality imperative  =
                              in if imperative_report = [] && report = []
                              then [ Message ([ Text "OK (no prohibited construction detected)"], Success 0) ]
                              else imperative_report @ report;;
+
                              |} in
   fonction
- 
-let ast_code quality imperative = 
+
+let ast_code quality imperative =
 let fonction =
     if quality || imperative then
       {|Section ([ Text "Code quality:" ], ast_quality code_ast);
@@ -392,15 +268,14 @@ let fonction =
     else
       "" in
   fonction
-  
+
   let compile indexed_list =
-    let tests=test_prel ^ (ast_fonction true true) in
-  
-    let tests= List.fold_left (fun acc (qid,quest) ->
+    let tests = test_prel ^ (ast_fonction true true) in
+    let tests = List.fold_left (fun acc (qid,quest) ->
           acc ^ (question_typed quest qid)^" \n")
          tests indexed_list in
-    let tests=tests ^ init ^ "[\n" ^ ast_code true true in
-    let tests=
+    let tests = tests ^ init ^ "[\n" ^ ast_code true true in
+    let tests =
       List.fold_left (fun acc (qid, quest) ->
           let name=match quest with
             | TestAgainstSol a->a.name
@@ -408,5 +283,4 @@ let fonction =
             | TestSuite a -> a.name in
           acc ^ (section name ("question" ^ string_of_int qid ) ))
          tests indexed_list in
-    tests ^ " ]" 
-  
+    tests ^ " ]"
